@@ -2,16 +2,18 @@ import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { RemixServer, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useLocation } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToReadableStream } from "react-dom/server";
+import { ChevronDown, Calculator, Printer } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva } from "class-variance-authority";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { ChevronRightIcon, CheckIcon, DotFilledIcon } from "@radix-ui/react-icons";
+import { redirect } from "@remix-run/cloudflare";
+import { Slot } from "@radix-ui/react-slot";
+import { cva } from "class-variance-authority";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { CheckIcon, DotFilledIcon } from "@radix-ui/react-icons";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Calculator, Printer } from "lucide-react";
 async function handleRequest(request, responseStatusCode, responseHeaders, remixContext, loadContext) {
   const body = await renderToReadableStream(
     /* @__PURE__ */ jsx(RemixServer, { context: remixContext, url: request.url }),
@@ -50,6 +52,122 @@ const entryServer = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
   __proto__: null,
   default: handleRequest
 }, Symbol.toStringTag, { value: "Module" }));
+function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
+const DropdownMenu = DropdownMenuPrimitive.Root;
+const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
+const DropdownMenuSubTrigger = React.forwardRef(({ className, inset, children, ...props }, ref) => /* @__PURE__ */ jsxs(
+  DropdownMenuPrimitive.SubTrigger,
+  {
+    ref,
+    className: cn(
+      "flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+      inset && "pl-8",
+      className
+    ),
+    ...props,
+    children: [
+      children,
+      /* @__PURE__ */ jsx(ChevronRightIcon, { className: "ml-auto" })
+    ]
+  }
+));
+DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
+const DropdownMenuSubContent = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  DropdownMenuPrimitive.SubContent,
+  {
+    ref,
+    className: cn(
+      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-dropdown-menu-content-transform-origin]",
+      className
+    ),
+    ...props
+  }
+));
+DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName;
+const DropdownMenuContent = React.forwardRef(({ className, sideOffset = 4, ...props }, ref) => /* @__PURE__ */ jsx(DropdownMenuPrimitive.Portal, { children: /* @__PURE__ */ jsx(
+  DropdownMenuPrimitive.Content,
+  {
+    ref,
+    sideOffset,
+    className: cn(
+      "z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
+      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-dropdown-menu-content-transform-origin]",
+      className
+    ),
+    ...props
+  }
+) }));
+DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
+const DropdownMenuItem = React.forwardRef(({ className, inset, ...props }, ref) => /* @__PURE__ */ jsx(
+  DropdownMenuPrimitive.Item,
+  {
+    ref,
+    className: cn(
+      "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+      inset && "pl-8",
+      className
+    ),
+    ...props
+  }
+));
+DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
+const DropdownMenuCheckboxItem = React.forwardRef(({ className, children, checked, ...props }, ref) => /* @__PURE__ */ jsxs(
+  DropdownMenuPrimitive.CheckboxItem,
+  {
+    ref,
+    className: cn(
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    ),
+    checked,
+    ...props,
+    children: [
+      /* @__PURE__ */ jsx("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center", children: /* @__PURE__ */ jsx(DropdownMenuPrimitive.ItemIndicator, { children: /* @__PURE__ */ jsx(CheckIcon, { className: "h-4 w-4" }) }) }),
+      children
+    ]
+  }
+));
+DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName;
+const DropdownMenuRadioItem = React.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxs(
+  DropdownMenuPrimitive.RadioItem,
+  {
+    ref,
+    className: cn(
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    ),
+    ...props,
+    children: [
+      /* @__PURE__ */ jsx("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center", children: /* @__PURE__ */ jsx(DropdownMenuPrimitive.ItemIndicator, { children: /* @__PURE__ */ jsx(DotFilledIcon, { className: "h-2 w-2 fill-current" }) }) }),
+      children
+    ]
+  }
+));
+DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
+const DropdownMenuLabel = React.forwardRef(({ className, inset, ...props }, ref) => /* @__PURE__ */ jsx(
+  DropdownMenuPrimitive.Label,
+  {
+    ref,
+    className: cn(
+      "px-2 py-1.5 text-sm font-semibold",
+      inset && "pl-8",
+      className
+    ),
+    ...props
+  }
+));
+DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
+const DropdownMenuSeparator = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  DropdownMenuPrimitive.Separator,
+  {
+    ref,
+    className: cn("-mx-1 my-1 h-px bg-muted", className),
+    ...props
+  }
+));
+DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 function Header() {
   return /* @__PURE__ */ jsx("header", { className: "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", children: /* @__PURE__ */ jsx("div", { className: "container flex h-14 max-w-screen-2xl items-center", children: /* @__PURE__ */ jsxs("div", { className: "mr-4 hidden md:flex", children: [
     /* @__PURE__ */ jsx(Link, { to: "/", className: "mr-6 flex items-center space-x-2", children: /* @__PURE__ */ jsx("span", { className: "hidden font-bold sm:inline-block", children: "你会开飞机吗" }) }),
@@ -62,14 +180,13 @@ function Header() {
           children: "文档"
         }
       ),
-      /* @__PURE__ */ jsx(
-        Link,
-        {
-          to: "/tools/multiplication",
-          className: "transition-colors hover:text-foreground/80 text-foreground/60",
-          children: "工具"
-        }
-      ),
+      /* @__PURE__ */ jsxs(DropdownMenu, { children: [
+        /* @__PURE__ */ jsxs(DropdownMenuTrigger, { className: "flex items-center gap-1 transition-colors hover:text-foreground/80 text-foreground/60 outline-none", children: [
+          "工具 ",
+          /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4" })
+        ] }),
+        /* @__PURE__ */ jsx(DropdownMenuContent, { align: "start", children: /* @__PURE__ */ jsx(DropdownMenuItem, { asChild: true, children: /* @__PURE__ */ jsx(Link, { to: "/tools/math", children: "小学生口算" }) }) })
+      ] }),
       /* @__PURE__ */ jsx(
         Link,
         {
@@ -82,19 +199,7 @@ function Header() {
   ] }) }) });
 }
 function Footer() {
-  return /* @__PURE__ */ jsx("footer", { className: "py-6 md:px-8 md:py-0", children: /* @__PURE__ */ jsx("div", { className: "container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row", children: /* @__PURE__ */ jsxs("p", { className: "text-balance text-center text-sm leading-loose text-muted-foreground md:text-left", children: [
-    "Built by Qihaibin",
-    /* @__PURE__ */ jsx(
-      "a",
-      {
-        href: "#",
-        target: "_blank",
-        rel: "noreferrer",
-        className: "font-medium underline underline-offset-4",
-        children: "GitHub"
-      }
-    )
-  ] }) }) });
+  return /* @__PURE__ */ jsx("footer", { className: "py-6 md:px-8 md:py-0", children: /* @__PURE__ */ jsx("div", { className: "container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row", children: /* @__PURE__ */ jsx("p", { className: "text-balance text-center text-sm leading-loose text-muted-foreground md:text-left", children: "Built by Qihaibin" }) }) });
 }
 function Layout({ children }) {
   return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
@@ -171,6 +276,13 @@ const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   default: MDXContent,
   frontmatter
 }, Symbol.toStringTag, { value: "Module" }));
+const loader = async () => {
+  return redirect("/tools/math");
+};
+const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  loader
+}, Symbol.toStringTag, { value: "Module" }));
 function DocsIndex() {
   return /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsx("h1", { className: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl", children: "Introduction" }),
@@ -184,13 +296,10 @@ function DocsIndex() {
     ] })
   ] });
 }
-const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: DocsIndex
 }, Symbol.toStringTag, { value: "Module" }));
-function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
@@ -477,8 +586,8 @@ function MathGenerator() {
       /* @__PURE__ */ jsx(
         "div",
         {
-          className: `grid w-full ${format === "vertical" ? "grid-cols-2 md:grid-cols-4 lg:grid-cols-5 print:grid-cols-5 gap-x-8 gap-y-12" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 print:grid-cols-4 gap-x-12 gap-y-8"}`,
-          children: problems.map((p, i) => /* @__PURE__ */ jsx("div", { className: "font-mono text-xl", style: { breakInside: "avoid" }, children: format === "vertical" ? p.operator === "/" ? (
+          className: `grid w-full ${format === "vertical" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 print:grid-cols-5 gap-x-12 gap-y-12" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-x-12 gap-y-8"}`,
+          children: problems.map((p, i) => /* @__PURE__ */ jsx("div", { className: "font-mono text-xl flex justify-center", style: { breakInside: "avoid" }, children: format === "vertical" ? p.operator === "/" ? (
             // Vertical Division Layout
             /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center text-lg", children: [
               /* @__PURE__ */ jsx("div", { className: "mr-2", children: p.num2 }),
@@ -486,17 +595,17 @@ function MathGenerator() {
             ] })
           ) : (
             // Vertical Standard Layout
-            /* @__PURE__ */ jsxs("div", { className: "inline-block", style: { letterSpacing: "0.1em" }, children: [
-              /* @__PURE__ */ jsx("div", { className: "text-right", children: p.num1 }),
-              /* @__PURE__ */ jsxs("div", { className: "text-right border-b-2 border-black relative pr-1", children: [
-                /* @__PURE__ */ jsx("span", { className: "absolute left-[-1em] bottom-0.5", children: getOperatorSymbol(p.operator) }),
+            /* @__PURE__ */ jsxs("div", { className: "inline-flex flex-col items-end", style: { letterSpacing: "0.1em" }, children: [
+              /* @__PURE__ */ jsx("div", { className: "text-right w-full", children: p.num1 }),
+              /* @__PURE__ */ jsxs("div", { className: "text-right w-full border-b-2 border-black relative", children: [
+                /* @__PURE__ */ jsx("span", { className: "absolute left-0 -translate-x-full pr-2", children: getOperatorSymbol(p.operator) }),
                 p.num2
               ] }),
               /* @__PURE__ */ jsx("div", { className: "h-8" })
             ] })
           ) : (
             // Horizontal Layout
-            /* @__PURE__ */ jsx("div", { className: "flex items-baseline justify-between border-b border-dashed border-gray-300 pb-1", children: /* @__PURE__ */ jsxs("span", { children: [
+            /* @__PURE__ */ jsx("div", { className: "flex items-baseline justify-between border-b border-dashed border-gray-300 pb-1 w-full", children: /* @__PURE__ */ jsxs("span", { children: [
               p.num1,
               " ",
               getOperatorSymbol(p.operator),
@@ -537,7 +646,7 @@ function MathGenerator() {
       ` })
   ] });
 }
-const route3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: MathGenerator
 }, Symbol.toStringTag, { value: "Module" }));
@@ -582,50 +691,14 @@ function Index() {
     ] })
   ] });
 }
-const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: Index
 }, Symbol.toStringTag, { value: "Module" }));
-const toolsNavItems = [
-  {
-    title: "学习工具",
-    items: [
-      {
-        title: "小学生口算",
-        href: "/tools/math"
-      }
-    ]
-  }
-];
-function ToolsSidebar() {
-  const location = useLocation();
-  const pathname = location.pathname;
-  return /* @__PURE__ */ jsx("aside", { className: "fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block", children: /* @__PURE__ */ jsx("div", { className: "h-full py-6 pr-6 lg:py-8", children: /* @__PURE__ */ jsx("div", { className: "w-full", children: toolsNavItems.map((item, index) => {
-    var _a;
-    return /* @__PURE__ */ jsxs("div", { className: "pb-4", children: [
-      /* @__PURE__ */ jsx("h4", { className: "mb-1 rounded-md px-2 py-1 text-sm font-semibold", children: item.title }),
-      ((_a = item.items) == null ? void 0 : _a.length) && /* @__PURE__ */ jsx("div", { className: "grid grid-flow-row auto-rows-max text-sm", children: item.items.map((subItem, subIndex) => /* @__PURE__ */ jsx(
-        Link,
-        {
-          to: subItem.href,
-          className: cn(
-            "group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline",
-            pathname === subItem.href ? "text-foreground font-medium" : "text-muted-foreground"
-          ),
-          children: subItem.title
-        },
-        subIndex
-      )) })
-    ] }, index);
-  }) }) }) });
-}
 function ToolsLayout() {
-  return /* @__PURE__ */ jsxs("div", { className: "container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10", children: [
-    /* @__PURE__ */ jsx(ToolsSidebar, {}),
-    /* @__PURE__ */ jsx("main", { className: "relative py-6 lg:gap-10 lg:py-8", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full min-w-0", children: /* @__PURE__ */ jsx(Outlet, {}) }) })
-  ] });
+  return /* @__PURE__ */ jsx("div", { className: "container mx-auto max-w-[960px] flex-1 py-6 lg:py-8", children: /* @__PURE__ */ jsx("main", { className: "relative", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full min-w-0", children: /* @__PURE__ */ jsx(Outlet, {}) }) }) });
 }
-const route5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: ToolsLayout
 }, Symbol.toStringTag, { value: "Module" }));
@@ -700,11 +773,11 @@ function DocsLayout() {
     ] })
   ] });
 }
-const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route7 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: DocsLayout
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-B7dd0jVf.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-CP1ih5Lf.js", "/assets/components-B1CJxA5t.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-DzqmSsxq.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-CP1ih5Lf.js", "/assets/components-B1CJxA5t.js"], "css": ["/assets/root-CjWyocKl.css"] }, "routes/docs.google-antivity-issue": { "id": "routes/docs.google-antivity-issue", "parentId": "routes/docs", "path": "google-antivity-issue", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs.google-antivity-issue-CqwUWCcr.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-tfclapco.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-BdcYGWXp.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DBWaBuSx.js", "/assets/utils-CDN07tui.js", "/assets/index-CP1ih5Lf.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-0LDXstfI.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DBWaBuSx.js", "/assets/components-B1CJxA5t.js", "/assets/utils-CDN07tui.js", "/assets/index-CP1ih5Lf.js"], "css": [] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-BCraqah5.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/utils-CDN07tui.js", "/assets/components-B1CJxA5t.js", "/assets/index-CP1ih5Lf.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-LIrXh4rZ.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/utils-CDN07tui.js", "/assets/components-B1CJxA5t.js", "/assets/index-CP1ih5Lf.js"], "css": [] } }, "url": "/assets/manifest-27cfb426.js", "version": "27cfb426" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-C_y_Tdsi.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DASjYjjc.js", "/assets/components-CM53OEYS.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-B_60d_b5.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DASjYjjc.js", "/assets/components-CM53OEYS.js", "/assets/react-icons.esm-bRy50t4j.js", "/assets/index-DEgJNgjO.js", "/assets/utils-CDN07tui.js"], "css": ["/assets/root-CHjUW-X_.css"] }, "routes/docs.google-antivity-issue": { "id": "routes/docs.google-antivity-issue", "parentId": "routes/docs", "path": "google-antivity-issue", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs.google-antivity-issue-CqwUWCcr.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": [] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-tfclapco.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CxT-vEuA.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-BRIOkNW8.js", "/assets/utils-CDN07tui.js", "/assets/index-DEgJNgjO.js", "/assets/react-icons.esm-bRy50t4j.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-DlHOAn4c.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-BRIOkNW8.js", "/assets/components-CM53OEYS.js", "/assets/index-DEgJNgjO.js", "/assets/utils-CDN07tui.js", "/assets/index-u55fAOmI.js", "/assets/index-DASjYjjc.js"], "css": [] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-Yv9A-_pN.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DASjYjjc.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-BghHuC-m.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/utils-CDN07tui.js", "/assets/index-DASjYjjc.js", "/assets/components-CM53OEYS.js", "/assets/index-u55fAOmI.js"], "css": [] } }, "url": "/assets/manifest-5623c103.js", "version": "5623c103" };
 const mode = "production";
 const assetsBuildDirectory = "build\\client";
 const basename = "/";
@@ -729,13 +802,21 @@ const routes = {
     caseSensitive: void 0,
     module: route1
   },
+  "routes/tools._index": {
+    id: "routes/tools._index",
+    parentId: "routes/tools",
+    path: void 0,
+    index: true,
+    caseSensitive: void 0,
+    module: route2
+  },
   "routes/docs._index": {
     id: "routes/docs._index",
     parentId: "routes/docs",
     path: void 0,
     index: true,
     caseSensitive: void 0,
-    module: route2
+    module: route3
   },
   "routes/tools.math": {
     id: "routes/tools.math",
@@ -743,7 +824,7 @@ const routes = {
     path: "math",
     index: void 0,
     caseSensitive: void 0,
-    module: route3
+    module: route4
   },
   "routes/_index": {
     id: "routes/_index",
@@ -751,7 +832,7 @@ const routes = {
     path: void 0,
     index: true,
     caseSensitive: void 0,
-    module: route4
+    module: route5
   },
   "routes/tools": {
     id: "routes/tools",
@@ -759,7 +840,7 @@ const routes = {
     path: "tools",
     index: void 0,
     caseSensitive: void 0,
-    module: route5
+    module: route6
   },
   "routes/docs": {
     id: "routes/docs",
@@ -767,7 +848,7 @@ const routes = {
     path: "docs",
     index: void 0,
     caseSensitive: void 0,
-    module: route6
+    module: route7
   }
 };
 export {

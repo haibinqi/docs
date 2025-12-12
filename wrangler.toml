@@ -2,7 +2,4 @@ name = "remix-docs-replica"
 pages_build_output_dir = "build/client"
 compatibility_date = "2024-12-09"
 
-[[d1_databases]]
-binding = "DB"
-database_name = "prompts-db"
-database_id = "xxxx-xxxx-xxxx-xxxx" # Placeholder, will be ignored locally
+

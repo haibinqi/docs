@@ -1,11 +1,9 @@
 import { Outlet } from "@remix-run/react";
-import { ToolsSidebar } from "~/components/tools-sidebar";
 
 export default function ToolsLayout() {
     return (
-        <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-            <ToolsSidebar />
-            <main className="relative py-6 lg:gap-10 lg:py-8">
+        <div className="container mx-auto max-w-[960px] flex-1 py-6 lg:py-8">
+            <main className="relative">
                 <div className="mx-auto w-full min-w-0">
                     <Outlet />
                 </div>

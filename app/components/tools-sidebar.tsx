@@ -11,6 +11,19 @@ const toolsNavItems = [
             },
         ],
     },
+    {
+        title: "工作",
+        items: [
+            {
+                title: "提示词合集",
+                href: "/tools/prompts",
+            },
+            {
+                title: "Gemini 对话",
+                href: "/tools/gemini",
+            },
+        ],
+    },
 ];
 
 export function ToolsSidebar() {

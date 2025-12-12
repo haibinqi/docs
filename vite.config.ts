@@ -1,5 +1,6 @@
 import { vitePlugin as remix, cloudflareDevProxyVitePlugin } from "@remix-run/dev";
 import { defineConfig } from "vite";
+// Trigger restart for wrangler.toml
 import tsconfigPaths from "vite-tsconfig-paths";
 
 import mdx from "@mdx-js/rollup";

@@ -8,7 +8,7 @@ export function Header() {
             <div className="container flex h-14 max-w-screen-2xl items-center">
                 <div className="mr-4 hidden md:flex">
                     <Link to="/" className="mr-6 flex items-center space-x-2">
-                        <span className="hidden font-bold sm:inline-block">你开开飞机吗</span>
+                        <span className="hidden font-bold sm:inline-block">你会开飞机吗</span>
                     </Link>
                     <nav className="flex items-center gap-6 text-sm">
                         <Link

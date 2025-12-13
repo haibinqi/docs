@@ -1,0 +1,11 @@
+import{j as e}from"./jsx-runtime-BDw8OB7t.js";/* empty css                        */import{u as n,L as d}from"./components-CygCA5-A.js";import{c as o}from"./createLucideIcon-3FgSs6nL.js";import"./index-u55fAOmI.js";import"./index-Drv927az.js";/**
+ * @license lucide-react v0.556.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const l=[["path",{d:"m12 19-7-7 7-7",key:"1l729n"}],["path",{d:"M19 12H5",key:"x3x0zl"}]],c=o("arrow-left",l);/**
+ * @license lucide-react v0.556.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const i=[["path",{d:"M3 5h.01",key:"18ugdj"}],["path",{d:"M3 12h.01",key:"nlz23k"}],["path",{d:"M3 19h.01",key:"noohij"}],["path",{d:"M8 5h13",key:"1pao27"}],["path",{d:"M8 12h13",key:"1za7za"}],["path",{d:"M8 19h13",key:"m83p4d"}]],m=o("list",i);function g(){const{note:s,toc:a,htmlContent:r}=n();return e.jsxs("div",{className:"flex gap-8",children:[e.jsxs("div",{className:"flex-1 min-w-0",children:[e.jsxs(d,{to:"/docs",className:"inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4",children:[e.jsx(c,{className:"h-4 w-4"}),"返回列表"]}),e.jsxs("div",{className:"border-b pb-4 mb-8",children:[e.jsx("h1",{className:"text-3xl font-bold mb-2",children:s.title}),e.jsxs("div",{className:"flex items-center gap-4 text-sm text-muted-foreground",children:[e.jsx("span",{className:"bg-muted px-2 py-1 rounded text-xs",children:s.tag}),e.jsxs("span",{children:["最后更新: ",s.modifiedAt]})]})]}),e.jsx("article",{className:"markdown-body",style:{fontSize:"13px",backgroundColor:"transparent"},dangerouslySetInnerHTML:{__html:r}})]}),a.length>0&&e.jsx("aside",{className:"hidden lg:block w-64 shrink-0 pl-8 border-l",children:e.jsxs("div",{className:"sticky top-20",children:[e.jsxs("div",{className:"flex items-center gap-2 text-sm font-semibold mb-4",children:[e.jsx(m,{className:"h-4 w-4"}),"目录"]}),e.jsx("nav",{className:"text-sm space-y-1.5",children:a.map(t=>e.jsx("a",{href:`#${t.id}`,className:"block text-muted-foreground hover:text-foreground transition-colors truncate",style:{paddingLeft:`${(t.level-1)*12}px`},children:t.text},t.id))})]})})]})}export{g as default};

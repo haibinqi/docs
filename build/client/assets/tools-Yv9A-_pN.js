@@ -1,1 +1,0 @@
-import{j as a}from"./jsx-runtime-BDw8OB7t.js";import{O as s}from"./index-DASjYjjc.js";function l(){return a.jsx("div",{className:"container mx-auto max-w-[960px] flex-1 py-6 lg:py-8",children:a.jsx("main",{className:"relative",children:a.jsx("div",{className:"mx-auto w-full min-w-0",children:a.jsx(s,{})})})})}export{l as default};

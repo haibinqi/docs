@@ -13,9 +13,9 @@ interface Problem {
 }
 
 export default function MathGenerator() {
-    const [range1, setRange1] = useState("1-100");
-    const [range2, setRange2] = useState("1-100");
-    const [count, setCount] = useState(20);
+    const [range1, setRange1] = useState("1-9999");
+    const [range2, setRange2] = useState("1-9999");
+    const [count, setCount] = useState(30);
     const [problems, setProblems] = useState<Problem[]>([]);
 
     // Options
@@ -101,67 +101,74 @@ export default function MathGenerator() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 text-[13px]">
             <div className="print:hidden space-y-6">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                        <Calculator className="h-8 w-8 text-primary" />
-                        小学生口算生成器
-                    </h1>
-                    <p className="text-muted-foreground">
-                        自定义生成加减乘除口算题，支持竖式和横式。
-                    </p>
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-[16px] font-bold tracking-tight flex items-center gap-2">
+                            <Calculator className="h-5 w-5 text-primary" />
+                            小学生口算生成器，自定义生成加减乘除口算题，支持竖式和横式。
+                        </h1>
+                        <div className="flex gap-2">
+                            <Button onClick={generateProblems} size="sm" className="h-8 px-4 text-[13px]" disabled={operators.length === 0}>
+                                生成试卷
+                            </Button>
+                            <Button variant="outline" onClick={handlePrint} size="sm" className="h-8 px-4 text-[13px]">
+                                <Printer className="mr-2 h-3.5 w-3.5" /> 打印A4
+                            </Button>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start bg-muted/30 p-4 rounded-lg border">
-                    {/* Configuration Inputs */}
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="range1">数字1范围</Label>
-                                <Input
-                                    id="range1"
-                                    value={range1}
-                                    onChange={(e) => setRange1(e.target.value)}
-                                    placeholder="1-100"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="range2">数字2范围</Label>
-                                <Input
-                                    id="range2"
-                                    value={range2}
-                                    onChange={(e) => setRange2(e.target.value)}
-                                    placeholder="1-100"
-                                />
-                            </div>
+                <div className="bg-muted/30 p-4 rounded-lg border space-y-4">
+                    {/* Parameters Row */}
+                    <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="range1" className="text-xs text-muted-foreground">数字1范围</Label>
+                            <Input
+                                id="range1"
+                                className="w-24 h-8 text-[13px]"
+                                value={range1}
+                                onChange={(e) => setRange1(e.target.value)}
+                                placeholder="1-100"
+                            />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="count">题目数量</Label>
+                        <div className="space-y-1">
+                            <Label htmlFor="range2" className="text-xs text-muted-foreground">数字2范围</Label>
+                            <Input
+                                id="range2"
+                                className="w-24 h-8 text-[13px]"
+                                value={range2}
+                                onChange={(e) => setRange2(e.target.value)}
+                                placeholder="1-100"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="count" className="text-xs text-muted-foreground">数量</Label>
                             <Input
                                 id="count"
                                 type="number"
+                                className="w-16 h-8 text-[13px]"
                                 value={count}
                                 onChange={(e) => setCount(parseInt(e.target.value) || 0)}
                             />
                         </div>
-                    </div>
 
-                    {/* Operator & Format Selection */}
-                    <div className="space-y-4">
+                        {/* Operators */}
                         <div className="space-y-2">
-                            <Label>运算符号</Label>
-                            <div className="flex gap-4">
+                            <Label className="text-xs text-muted-foreground">符号</Label>
+                            <div className="flex gap-3 items-center h-8">
                                 {["+", "-", "*", "/"].map(op => (
-                                    <div key={op} className="flex items-center space-x-2">
+                                    <div key={op} className="flex items-center space-x-1.5">
                                         <Checkbox
                                             id={`op-${op}`}
                                             checked={operators.includes(op)}
                                             onCheckedChange={() => toggleOperator(op)}
+                                            className="h-4 w-4"
                                         />
                                         <label
                                             htmlFor={`op-${op}`}
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            className="text-[13px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                         >
                                             {getOperatorSymbol(op)}
                                         </label>
@@ -169,28 +176,26 @@ export default function MathGenerator() {
                                 ))}
                             </div>
                         </div>
+
+                        {/* Format */}
                         <div className="space-y-2">
-                            <Label>题目格式</Label>
-                            <RadioGroup value={format} onValueChange={(v: "vertical" | "horizontal") => setFormat(v)} className="flex gap-4">
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="horizontal" id="r-horizontal" />
-                                    <Label htmlFor="r-horizontal">横式 (1 + 1 = )</Label>
+                            <Label className="text-xs text-muted-foreground">格式</Label>
+                            <RadioGroup value={format} onValueChange={(v: "vertical" | "horizontal") => setFormat(v)} className="flex gap-4 items-center h-8">
+                                <div className="flex items-center space-x-1.5">
+                                    <RadioGroupItem value="horizontal" id="r-horizontal" className="h-4 w-4" />
+                                    <Label htmlFor="r-horizontal" className="text-[13px] font-normal cursor-pointer">横式</Label>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="vertical" id="r-vertical" />
-                                    <Label htmlFor="r-vertical">竖式</Label>
+                                <div className="flex items-center space-x-1.5">
+                                    <RadioGroupItem value="vertical" id="r-vertical" className="h-4 w-4" />
+                                    <Label htmlFor="r-vertical" className="text-[13px] font-normal cursor-pointer">竖式</Label>
                                 </div>
                             </RadioGroup>
                         </div>
-                    </div>
 
-                    <div className="flex flex-col gap-2 justify-end h-full">
-                        <Button onClick={generateProblems} size="lg" disabled={operators.length === 0}>
-                            生成试卷
-                        </Button>
-                        <Button variant="outline" onClick={handlePrint}>
-                            <Printer className="mr-2 h-4 w-4" /> 打印A4
-                        </Button>
+                        {/* Buttons */}
+
+
+
                     </div>
                 </div>
             </div>
@@ -199,7 +204,7 @@ export default function MathGenerator() {
                 {/* Print Header */}
                 <div className="hidden print:block mb-6 text-center">
                     <h2 className="text-2xl font-bold">口算能力测试</h2>
-                    <div className="mt-4 flex justify-center gap-12 text-sm">
+                    <div className="mt-4 flex justify-center gap-12 text-[13px]">
                         <span>班级: ____________</span>
                         <span>姓名: ____________</span>
                         <span>日期: ____________</span>

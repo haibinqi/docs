@@ -5,7 +5,7 @@ export default function Index() {
     return (
         <div className="flex-1">
             <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-                <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+                <div className="mx-auto flex max-w-[960px] flex-col items-center gap-4 px-4 text-center">
                     <Link
                         to="https://twitter.com/remix_run"
                         className="rounded-2xl bg-muted px-4 py-1.5 text-sm font-medium"
@@ -34,8 +34,8 @@ export default function Index() {
                     </div>
                 </div>
             </section>
-            <section id="features" className="container space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24">
-                <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
+            <section id="features" className="space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24">
+                <div className="mx-auto flex max-w-[960px] flex-col items-center space-y-4 px-4 text-center">
                     <h2 className="font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl font-bold">
                         Features
                     </h2>
@@ -44,7 +44,7 @@ export default function Index() {
                         built using Remix.
                     </p>
                 </div>
-                <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+                <div className="mx-auto grid justify-center gap-4 px-4 sm:grid-cols-2 md:max-w-[960px] md:grid-cols-3">
                     <div className="relative overflow-hidden rounded-lg border bg-background p-2">
                         <div className="flex h-[180px] flex-col justify-between rounded-md p-6">
                             <div className="space-y-2">

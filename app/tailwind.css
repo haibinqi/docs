@@ -58,3 +58,19 @@
         @apply bg-background text-foreground;
     }
 }
+
+@layer utilities {
+    .markdown-body ul {
+        list-style-type: disc !important;
+        padding-left: 1.5em !important;
+    }
+
+    .markdown-body ol {
+        list-style-type: decimal !important;
+        padding-left: 1.5em !important;
+    }
+
+    .markdown-body li {
+        display: list-item !important;
+    }
+}

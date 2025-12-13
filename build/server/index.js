@@ -1,14 +1,19 @@
-import { jsx, jsxs, Fragment } from "react/jsx-runtime";
-import { RemixServer, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useLocation } from "@remix-run/react";
+import { jsx, jsxs } from "react/jsx-runtime";
+import { RemixServer, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useLoaderData, useLocation } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToReadableStream } from "react-dom/server";
-import { ChevronDown, Calculator, Printer } from "lucide-react";
+import { ChevronDown, Calculator, ArrowLeft, List, FileText, FolderOpen, Printer, ChevronRight } from "lucide-react";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ChevronRightIcon, CheckIcon, DotFilledIcon } from "@radix-ui/react-icons";
+import { json } from "@remix-run/node";
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import { marked } from "marked";
 import { redirect } from "@remix-run/cloudflare";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
@@ -169,7 +174,7 @@ const DropdownMenuSeparator = React.forwardRef(({ className, ...props }, ref) =>
 ));
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 function Header() {
-  return /* @__PURE__ */ jsx("header", { className: "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", children: /* @__PURE__ */ jsx("div", { className: "container flex h-14 max-w-screen-2xl items-center", children: /* @__PURE__ */ jsxs("div", { className: "mr-4 hidden md:flex", children: [
+  return /* @__PURE__ */ jsx("header", { className: "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", children: /* @__PURE__ */ jsx("div", { className: "mx-auto flex h-14 max-w-[960px] items-center px-4", children: /* @__PURE__ */ jsxs("div", { className: "mr-4 hidden md:flex", children: [
     /* @__PURE__ */ jsx(Link, { to: "/", className: "mr-6 flex items-center space-x-2", children: /* @__PURE__ */ jsx("span", { className: "hidden font-bold sm:inline-block", children: "你会开飞机吗" }) }),
     /* @__PURE__ */ jsxs("nav", { className: "flex items-center gap-6 text-sm", children: [
       /* @__PURE__ */ jsx(
@@ -180,12 +185,40 @@ function Header() {
           children: "文档"
         }
       ),
-      /* @__PURE__ */ jsxs(DropdownMenu, { children: [
-        /* @__PURE__ */ jsxs(DropdownMenuTrigger, { className: "flex items-center gap-1 transition-colors hover:text-foreground/80 text-foreground/60 outline-none", children: [
+      /* @__PURE__ */ jsxs(DropdownMenu, { modal: false, children: [
+        /* @__PURE__ */ jsxs(DropdownMenuTrigger, { className: "transition-colors hover:text-foreground/80 text-foreground/60 outline-none flex items-center gap-1", children: [
           "工具 ",
           /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4" })
         ] }),
-        /* @__PURE__ */ jsx(DropdownMenuContent, { align: "start", children: /* @__PURE__ */ jsx(DropdownMenuItem, { asChild: true, children: /* @__PURE__ */ jsx(Link, { to: "/tools/math", children: "小学生口算" }) }) })
+        /* @__PURE__ */ jsx(DropdownMenuContent, { align: "start", className: "w-[600px] p-4", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+            /* @__PURE__ */ jsx("h4", { className: "font-medium leading-none text-muted-foreground", children: "数学工具" }),
+            /* @__PURE__ */ jsx("div", { className: "grid gap-1", children: /* @__PURE__ */ jsxs(
+              Link,
+              {
+                to: "/tools/math",
+                className: "group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+                    /* @__PURE__ */ jsx(Calculator, { className: "h-4 w-4 text-primary" }),
+                    /* @__PURE__ */ jsx("div", { className: "text-sm font-medium leading-none", children: "小学生口算" })
+                  ] }),
+                  /* @__PURE__ */ jsx("p", { className: "line-clamp-2 text-sm leading-snug text-muted-foreground mt-1 pl-6", children: "自定义生成加减乘除口算，支持打印" })
+                ]
+              }
+            ) })
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+            /* @__PURE__ */ jsx("h4", { className: "font-medium leading-none text-muted-foreground", children: "开发工具" }),
+            /* @__PURE__ */ jsx("div", { className: "grid gap-1", children: /* @__PURE__ */ jsxs("div", { className: "group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none opacity-50 cursor-not-allowed", children: [
+              /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ jsx("div", { className: "h-4 w-4 rounded-full border border-primary/20 bg-primary/10" }),
+                /* @__PURE__ */ jsx("div", { className: "text-sm font-medium leading-none", children: "JSON 格式化" })
+              ] }),
+              /* @__PURE__ */ jsx("p", { className: "line-clamp-2 text-sm leading-snug text-muted-foreground mt-1 pl-6", children: "即将推出..." })
+            ] }) })
+          ] })
+        ] }) })
       ] }),
       /* @__PURE__ */ jsx(
         Link,
@@ -199,10 +232,14 @@ function Header() {
   ] }) }) });
 }
 function Footer() {
-  return /* @__PURE__ */ jsx("footer", { className: "py-6 md:px-8 md:py-0", children: /* @__PURE__ */ jsx("div", { className: "container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row", children: /* @__PURE__ */ jsx("p", { className: "text-balance text-center text-sm leading-loose text-muted-foreground md:text-left", children: "Built by Qihaibin" }) }) });
+  return /* @__PURE__ */ jsx("footer", { className: "border-t py-6 md:py-0", children: /* @__PURE__ */ jsx("div", { className: "mx-auto flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row max-w-[960px] px-4", children: /* @__PURE__ */ jsxs("p", { className: "text-center text-sm leading-loose text-muted-foreground md:text-left", children: [
+    "Built by ",
+    /* @__PURE__ */ jsx("span", { className: "font-medium underline underline-offset-4", children: "Qihaibin" }),
+    "."
+  ] }) }) });
 }
 function Layout({ children }) {
-  return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
+  return /* @__PURE__ */ jsxs("html", { lang: "en", className: "overflow-y-scroll", children: [
     /* @__PURE__ */ jsxs("head", { children: [
       /* @__PURE__ */ jsx("meta", { charSet: "utf-8" }),
       /* @__PURE__ */ jsx("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
@@ -228,77 +265,214 @@ const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   Layout,
   default: App
 }, Symbol.toStringTag, { value: "Module" }));
-const frontmatter = {
-  "title": "google-antivity-issue",
-  "description": null
-};
-function _createMdxContent(props) {
-  const _components = {
-    li: "li",
-    ol: "ol",
-    p: "p",
-    strong: "strong",
-    ...props.components
-  };
-  return jsxs(Fragment, {
-    children: [jsxs(_components.p, {
-      children: ["Antigravity", jsx(_components.strong, {
-        children: "使用方法"
-      })]
-    }), "\n", jsxs(_components.ol, {
-      children: ["\n", jsx(_components.li, {
-        children: "下载安装"
-      }), "\n", jsxs(_components.li, {
-        children: ["登入", "\n", jsxs(_components.ol, {
-          children: ["\n", jsx(_components.li, {
-            children: "修改google账号归属地，https://policies.google.com/country-association-form?pli=1，改为美国加利福尼亚州"
-          }), "\n", jsx(_components.li, {
-            children: "TUN"
-          }), "\n"]
-        }), "\n"]
-      }), "\n", jsx(_components.li, {
-        children: "运行Antigravity并使用google登入"
-      }), "\n"]
-    })]
-  });
+const CONTENT_DIR = path.join(process.cwd(), "content");
+function getAllNotes() {
+  const notes = [];
+  if (!fs.existsSync(CONTENT_DIR)) {
+    return notes;
+  }
+  const folders = fs.readdirSync(CONTENT_DIR, { withFileTypes: true }).filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name);
+  for (const folder of folders) {
+    const folderPath = path.join(CONTENT_DIR, folder);
+    const files = fs.readdirSync(folderPath).filter((file) => file.endsWith(".md") || file.endsWith(".mdx"));
+    for (const file of files) {
+      const filePath = path.join(folderPath, file);
+      const fileContent = fs.readFileSync(filePath, "utf-8");
+      const { data, content } = matter(fileContent);
+      const stats = fs.statSync(filePath);
+      notes.push({
+        slug: file.replace(/\.(md|mdx)$/, ""),
+        title: data.title || file.replace(/\.(md|mdx)$/, ""),
+        content: content.trim(),
+        tag: folder,
+        filePath: `${folder}/${file}`,
+        modifiedAt: stats.mtime.toISOString().split("T")[0]
+      });
+    }
+  }
+  return notes;
 }
-function MDXContent(props = {}) {
-  const { wrapper: MDXLayout } = props.components || {};
-  return MDXLayout ? jsx(MDXLayout, {
-    ...props,
-    children: jsx(_createMdxContent, {
-      ...props
-    })
-  }) : _createMdxContent(props);
+function getNotesByTag() {
+  const allNotes = getAllNotes();
+  const tagMap = /* @__PURE__ */ new Map();
+  for (const note of allNotes) {
+    if (!tagMap.has(note.tag)) {
+      tagMap.set(note.tag, []);
+    }
+    tagMap.get(note.tag).push(note);
+  }
+  return Array.from(tagMap.entries()).map(([tag, notes]) => ({ tag, notes }));
+}
+function getNoteByPath(tag, slug) {
+  const filePath = path.join(CONTENT_DIR, tag, `${slug}.md`);
+  const mdxPath = path.join(CONTENT_DIR, tag, `${slug}.mdx`);
+  let actualPath = "";
+  if (fs.existsSync(filePath)) {
+    actualPath = filePath;
+  } else if (fs.existsSync(mdxPath)) {
+    actualPath = mdxPath;
+  } else {
+    return null;
+  }
+  const fileContent = fs.readFileSync(actualPath, "utf-8");
+  const { data, content } = matter(fileContent);
+  const stats = fs.statSync(actualPath);
+  const fileName = path.basename(actualPath);
+  return {
+    slug,
+    title: data.title || slug,
+    content: content.trim(),
+    tag,
+    filePath: `${tag}/${fileName}`,
+    modifiedAt: stats.mtime.toISOString().split("T")[0]
+  };
+}
+function slugify(text) {
+  return text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, "-");
+}
+function extractToc(content) {
+  const headingRegex = /^(#{1,3})\s+(.+)$/gm;
+  const toc = [];
+  let match;
+  while ((match = headingRegex.exec(content)) !== null) {
+    const level = match[1].length;
+    const text = match[2].trim();
+    const id = slugify(text);
+    toc.push({ id, text, level });
+  }
+  return toc;
+}
+async function loader$2({ params }) {
+  const { tag, slug } = params;
+  if (!tag || !slug) {
+    throw new Response("Not Found", { status: 404 });
+  }
+  const note = getNoteByPath(decodeURIComponent(tag), decodeURIComponent(slug));
+  if (!note) {
+    throw new Response("Not Found", { status: 404 });
+  }
+  const renderer = new marked.Renderer();
+  renderer.heading = ({ text, depth }) => {
+    const id = slugify(text.replace(/&[#\w]+;/g, ""));
+    return `<h${depth} id="${id}">${text}</h${depth}>`;
+  };
+  marked.use({ renderer });
+  const htmlContent = await marked.parse(note.content);
+  const toc = extractToc(note.content);
+  return json({ note, toc, htmlContent });
+}
+function NoteDetailPage() {
+  const { note, toc, htmlContent } = useLoaderData();
+  return /* @__PURE__ */ jsxs("div", { className: "flex gap-8", children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex-1 min-w-0", children: [
+      /* @__PURE__ */ jsxs(
+        Link,
+        {
+          to: "/docs",
+          className: "inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4",
+          children: [
+            /* @__PURE__ */ jsx(ArrowLeft, { className: "h-4 w-4" }),
+            "返回列表"
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxs("div", { className: "border-b pb-4 mb-8", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl font-bold mb-2", children: note.title }),
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-4 text-sm text-muted-foreground", children: [
+          /* @__PURE__ */ jsx("span", { className: "bg-muted px-2 py-1 rounded text-xs", children: note.tag }),
+          /* @__PURE__ */ jsxs("span", { children: [
+            "最后更新: ",
+            note.modifiedAt
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsx(
+        "article",
+        {
+          className: "markdown-body",
+          style: { fontSize: "13px", backgroundColor: "transparent" },
+          dangerouslySetInnerHTML: { __html: htmlContent }
+        }
+      )
+    ] }),
+    toc.length > 0 && /* @__PURE__ */ jsx("aside", { className: "hidden lg:block w-64 shrink-0 pl-8 border-l", children: /* @__PURE__ */ jsxs("div", { className: "sticky top-20", children: [
+      /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-sm font-semibold mb-4", children: [
+        /* @__PURE__ */ jsx(List, { className: "h-4 w-4" }),
+        "目录"
+      ] }),
+      /* @__PURE__ */ jsx("nav", { className: "text-sm space-y-1.5", children: toc.map((item) => /* @__PURE__ */ jsx(
+        "a",
+        {
+          href: `#${item.id}`,
+          className: "block text-muted-foreground hover:text-foreground transition-colors truncate",
+          style: { paddingLeft: `${(item.level - 1) * 12}px` },
+          children: item.text
+        },
+        item.id
+      )) })
+    ] }) })
+  ] });
 }
 const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: MDXContent,
-  frontmatter
+  default: NoteDetailPage,
+  loader: loader$2
 }, Symbol.toStringTag, { value: "Module" }));
-const loader = async () => {
+const loader$1 = async () => {
   return redirect("/tools/math");
 };
 const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  loader
+  loader: loader$1
 }, Symbol.toStringTag, { value: "Module" }));
-function DocsIndex() {
-  return /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
-    /* @__PURE__ */ jsx("h1", { className: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl", children: "Introduction" }),
-    /* @__PURE__ */ jsx("p", { className: "leading-7 [&:not(:first-child)]:mt-6", children: "Welcome to the documentation. This is a replication of the nextjscn.org style using Remix." }),
-    /* @__PURE__ */ jsx("h2", { className: "mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0", children: "Features" }),
-    /* @__PURE__ */ jsxs("ul", { className: "my-6 ml-6 list-disc [&>li]:mt-2", children: [
-      /* @__PURE__ */ jsx("li", { children: "Remix Framework" }),
-      /* @__PURE__ */ jsx("li", { children: "Tailwind CSS Styling" }),
-      /* @__PURE__ */ jsx("li", { children: "Shadcn UI Components" }),
-      /* @__PURE__ */ jsx("li", { children: "Dark Mode Support" })
-    ] })
+async function loader() {
+  const notesByTag = getNotesByTag();
+  return json({ notesByTag });
+}
+function DocsIndexPage() {
+  const { notesByTag } = useLoaderData();
+  if (notesByTag.length === 0) {
+    return /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center min-h-[calc(100vh-15rem)] text-muted-foreground", children: [
+      /* @__PURE__ */ jsx(FileText, { className: "h-16 w-16 mb-4 opacity-20" }),
+      /* @__PURE__ */ jsx("p", { children: "暂无笔记" }),
+      /* @__PURE__ */ jsxs("p", { className: "text-sm mt-2", children: [
+        "在 ",
+        /* @__PURE__ */ jsx("code", { className: "bg-muted px-2 py-1 rounded", children: "content/" }),
+        " 目录创建 md 文件"
+      ] })
+    ] });
+  }
+  return /* @__PURE__ */ jsxs("div", { className: "mt-4 text-[13px]", children: [
+    /* @__PURE__ */ jsx("div", { className: "flex items-center justify-between mb-2" }),
+    /* @__PURE__ */ jsx("div", { className: "space-y-8", children: notesByTag.map(({ tag, notes }) => /* @__PURE__ */ jsxs("div", { className: "border rounded-lg overflow-hidden", children: [
+      /* @__PURE__ */ jsxs("div", { className: "bg-muted/50 px-4 py-3 flex items-center gap-2", children: [
+        /* @__PURE__ */ jsx(FolderOpen, { className: "h-4 w-4 text-muted-foreground" }),
+        /* @__PURE__ */ jsx("span", { className: "font-medium", children: tag }),
+        /* @__PURE__ */ jsxs("span", { className: "text-muted-foreground", children: [
+          "(",
+          notes.length,
+          ")"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsx("div", { className: "divide-y", children: notes.map((note) => /* @__PURE__ */ jsxs(
+        Link,
+        {
+          to: `/docs/${encodeURIComponent(note.tag)}/${encodeURIComponent(note.slug)}`,
+          className: "px-4 py-3 hover:bg-muted/30 transition-colors flex items-center justify-between block",
+          children: [
+            /* @__PURE__ */ jsx("h3", { className: "font-medium", children: note.title }),
+            /* @__PURE__ */ jsx("span", { className: "text-muted-foreground", children: note.modifiedAt })
+          ]
+        },
+        note.filePath
+      )) })
+    ] }, tag)) })
   ] });
 }
 const route3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: DocsIndex
+  default: DocsIndexPage,
+  loader
 }, Symbol.toStringTag, { value: "Module" }));
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -414,9 +588,9 @@ const RadioGroupItem = React.forwardRef(({ className, ...props }, ref) => {
 });
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
 function MathGenerator() {
-  const [range1, setRange1] = useState("1-100");
-  const [range2, setRange2] = useState("1-100");
-  const [count, setCount] = useState(20);
+  const [range1, setRange1] = useState("1-9999");
+  const [range2, setRange2] = useState("1-9999");
+  const [count, setCount] = useState(30);
   const [problems, setProblems] = useState([]);
   const [operators, setOperators] = useState(["+"]);
   const [format, setFormat] = useState("horizontal");
@@ -477,105 +651,102 @@ function MathGenerator() {
         return op;
     }
   };
-  return /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
+  return /* @__PURE__ */ jsxs("div", { className: "space-y-6 text-[13px]", children: [
     /* @__PURE__ */ jsxs("div", { className: "print:hidden space-y-6", children: [
-      /* @__PURE__ */ jsxs("div", { children: [
-        /* @__PURE__ */ jsxs("h1", { className: "text-3xl font-bold tracking-tight flex items-center gap-2", children: [
-          /* @__PURE__ */ jsx(Calculator, { className: "h-8 w-8 text-primary" }),
-          "小学生口算生成器"
+      /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxs("h1", { className: "text-[16px] font-bold tracking-tight flex items-center gap-2", children: [
+          /* @__PURE__ */ jsx(Calculator, { className: "h-5 w-5 text-primary" }),
+          "小学生口算生成器，自定义生成加减乘除口算题，支持竖式和横式。"
         ] }),
-        /* @__PURE__ */ jsx("p", { className: "text-muted-foreground", children: "自定义生成加减乘除口算题，支持竖式和横式。" })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start bg-muted/30 p-4 rounded-lg border", children: [
-        /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-2 gap-4", children: [
-            /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsx(Label, { htmlFor: "range1", children: "数字1范围" }),
-              /* @__PURE__ */ jsx(
-                Input,
-                {
-                  id: "range1",
-                  value: range1,
-                  onChange: (e) => setRange1(e.target.value),
-                  placeholder: "1-100"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsx(Label, { htmlFor: "range2", children: "数字2范围" }),
-              /* @__PURE__ */ jsx(
-                Input,
-                {
-                  id: "range2",
-                  value: range2,
-                  onChange: (e) => setRange2(e.target.value),
-                  placeholder: "1-100"
-                }
-              )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsx(Label, { htmlFor: "count", children: "题目数量" }),
-            /* @__PURE__ */ jsx(
-              Input,
-              {
-                id: "count",
-                type: "number",
-                value: count,
-                onChange: (e) => setCount(parseInt(e.target.value) || 0)
-              }
-            )
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsx(Label, { children: "运算符号" }),
-            /* @__PURE__ */ jsx("div", { className: "flex gap-4", children: ["+", "-", "*", "/"].map((op) => /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
-              /* @__PURE__ */ jsx(
-                Checkbox,
-                {
-                  id: `op-${op}`,
-                  checked: operators.includes(op),
-                  onCheckedChange: () => toggleOperator(op)
-                }
-              ),
-              /* @__PURE__ */ jsx(
-                "label",
-                {
-                  htmlFor: `op-${op}`,
-                  className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-                  children: getOperatorSymbol(op)
-                }
-              )
-            ] }, op)) })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsx(Label, { children: "题目格式" }),
-            /* @__PURE__ */ jsxs(RadioGroup, { value: format, onValueChange: (v) => setFormat(v), className: "flex gap-4", children: [
-              /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
-                /* @__PURE__ */ jsx(RadioGroupItem, { value: "horizontal", id: "r-horizontal" }),
-                /* @__PURE__ */ jsx(Label, { htmlFor: "r-horizontal", children: "横式 (1 + 1 = )" })
-              ] }),
-              /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
-                /* @__PURE__ */ jsx(RadioGroupItem, { value: "vertical", id: "r-vertical" }),
-                /* @__PURE__ */ jsx(Label, { htmlFor: "r-vertical", children: "竖式" })
-              ] })
-            ] })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 justify-end h-full", children: [
-          /* @__PURE__ */ jsx(Button, { onClick: generateProblems, size: "lg", disabled: operators.length === 0, children: "生成试卷" }),
-          /* @__PURE__ */ jsxs(Button, { variant: "outline", onClick: handlePrint, children: [
-            /* @__PURE__ */ jsx(Printer, { className: "mr-2 h-4 w-4" }),
+        /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
+          /* @__PURE__ */ jsx(Button, { onClick: generateProblems, size: "sm", className: "h-8 px-4 text-[13px]", disabled: operators.length === 0, children: "生成试卷" }),
+          /* @__PURE__ */ jsxs(Button, { variant: "outline", onClick: handlePrint, size: "sm", className: "h-8 px-4 text-[13px]", children: [
+            /* @__PURE__ */ jsx(Printer, { className: "mr-2 h-3.5 w-3.5" }),
             " 打印A4"
           ] })
         ] })
-      ] })
+      ] }) }),
+      /* @__PURE__ */ jsx("div", { className: "bg-muted/30 p-4 rounded-lg border space-y-4", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-end gap-x-8 gap-y-4", children: [
+        /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
+          /* @__PURE__ */ jsx(Label, { htmlFor: "range1", className: "text-xs text-muted-foreground", children: "数字1范围" }),
+          /* @__PURE__ */ jsx(
+            Input,
+            {
+              id: "range1",
+              className: "w-24 h-8 text-[13px]",
+              value: range1,
+              onChange: (e) => setRange1(e.target.value),
+              placeholder: "1-100"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
+          /* @__PURE__ */ jsx(Label, { htmlFor: "range2", className: "text-xs text-muted-foreground", children: "数字2范围" }),
+          /* @__PURE__ */ jsx(
+            Input,
+            {
+              id: "range2",
+              className: "w-24 h-8 text-[13px]",
+              value: range2,
+              onChange: (e) => setRange2(e.target.value),
+              placeholder: "1-100"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
+          /* @__PURE__ */ jsx(Label, { htmlFor: "count", className: "text-xs text-muted-foreground", children: "数量" }),
+          /* @__PURE__ */ jsx(
+            Input,
+            {
+              id: "count",
+              type: "number",
+              className: "w-16 h-8 text-[13px]",
+              value: count,
+              onChange: (e) => setCount(parseInt(e.target.value) || 0)
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsx(Label, { className: "text-xs text-muted-foreground", children: "符号" }),
+          /* @__PURE__ */ jsx("div", { className: "flex gap-3 items-center h-8", children: ["+", "-", "*", "/"].map((op) => /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-1.5", children: [
+            /* @__PURE__ */ jsx(
+              Checkbox,
+              {
+                id: `op-${op}`,
+                checked: operators.includes(op),
+                onCheckedChange: () => toggleOperator(op),
+                className: "h-4 w-4"
+              }
+            ),
+            /* @__PURE__ */ jsx(
+              "label",
+              {
+                htmlFor: `op-${op}`,
+                className: "text-[13px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                children: getOperatorSymbol(op)
+              }
+            )
+          ] }, op)) })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsx(Label, { className: "text-xs text-muted-foreground", children: "格式" }),
+          /* @__PURE__ */ jsxs(RadioGroup, { value: format, onValueChange: (v) => setFormat(v), className: "flex gap-4 items-center h-8", children: [
+            /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-1.5", children: [
+              /* @__PURE__ */ jsx(RadioGroupItem, { value: "horizontal", id: "r-horizontal", className: "h-4 w-4" }),
+              /* @__PURE__ */ jsx(Label, { htmlFor: "r-horizontal", className: "text-[13px] font-normal cursor-pointer", children: "横式" })
+            ] }),
+            /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-1.5", children: [
+              /* @__PURE__ */ jsx(RadioGroupItem, { value: "vertical", id: "r-vertical", className: "h-4 w-4" }),
+              /* @__PURE__ */ jsx(Label, { htmlFor: "r-vertical", className: "text-[13px] font-normal cursor-pointer", children: "竖式" })
+            ] })
+          ] })
+        ] })
+      ] }) })
     ] }),
     /* @__PURE__ */ jsxs("div", { className: "print:block min-h-[500px]", id: "print-area", children: [
       /* @__PURE__ */ jsxs("div", { className: "hidden print:block mb-6 text-center", children: [
         /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "口算能力测试" }),
-        /* @__PURE__ */ jsxs("div", { className: "mt-4 flex justify-center gap-12 text-sm", children: [
+        /* @__PURE__ */ jsxs("div", { className: "mt-4 flex justify-center gap-12 text-[13px]", children: [
           /* @__PURE__ */ jsx("span", { children: "班级: ____________" }),
           /* @__PURE__ */ jsx("span", { children: "姓名: ____________" }),
           /* @__PURE__ */ jsx("span", { children: "日期: ____________" }),
@@ -652,7 +823,7 @@ const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
 }, Symbol.toStringTag, { value: "Module" }));
 function Index() {
   return /* @__PURE__ */ jsxs("div", { className: "flex-1", children: [
-    /* @__PURE__ */ jsx("section", { className: "space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32", children: /* @__PURE__ */ jsxs("div", { className: "container flex max-w-[64rem] flex-col items-center gap-4 text-center", children: [
+    /* @__PURE__ */ jsx("section", { className: "space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto flex max-w-[960px] flex-col items-center gap-4 px-4 text-center", children: [
       /* @__PURE__ */ jsx(
         Link,
         {
@@ -669,12 +840,12 @@ function Index() {
         /* @__PURE__ */ jsx(Button, { asChild: true, variant: "outline", size: "lg", children: /* @__PURE__ */ jsx(Link, { to: "https://github.com/remix-run/remix", target: "_blank", children: "GitHub" }) })
       ] })
     ] }) }),
-    /* @__PURE__ */ jsxs("section", { id: "features", className: "container space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24", children: [
-      /* @__PURE__ */ jsxs("div", { className: "mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center", children: [
+    /* @__PURE__ */ jsxs("section", { id: "features", className: "space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24", children: [
+      /* @__PURE__ */ jsxs("div", { className: "mx-auto flex max-w-[960px] flex-col items-center space-y-4 px-4 text-center", children: [
         /* @__PURE__ */ jsx("h2", { className: "font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl font-bold", children: "Features" }),
         /* @__PURE__ */ jsx("p", { className: "max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7", children: "This project is an exact replica of the Next.js site style but built using Remix." })
       ] }),
-      /* @__PURE__ */ jsxs("div", { className: "mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3", children: [
+      /* @__PURE__ */ jsxs("div", { className: "mx-auto grid justify-center gap-4 px-4 sm:grid-cols-2 md:max-w-[960px] md:grid-cols-3", children: [
         /* @__PURE__ */ jsx("div", { className: "relative overflow-hidden rounded-lg border bg-background p-2", children: /* @__PURE__ */ jsx("div", { className: "flex h-[180px] flex-col justify-between rounded-md p-6", children: /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
           /* @__PURE__ */ jsx("h3", { className: "font-bold", children: "Next.js" }),
           /* @__PURE__ */ jsx("p", { className: "text-sm text-muted-foreground", children: "App Router, Server Components, Image Optimization." })
@@ -695,89 +866,77 @@ const route5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   __proto__: null,
   default: Index
 }, Symbol.toStringTag, { value: "Module" }));
-function ToolsLayout() {
-  return /* @__PURE__ */ jsx("div", { className: "container mx-auto max-w-[960px] flex-1 py-6 lg:py-8", children: /* @__PURE__ */ jsx("main", { className: "relative", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full min-w-0", children: /* @__PURE__ */ jsx(Outlet, {}) }) }) });
+const CONTENT = `
+这是一个基于 Remix 构建的示例应用，旨在展示现代 Web 开发的最佳实践。
+
+主要功能包括：
+- Next.js 风格的文档系统
+- 小学生口算生成器
+- 基于文件系统的 Markdown 笔记
+
+Built by Qihaibin correctly.
+`;
+function AboutPage() {
+  const [htmlContent, setHtmlContent] = useState("");
+  useEffect(() => {
+    async function parse() {
+      const html = await marked.parse(CONTENT);
+      setHtmlContent(html);
+    }
+    parse();
+  }, []);
+  return /* @__PURE__ */ jsx("div", { className: "max-w-[960px] mx-auto px-4 py-6", children: /* @__PURE__ */ jsx(
+    "article",
+    {
+      className: "markdown-body",
+      style: { fontSize: "13px", backgroundColor: "transparent" },
+      dangerouslySetInnerHTML: { __html: htmlContent }
+    }
+  ) });
 }
 const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: ToolsLayout
+  default: AboutPage
 }, Symbol.toStringTag, { value: "Module" }));
-const sidebarNavItems = [
-  {
-    title: "Google issue",
-    items: [
-      {
-        title: "antivity issue",
-        href: "/docs/google-antivity-issue"
-      }
-    ]
-  },
-  {
-    title: "Getting Started",
-    items: [
-      {
-        title: "Introduction",
-        href: "/docs"
-      },
-      {
-        title: "Installation",
-        href: "/docs/installation"
-      }
-    ]
-  },
-  {
-    title: "Components",
-    items: [
-      {
-        title: "Button",
-        href: "/docs/components/button"
-      },
-      {
-        title: "Card",
-        href: "/docs/components/card"
-      }
-    ]
-  }
-];
-function Sidebar() {
+function Breadcrumbs() {
   const location = useLocation();
-  const pathname = location.pathname;
-  return /* @__PURE__ */ jsx("aside", { className: "fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block", children: /* @__PURE__ */ jsx("div", { className: "h-full py-6 pr-6 lg:py-8", children: /* @__PURE__ */ jsx("div", { className: "w-full", children: sidebarNavItems.map((item, index) => {
-    var _a;
-    return /* @__PURE__ */ jsxs("div", { className: "pb-4", children: [
-      /* @__PURE__ */ jsx("h4", { className: "mb-1 rounded-md px-2 py-1 text-sm font-semibold", children: item.title }),
-      ((_a = item.items) == null ? void 0 : _a.length) && /* @__PURE__ */ jsx("div", { className: "grid grid-flow-row auto-rows-max text-sm", children: item.items.map((subItem, subIndex) => /* @__PURE__ */ jsx(
-        Link,
-        {
-          to: subItem.href,
-          className: cn(
-            "group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline",
-            pathname === subItem.href ? "text-foreground font-medium" : "text-muted-foreground"
-          ),
-          children: subItem.title
-        },
-        subIndex
-      )) })
-    ] }, index);
-  }) }) }) });
+  const pathnames = location.pathname.split("/").filter((x) => x);
+  const getTitle = (value) => {
+    const titleMap = {
+      docs: "文档",
+      notes: "记录",
+      tags: "标签",
+      tools: "工具"
+    };
+    return titleMap[value] || value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, " ");
+  };
+  return /* @__PURE__ */ jsx("div", { className: "mb-4 flex items-center text-sm text-muted-foreground", children: pathnames.map((value, index) => {
+    const title = getTitle(value);
+    const isLast = index === pathnames.length - 1;
+    return /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
+      index > 0 && /* @__PURE__ */ jsx(ChevronRight, { className: "h-4 w-4 mx-1" }),
+      /* @__PURE__ */ jsx("span", { className: isLast ? "font-medium text-foreground" : "", children: title })
+    ] }, value + index);
+  }) });
 }
-function DocsLayout() {
-  return /* @__PURE__ */ jsxs("div", { className: "container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10", children: [
-    /* @__PURE__ */ jsx(Sidebar, {}),
-    /* @__PURE__ */ jsxs("main", { className: "relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]", children: [
-      /* @__PURE__ */ jsx("div", { className: "mx-auto w-full min-w-0", children: /* @__PURE__ */ jsx(Outlet, {}) }),
-      /* @__PURE__ */ jsx("div", { className: "hidden text-sm xl:block", children: /* @__PURE__ */ jsxs("div", { className: "sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] overflow-y-auto pt-4", children: [
-        /* @__PURE__ */ jsx("p", { className: "font-medium", children: "On This Page" }),
-        /* @__PURE__ */ jsx("ul", { className: "m-0 list-none", children: /* @__PURE__ */ jsx("li", { className: "mt-0 pt-2", children: /* @__PURE__ */ jsx("a", { href: "#", className: "inline-block no-underline transition-colors hover:text-foreground text-muted-foreground", children: "Top" }) }) })
-      ] }) })
-    ] })
+function ToolsLayout() {
+  return /* @__PURE__ */ jsxs("div", { className: "max-w-[960px] mx-auto px-4 py-6", children: [
+    /* @__PURE__ */ jsx(Breadcrumbs, {}),
+    /* @__PURE__ */ jsx(Outlet, {})
   ] });
 }
 const route7 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
+  default: ToolsLayout
+}, Symbol.toStringTag, { value: "Module" }));
+function DocsLayout() {
+  return /* @__PURE__ */ jsx("div", { className: "max-w-[960px] mx-auto px-4 py-6", children: /* @__PURE__ */ jsx(Outlet, {}) });
+}
+const route8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
   default: DocsLayout
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-C_y_Tdsi.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DASjYjjc.js", "/assets/components-CM53OEYS.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-B_60d_b5.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DASjYjjc.js", "/assets/components-CM53OEYS.js", "/assets/react-icons.esm-bRy50t4j.js", "/assets/index-DEgJNgjO.js", "/assets/utils-CDN07tui.js"], "css": ["/assets/root-CHjUW-X_.css"] }, "routes/docs.google-antivity-issue": { "id": "routes/docs.google-antivity-issue", "parentId": "routes/docs", "path": "google-antivity-issue", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs.google-antivity-issue-CqwUWCcr.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": [] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-tfclapco.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CxT-vEuA.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-BRIOkNW8.js", "/assets/utils-CDN07tui.js", "/assets/index-DEgJNgjO.js", "/assets/react-icons.esm-bRy50t4j.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-DlHOAn4c.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-BRIOkNW8.js", "/assets/components-CM53OEYS.js", "/assets/index-DEgJNgjO.js", "/assets/utils-CDN07tui.js", "/assets/index-u55fAOmI.js", "/assets/index-DASjYjjc.js"], "css": [] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-Yv9A-_pN.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DASjYjjc.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-BghHuC-m.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/utils-CDN07tui.js", "/assets/index-DASjYjjc.js", "/assets/components-CM53OEYS.js", "/assets/index-u55fAOmI.js"], "css": [] } }, "url": "/assets/manifest-5623c103.js", "version": "5623c103" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-CcXv6cDh.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js", "/assets/components-CygCA5-A.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-_Bshli8p.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js", "/assets/components-CygCA5-A.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/utils-BafzuVJE.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-BAUJX8W4.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._tag._slug-DiBFHWut.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-CygCA5-A.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-VxqXupWN.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-CygCA5-A.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CsX_1i7s.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/utils-BafzuVJE.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-D0_k_iqe.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/components-CygCA5-A.js", "/assets/utils-BafzuVJE.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-wKbtEu1z.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-_8Q5ozeV.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-Drv927az.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-zBhqxjG2.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-Drv927az.js"], "css": [] } }, "url": "/assets/manifest-48e88b9f.js", "version": "48e88b9f" };
 const mode = "production";
 const assetsBuildDirectory = "build\\client";
 const basename = "/";
@@ -794,10 +953,10 @@ const routes = {
     caseSensitive: void 0,
     module: route0
   },
-  "routes/docs.google-antivity-issue": {
-    id: "routes/docs.google-antivity-issue",
+  "routes/docs.$tag.$slug": {
+    id: "routes/docs.$tag.$slug",
     parentId: "routes/docs",
-    path: "google-antivity-issue",
+    path: ":tag/:slug",
     index: void 0,
     caseSensitive: void 0,
     module: route1
@@ -834,13 +993,21 @@ const routes = {
     caseSensitive: void 0,
     module: route5
   },
+  "routes/about": {
+    id: "routes/about",
+    parentId: "root",
+    path: "about",
+    index: void 0,
+    caseSensitive: void 0,
+    module: route6
+  },
   "routes/tools": {
     id: "routes/tools",
     parentId: "root",
     path: "tools",
     index: void 0,
     caseSensitive: void 0,
-    module: route6
+    module: route7
   },
   "routes/docs": {
     id: "routes/docs",
@@ -848,7 +1015,7 @@ const routes = {
     path: "docs",
     index: void 0,
     caseSensitive: void 0,
-    module: route7
+    module: route8
   }
 };
 export {

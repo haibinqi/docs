@@ -8,8 +8,9 @@ export interface ContentNote {
 }
 
 // Use import.meta.glob to load all markdown files eagerly.
-// This works in Cloudflare Pages because Vite bundles the content.
-const modules = import.meta.glob("/content/**/*.{md,mdx}", { eager: true, as: "raw" });
+// We use a relative path to ensure Vite finds it relative to this file (app/lib/content-reader.server.ts).
+// This usually resolves to keys starting with ../../content/ or /content/ depending on configuration.
+const modules = import.meta.glob("../../content/**/*.{md,mdx}", { eager: true, as: "raw" });
 
 // Helper to extract frontmatter locally without gray-matter if possible,
 // or just parse basic frontmatter since we removed the complex dependency.
@@ -41,15 +42,17 @@ export function getAllNotes(): ContentNote[] {
     const notes: ContentNote[] = [];
 
     for (const [path, rawContent] of Object.entries(modules)) {
-        // Path is like "/content/Tag/Slug.md"
-        // We need to parse tag and slug from it.
-        // Assuming structure /content/<Tag>/<Slug>.md
-        const parts = path.split("/");
-        // parts = ["", "content", "Tag", "Slug.md"]
-        if (parts.length < 4) continue;
+        // Path might be "../../content/Tag/Slug.md" or "/content/Tag/Slug.md"
+        // Normalize it to look like content/Tag/Slug.md for splitting
+        const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
+        // normalizedPath = "content/Tag/Slug.md"
 
-        const tag = parts[2];
-        const filename = parts[3];
+        const parts = normalizedPath.split("/");
+        // parts = ["content", "Tag", "Slug.md"]
+        if (parts.length < 3) continue;
+
+        const tag = parts[1];
+        const filename = parts[2];
         const slug = filename.replace(/\.(md|mdx)$/, "");
 
         const { data, content } = parseFrontmatter(rawContent as string);
@@ -60,10 +63,7 @@ export function getAllNotes(): ContentNote[] {
             content,
             tag,
             filePath: `${tag}/${filename}`,
-            // We can't get real file mtime easily in bundled environment without plugins,
-            // so we'll use current date or a placeholder for now, or 2024-01-01.
-            // A better way is to use a Vite plugin to inject mtime, but simple is best for now.
-            modifiedAt: new Date().toISOString().split("T")[0],
+            modifiedAt: "2024-01-01", // Placeholder
         });
     }
 

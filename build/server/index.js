@@ -316,7 +316,7 @@ function MDXContent(props = {}) {
     })
   }) : _createMdxContent(props);
 }
-const modules = /* @__PURE__ */ Object.assign({ "/content/Google/anitvity登入问题.md": MDXContent$2, "/content/学习/React学习笔记.md": MDXContent$1, "/content/工作/项目进度.md": MDXContent });
+const modules = /* @__PURE__ */ Object.assign({ "../../content/Google/anitvity登入问题.md": MDXContent$2, "../../content/学习/React学习笔记.md": MDXContent$1, "../../content/工作/项目进度.md": MDXContent });
 function parseFrontmatter(text) {
   const frontmatterRegex = /^---\s*([\s\S]*?)\s*---/;
   const match = text.match(frontmatterRegex);
@@ -337,10 +337,11 @@ function parseFrontmatter(text) {
 function getAllNotes() {
   const notes = [];
   for (const [path, rawContent] of Object.entries(modules)) {
-    const parts = path.split("/");
-    if (parts.length < 4) continue;
-    const tag = parts[2];
-    const filename = parts[3];
+    const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
+    const parts = normalizedPath.split("/");
+    if (parts.length < 3) continue;
+    const tag = parts[1];
+    const filename = parts[2];
     const slug = filename.replace(/\.(md|mdx)$/, "");
     const { data, content } = parseFrontmatter(rawContent);
     notes.push({
@@ -349,10 +350,8 @@ function getAllNotes() {
       content,
       tag,
       filePath: `${tag}/${filename}`,
-      // We can't get real file mtime easily in bundled environment without plugins,
-      // so we'll use current date or a placeholder for now, or 2024-01-01.
-      // A better way is to use a Vite plugin to inject mtime, but simple is best for now.
-      modifiedAt: (/* @__PURE__ */ new Date()).toISOString().split("T")[0]
+      modifiedAt: "2024-01-01"
+      // Placeholder
     });
   }
   return notes;

@@ -201,17 +201,7 @@ export default function MathGenerator() {
             </div>
 
             <div className="print:block min-h-[500px]" id="print-area">
-                {/* Print Header */}
-                <div className="hidden print:block mb-6 text-center">
-                    <h2 className="text-2xl font-bold">口算能力测试</h2>
-                    <div className="mt-4 flex justify-center gap-12 text-[13px]">
-                        <span>班级: ____________</span>
-                        <span>姓名: ____________</span>
-                        <span>日期: ____________</span>
-                        <span>用时: ____________</span>
-                        <span>得分: ____________</span>
-                    </div>
-                </div>
+                {/* Print Header Removed as requested */}
 
                 {/* Problems Grid */}
                 <div
@@ -239,7 +229,7 @@ export default function MathGenerator() {
                                             <span className="absolute left-0 -translate-x-full pr-2">{getOperatorSymbol(p.operator)}</span>
                                             {p.num2}
                                         </div>
-                                        <div className="h-8"></div>
+                                        <div className="h-16"></div>
                                     </div>
                                 )
                             ) : (
@@ -267,21 +257,47 @@ export default function MathGenerator() {
             }
             body {
                 background: white;
+                visibility: hidden;
             }
-            nav, header, aside, footer, .print\\:hidden {
-                display: none !important;
+            /* Hide everything by default */
+            body * {
+                visibility: hidden;
             }
-            main {
-                width: 100% !important;
+            
+            /* Only show the print area and its children */
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+
+            /* Reset the print area to top-left of the page */
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
                 margin: 0 !important;
                 padding: 0 !important;
-                max-width: none !important;
                 display: block !important;
             }
-            .container {
-                max-width: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
+
+            /* Ensure internal grid works */
+            .grid {
+                display: grid !important;
+            }
+            
+            /* Neutralize the root layout (Remix/Tailwind specific) */
+            /* This targets the div.relative.flex.min-h-screen in root.tsx */
+            body > div {
+                display: block !important;
+                position: static !important;
+                min-height: 0 !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            
+            /* Hide standard layout elements just in case */
+            nav, header, aside, footer, .print\\:hidden {
+                display: none !important;
             }
         }
       `}</style>

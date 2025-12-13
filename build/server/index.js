@@ -785,16 +785,6 @@ function MathGenerator() {
       ] }) })
     ] }),
     /* @__PURE__ */ jsxs("div", { className: "print:block min-h-[500px]", id: "print-area", children: [
-      /* @__PURE__ */ jsxs("div", { className: "hidden print:block mb-6 text-center", children: [
-        /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "口算能力测试" }),
-        /* @__PURE__ */ jsxs("div", { className: "mt-4 flex justify-center gap-12 text-[13px]", children: [
-          /* @__PURE__ */ jsx("span", { children: "班级: ____________" }),
-          /* @__PURE__ */ jsx("span", { children: "姓名: ____________" }),
-          /* @__PURE__ */ jsx("span", { children: "日期: ____________" }),
-          /* @__PURE__ */ jsx("span", { children: "用时: ____________" }),
-          /* @__PURE__ */ jsx("span", { children: "得分: ____________" })
-        ] })
-      ] }),
       /* @__PURE__ */ jsx(
         "div",
         {
@@ -813,7 +803,7 @@ function MathGenerator() {
                 /* @__PURE__ */ jsx("span", { className: "absolute left-0 -translate-x-full pr-2", children: getOperatorSymbol(p.operator) }),
                 p.num2
               ] }),
-              /* @__PURE__ */ jsx("div", { className: "h-8" })
+              /* @__PURE__ */ jsx("div", { className: "h-16" })
             ] })
           ) : (
             // Horizontal Layout
@@ -838,21 +828,47 @@ function MathGenerator() {
             }
             body {
                 background: white;
+                visibility: hidden;
             }
-            nav, header, aside, footer, .print\\:hidden {
-                display: none !important;
+            /* Hide everything by default */
+            body * {
+                visibility: hidden;
             }
-            main {
-                width: 100% !important;
+            
+            /* Only show the print area and its children */
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+
+            /* Reset the print area to top-left of the page */
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
                 margin: 0 !important;
                 padding: 0 !important;
-                max-width: none !important;
                 display: block !important;
             }
-            .container {
-                max-width: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
+
+            /* Ensure internal grid works */
+            .grid {
+                display: grid !important;
+            }
+            
+            /* Neutralize the root layout (Remix/Tailwind specific) */
+            /* This targets the div.relative.flex.min-h-screen in root.tsx */
+            body > div {
+                display: block !important;
+                position: static !important;
+                min-height: 0 !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            
+            /* Hide standard layout elements just in case */
+            nav, header, aside, footer, .print\\:hidden {
+                display: none !important;
             }
         }
       ` })
@@ -977,7 +993,7 @@ const route8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   __proto__: null,
   default: DocsLayout
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-Dfj1xrZG.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-Dhmzlhce.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/utils-BafzuVJE.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-BB66-h2D.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug-CuEw84iw.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-DQ6GnT8X.js", "/assets/index-u55fAOmI.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-BNWhCJul.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CsX_1i7s.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/utils-BafzuVJE.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-CP7df9g5.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/components-C8HnSbrh.js", "/assets/utils-BafzuVJE.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-wKbtEu1z.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-BNsJzBkQ.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-CYKoaXEk.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js"], "css": [] } }, "url": "/assets/manifest-2e53b630.js", "version": "2e53b630" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-Dfj1xrZG.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-DYorfg-H.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/utils-BafzuVJE.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-C3fUhWGn.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug-CuEw84iw.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-DQ6GnT8X.js", "/assets/index-u55fAOmI.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-BNWhCJul.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CDPxAebv.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/utils-BafzuVJE.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-CP7df9g5.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/components-C8HnSbrh.js", "/assets/utils-BafzuVJE.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-wKbtEu1z.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-BNsJzBkQ.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-CYKoaXEk.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js"], "css": [] } }, "url": "/assets/manifest-7b77001e.js", "version": "7b77001e" };
 const mode = "production";
 const assetsBuildDirectory = "build\\client";
 const basename = "/";

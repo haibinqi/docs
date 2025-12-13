@@ -1,4 +1,4 @@
-import { jsx, jsxs } from "react/jsx-runtime";
+import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { RemixServer, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useLoaderData, useRouteError, isRouteErrorResponse, useLocation } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToReadableStream } from "react-dom/server";
@@ -262,13 +262,35 @@ const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   Layout,
   default: App
 }, Symbol.toStringTag, { value: "Module" }));
+const frontmatter$2 = {
+  "title": "Antigravity登入"
+};
 function _createMdxContent$2(props) {
   const _components = {
+    h3: "h3",
+    li: "li",
     p: "p",
+    ul: "ul",
     ...props.components
   };
-  return jsx(_components.p, {
-    children: 'export default "---\\r\\ntitle: Antigravity登入\\r\\n---\\r\\n\\r\\n### 下载安装\\r\\n### 登入\\r\\n\\r\\n会遇到跳转到浏览器登入后跳转不回IDE的场景，接下来的步骤是：\\r\\n\\r\\n* https://policies.google.com/country-association-form?pli=1，到此链接把归属地改到美国\\r\\n\\r\\n* 梯子打开TUN模式\\r\\n\\r\\n\\r\\n"'
+  return jsxs(Fragment, {
+    children: [jsx(_components.h3, {
+      children: "下载安装"
+    }), "\n", jsx(_components.h3, {
+      children: "登入"
+    }), "\n", jsx(_components.p, {
+      children: "会遇到跳转到浏览器登入后跳转不回IDE的场景，接下来的步骤是："
+    }), "\n", jsxs(_components.ul, {
+      children: ["\n", jsxs(_components.li, {
+        children: ["\n", jsx(_components.p, {
+          children: "https://policies.google.com/country-association-form?pli=1，到此链接把归属地改到美国"
+        }), "\n"]
+      }), "\n", jsxs(_components.li, {
+        children: ["\n", jsx(_components.p, {
+          children: "梯子打开TUN模式"
+        }), "\n"]
+      }), "\n"]
+    })]
   });
 }
 function MDXContent$2(props = {}) {
@@ -280,13 +302,33 @@ function MDXContent$2(props = {}) {
     })
   }) : _createMdxContent$2(props);
 }
+const __vite_glob_0_0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: MDXContent$2,
+  frontmatter: frontmatter$2
+}, Symbol.toStringTag, { value: "Module" }));
+const frontmatter$1 = {
+  "title": "Antigravity登入"
+};
 function _createMdxContent$1(props) {
   const _components = {
-    p: "p",
+    code: "code",
+    h4: "h4",
+    pre: "pre",
     ...props.components
   };
-  return jsx(_components.p, {
-    children: 'export default "---\\r\\ntitle: Antigravity登入\\r\\n---\\r\\n\\r\\n\\r\\n#### 下载安装\\r\\n#### 登入\\r\\n    ##### 1. 修改google账号归属地到美国，https://policies.google.com/country-association-form?pli=1\\r\\n    ##### 2. 梯子TUN\\r\\n#### 运行Antigravity并使用google登入\\r\\n"'
+  return jsxs(Fragment, {
+    children: [jsx(_components.h4, {
+      children: "下载安装"
+    }), "\n", jsx(_components.h4, {
+      children: "登入"
+    }), "\n", jsx(_components.pre, {
+      children: jsx(_components.code, {
+        children: "##### 1. 修改google账号归属地到美国，https://policies.google.com/country-association-form?pli=1\r\n##### 2. 梯子TUN\n"
+      })
+    }), "\n", jsx(_components.h4, {
+      children: "运行Antigravity并使用google登入"
+    })]
   });
 }
 function MDXContent$1(props = {}) {
@@ -298,13 +340,42 @@ function MDXContent$1(props = {}) {
     })
   }) : _createMdxContent$1(props);
 }
+const __vite_glob_0_1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: MDXContent$1,
+  frontmatter: frontmatter$1
+}, Symbol.toStringTag, { value: "Module" }));
+const frontmatter = {
+  "title": "项目进度"
+};
 function _createMdxContent(props) {
   const _components = {
-    p: "p",
+    h1: "h1",
+    h2: "h2",
+    li: "li",
+    ul: "ul",
     ...props.components
   };
-  return jsx(_components.p, {
-    children: 'export default "---\\r\\ntitle: 项目进度\\r\\n---\\r\\n\\r\\n# 项目进度\\r\\n\\r\\n## 本周完成\\r\\n\\r\\n- 完成了用户界面设计\\r\\n- 修复了登录问题\\r\\n\\r\\n## 下周计划\\r\\n\\r\\n- 开始后端开发\\r\\n- 编写测试用例\\r\\n"'
+  return jsxs(Fragment, {
+    children: [jsx(_components.h1, {
+      children: "项目进度"
+    }), "\n", jsx(_components.h2, {
+      children: "本周完成"
+    }), "\n", jsxs(_components.ul, {
+      children: ["\n", jsx(_components.li, {
+        children: "完成了用户界面设计"
+      }), "\n", jsx(_components.li, {
+        children: "修复了登录问题"
+      }), "\n"]
+    }), "\n", jsx(_components.h2, {
+      children: "下周计划"
+    }), "\n", jsxs(_components.ul, {
+      children: ["\n", jsx(_components.li, {
+        children: "开始后端开发"
+      }), "\n", jsx(_components.li, {
+        children: "编写测试用例"
+      }), "\n"]
+    })]
   });
 }
 function MDXContent(props = {}) {
@@ -316,45 +387,50 @@ function MDXContent(props = {}) {
     })
   }) : _createMdxContent(props);
 }
-const modules = /* @__PURE__ */ Object.assign({ "../../content/Google/anitvity登入问题.md": MDXContent$2, "../../content/学习/React学习笔记.md": MDXContent$1, "../../content/工作/项目进度.md": MDXContent });
-function parseFrontmatter(text) {
-  const frontmatterRegex = /^---\s*([\s\S]*?)\s*---/;
-  const match = text.match(frontmatterRegex);
-  if (match) {
-    const frontmatterBlock = match[1];
-    const content = text.slice(match[0].length).trim();
-    const data = {};
-    frontmatterBlock.split("\n").forEach((line) => {
-      const [key, ...values] = line.split(":");
-      if (key && values.length) {
-        data[key.trim()] = values.join(":").trim();
-      }
-    });
-    return { data, content };
-  }
-  return { data: {}, content: text };
-}
+const __vite_glob_0_2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: MDXContent,
+  frontmatter
+}, Symbol.toStringTag, { value: "Module" }));
+const modules = /* @__PURE__ */ Object.assign({ "../../content/Google/anitvity登入问题.md": __vite_glob_0_0, "../../content/学习/React学习笔记.md": __vite_glob_0_1, "../../content/工作/项目进度.md": __vite_glob_0_2 });
+const debugLogs = [];
 function getAllNotes() {
   const notes = [];
-  for (const [path, rawContent] of Object.entries(modules)) {
+  debugLogs.length = 0;
+  for (const [path, mod] of Object.entries(modules)) {
     try {
+      debugLogs.push(`Processing: ${path}`);
       const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
+      debugLogs.push(`Normalized: ${normalizedPath}`);
       const parts = normalizedPath.split("/");
-      if (parts.length < 3) continue;
+      if (parts.length < 3) {
+        debugLogs.push("SKIPPED: Parts < 3");
+        continue;
+      }
       const tag = parts[1];
       const filename = parts[2];
       const slug = filename.replace(/\.(md|mdx)$/, "");
-      const { data, content } = parseFrontmatter(rawContent);
+      debugLogs.push(`Module Keys: ${Object.keys(mod).join(", ")}`);
+      const frontmatter2 = mod.frontmatter || {};
+      debugLogs.push(`Frontmatter found: ${JSON.stringify(frontmatter2)}`);
+      let content = "";
+      if (typeof mod.default === "string") content = mod.default;
+      else content = "Content unavailable in debug mode (component source)";
+      if (content.startsWith("Content unavailable")) {
+      }
       notes.push({
         slug,
-        title: data.title || slug,
+        title: frontmatter2.title || slug,
+        // Prefer exported frontmatter
         content,
         tag,
         filePath: `${tag}/${filename}`,
         modifiedAt: "2024-01-01"
         // Placeholder
       });
+      debugLogs.push("SUCCESS");
     } catch (e) {
+      debugLogs.push(`ERROR: ${e.message}`);
       console.error("Error parsing note:", path, e);
     }
   }
@@ -374,6 +450,9 @@ function getNotesByTag() {
 function getNoteByPath(tag, slug) {
   const allNotes = getAllNotes();
   return allNotes.find((n) => n.tag === tag && n.slug === slug) || null;
+}
+function getDebugKeys() {
+  return debugLogs;
 }
 function slugify(text) {
   return text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, "-");
@@ -495,10 +574,11 @@ const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
 }, Symbol.toStringTag, { value: "Module" }));
 async function loader() {
   const notesByTag = getNotesByTag();
-  return json({ notesByTag });
+  const debugKeys = getDebugKeys();
+  return json({ notesByTag, debugKeys });
 }
 function DocsIndexPage() {
-  const { notesByTag } = useLoaderData();
+  const { notesByTag, debugKeys } = useLoaderData();
   if (notesByTag.length === 0) {
     return /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center min-h-[calc(100vh-15rem)] text-muted-foreground", children: [
       /* @__PURE__ */ jsx(FileText, { className: "h-16 w-16 mb-4 opacity-20" }),
@@ -507,6 +587,14 @@ function DocsIndexPage() {
         "在 ",
         /* @__PURE__ */ jsx("code", { className: "bg-muted px-2 py-1 rounded", children: "content/" }),
         " 目录创建 md 文件"
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: "mt-8 p-4 bg-muted/20 rounded text-xs font-mono text-left max-w-lg w-full overflow-auto max-h-64", children: [
+        /* @__PURE__ */ jsxs("p", { className: "font-bold mb-2", children: [
+          "Debug Info (Found ",
+          debugKeys.length,
+          " files):"
+        ] }),
+        /* @__PURE__ */ jsx("pre", { children: JSON.stringify(debugKeys, null, 2) })
       ] })
     ] });
   }
@@ -1004,7 +1092,7 @@ const route8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   __proto__: null,
   default: DocsLayout
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-Dfj1xrZG.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-D7zcH9kv.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/utils-BafzuVJE.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-DdAPecpk.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug-CuEw84iw.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-DQ6GnT8X.js", "/assets/index-u55fAOmI.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-CByYYFwI.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CsX_1i7s.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/utils-BafzuVJE.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-CP7df9g5.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/components-C8HnSbrh.js", "/assets/utils-BafzuVJE.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-wKbtEu1z.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-BNsJzBkQ.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-CYKoaXEk.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js"], "css": [] } }, "url": "/assets/manifest-d902dcef.js", "version": "d902dcef" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-Dfj1xrZG.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-Dhmzlhce.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/utils-BafzuVJE.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-BB66-h2D.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug-CuEw84iw.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-DQ6GnT8X.js", "/assets/index-u55fAOmI.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-BNWhCJul.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CsX_1i7s.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/utils-BafzuVJE.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-CP7df9g5.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/components-C8HnSbrh.js", "/assets/utils-BafzuVJE.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-wKbtEu1z.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-BNsJzBkQ.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-CYKoaXEk.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js"], "css": [] } }, "url": "/assets/manifest-2e53b630.js", "version": "2e53b630" };
 const mode = "production";
 const assetsBuildDirectory = "build\\client";
 const basename = "/";

@@ -42,29 +42,33 @@ export function getAllNotes(): ContentNote[] {
     const notes: ContentNote[] = [];
 
     for (const [path, rawContent] of Object.entries(modules)) {
-        // Path might be "../../content/Tag/Slug.md" or "/content/Tag/Slug.md"
-        // Normalize it to look like content/Tag/Slug.md for splitting
-        const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
-        // normalizedPath = "content/Tag/Slug.md"
+        try {
+            // Path might be "../../content/Tag/Slug.md" or "/content/Tag/Slug.md"
+            // Normalize it to look like content/Tag/Slug.md for splitting
+            const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
+            // normalizedPath = "content/Tag/Slug.md"
 
-        const parts = normalizedPath.split("/");
-        // parts = ["content", "Tag", "Slug.md"]
-        if (parts.length < 3) continue;
+            const parts = normalizedPath.split("/");
+            // parts = ["content", "Tag", "Slug.md"]
+            if (parts.length < 3) continue;
 
-        const tag = parts[1];
-        const filename = parts[2];
-        const slug = filename.replace(/\.(md|mdx)$/, "");
+            const tag = parts[1];
+            const filename = parts[2];
+            const slug = filename.replace(/\.(md|mdx)$/, "");
 
-        const { data, content } = parseFrontmatter(rawContent as string);
+            const { data, content } = parseFrontmatter(rawContent as string);
 
-        notes.push({
-            slug,
-            title: data.title || slug,
-            content,
-            tag,
-            filePath: `${tag}/${filename}`,
-            modifiedAt: "2024-01-01", // Placeholder
-        });
+            notes.push({
+                slug,
+                title: data.title || slug,
+                content,
+                tag,
+                filePath: `${tag}/${filename}`,
+                modifiedAt: "2024-01-01", // Placeholder
+            });
+        } catch (e) {
+            console.error("Error parsing note:", path, e);
+        }
     }
 
     return notes;

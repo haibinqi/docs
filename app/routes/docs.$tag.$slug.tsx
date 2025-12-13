@@ -64,6 +64,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
     return json({ note, toc, htmlContent });
 }
 
+// ... existing code ...
+
 export default function NoteDetailPage() {
     const { note, toc, htmlContent } = useLoaderData<typeof loader>();
 
@@ -117,6 +119,37 @@ export default function NoteDetailPage() {
                     </div>
                 </aside>
             )}
+        </div>
+    );
+}
+
+import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
+
+export function ErrorBoundary() {
+    const error = useRouteError();
+
+    if (isRouteErrorResponse(error)) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-4">
+                <h1 className="text-4xl font-bold text-primary">{error.status}</h1>
+                <p className="text-xl text-muted-foreground">{error.statusText}</p>
+                <Link to="/docs" className="text-sm text-primary hover:underline">返回文档列表</Link>
+            </div>
+        );
+    }
+
+    let errorMessage = "Unknown error";
+    if (error instanceof Error) {
+        errorMessage = error.message;
+    }
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-4">
+            <h1 className="text-2xl font-bold text-destructive">Application Error</h1>
+            <p className="text-muted-foreground max-w-lg mx-auto break-words bg-muted p-4 rounded text-left font-mono text-xs">
+                {errorMessage}
+            </p>
+            <Link to="/docs" className="text-sm text-primary hover:underline">返回文档列表</Link>
         </div>
     );
 }

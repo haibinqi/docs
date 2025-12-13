@@ -1,5 +1,5 @@
 import { jsx, jsxs } from "react/jsx-runtime";
-import { RemixServer, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useLoaderData, useLocation } from "@remix-run/react";
+import { RemixServer, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useLoaderData, useRouteError, isRouteErrorResponse, useLocation } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToReadableStream } from "react-dom/server";
 import { ChevronDown, Calculator, ArrowLeft, List, FileText, FolderOpen, Printer, ChevronRight } from "lucide-react";
@@ -337,22 +337,26 @@ function parseFrontmatter(text) {
 function getAllNotes() {
   const notes = [];
   for (const [path, rawContent] of Object.entries(modules)) {
-    const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
-    const parts = normalizedPath.split("/");
-    if (parts.length < 3) continue;
-    const tag = parts[1];
-    const filename = parts[2];
-    const slug = filename.replace(/\.(md|mdx)$/, "");
-    const { data, content } = parseFrontmatter(rawContent);
-    notes.push({
-      slug,
-      title: data.title || slug,
-      content,
-      tag,
-      filePath: `${tag}/${filename}`,
-      modifiedAt: "2024-01-01"
-      // Placeholder
-    });
+    try {
+      const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
+      const parts = normalizedPath.split("/");
+      if (parts.length < 3) continue;
+      const tag = parts[1];
+      const filename = parts[2];
+      const slug = filename.replace(/\.(md|mdx)$/, "");
+      const { data, content } = parseFrontmatter(rawContent);
+      notes.push({
+        slug,
+        title: data.title || slug,
+        content,
+        tag,
+        filePath: `${tag}/${filename}`,
+        modifiedAt: "2024-01-01"
+        // Placeholder
+      });
+    } catch (e) {
+      console.error("Error parsing note:", path, e);
+    }
   }
   return notes;
 }
@@ -457,8 +461,28 @@ function NoteDetailPage() {
     ] }) })
   ] });
 }
+function ErrorBoundary() {
+  const error = useRouteError();
+  if (isRouteErrorResponse(error)) {
+    return /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center min-h-[50vh] text-center space-y-4", children: [
+      /* @__PURE__ */ jsx("h1", { className: "text-4xl font-bold text-primary", children: error.status }),
+      /* @__PURE__ */ jsx("p", { className: "text-xl text-muted-foreground", children: error.statusText }),
+      /* @__PURE__ */ jsx(Link, { to: "/docs", className: "text-sm text-primary hover:underline", children: "返回文档列表" })
+    ] });
+  }
+  let errorMessage = "Unknown error";
+  if (error instanceof Error) {
+    errorMessage = error.message;
+  }
+  return /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center min-h-[50vh] text-center space-y-4", children: [
+    /* @__PURE__ */ jsx("h1", { className: "text-2xl font-bold text-destructive", children: "Application Error" }),
+    /* @__PURE__ */ jsx("p", { className: "text-muted-foreground max-w-lg mx-auto break-words bg-muted p-4 rounded text-left font-mono text-xs", children: errorMessage }),
+    /* @__PURE__ */ jsx(Link, { to: "/docs", className: "text-sm text-primary hover:underline", children: "返回文档列表" })
+  ] });
+}
 const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
+  ErrorBoundary,
   default: NoteDetailPage,
   loader: loader$2
 }, Symbol.toStringTag, { value: "Module" }));
@@ -980,7 +1004,7 @@ const route8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   __proto__: null,
   default: DocsLayout
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-CcXv6cDh.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js", "/assets/components-CygCA5-A.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-_Bshli8p.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js", "/assets/components-CygCA5-A.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/utils-BafzuVJE.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-BAUJX8W4.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._tag._slug-DiBFHWut.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-CygCA5-A.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-VxqXupWN.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-CygCA5-A.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CsX_1i7s.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/utils-BafzuVJE.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-D0_k_iqe.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/components-CygCA5-A.js", "/assets/utils-BafzuVJE.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-wKbtEu1z.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-_8Q5ozeV.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-Drv927az.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-zBhqxjG2.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-Drv927az.js"], "css": [] } }, "url": "/assets/manifest-48e88b9f.js", "version": "48e88b9f" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-Dfj1xrZG.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-D7zcH9kv.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js", "/assets/components-C8HnSbrh.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/utils-BafzuVJE.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-DdAPecpk.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug-CuEw84iw.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-DQ6GnT8X.js", "/assets/index-u55fAOmI.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-CByYYFwI.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-C8HnSbrh.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CsX_1i7s.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/utils-BafzuVJE.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-CP7df9g5.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/components-C8HnSbrh.js", "/assets/utils-BafzuVJE.js", "/assets/index-u55fAOmI.js", "/assets/index-DQ6GnT8X.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-wKbtEu1z.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-BNsJzBkQ.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-CYKoaXEk.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DQ6GnT8X.js"], "css": [] } }, "url": "/assets/manifest-d902dcef.js", "version": "d902dcef" };
 const mode = "production";
 const assetsBuildDirectory = "build\\client";
 const basename = "/";

@@ -7,16 +7,8 @@ import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
-import { nodePolyfills } from "vite-plugin-node-polyfills";
-
 export default defineConfig({
     plugins: [
-        nodePolyfills({
-            include: ["path", "stream", "util"],
-            globals: {
-                Buffer: true,
-            },
-        }),
         cloudflareDevProxyVitePlugin(),
         mdx({
             remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],

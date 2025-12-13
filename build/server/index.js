@@ -10,9 +10,6 @@ import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ChevronRightIcon, CheckIcon, DotFilledIcon } from "@radix-ui/react-icons";
 import { json } from "@remix-run/node";
-import process from "vite-plugin-node-polyfills/shims/process";
-import fs from "fs";
-import matter from "gray-matter";
 import { marked } from "marked";
 import { redirect } from "@remix-run/cloudflare";
 import { Slot } from "@radix-ui/react-slot";
@@ -265,434 +262,98 @@ const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   Layout,
   default: App
 }, Symbol.toStringTag, { value: "Module" }));
-function getDefaultExportFromCjs(x) {
-  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
+function _createMdxContent$2(props) {
+  const _components = {
+    p: "p",
+    ...props.components
+  };
+  return jsx(_components.p, {
+    children: 'export default "---\\r\\ntitle: Antigravity登入\\r\\n---\\r\\n\\r\\n### 下载安装\\r\\n### 登入\\r\\n\\r\\n会遇到跳转到浏览器登入后跳转不回IDE的场景，接下来的步骤是：\\r\\n\\r\\n* https://policies.google.com/country-association-form?pli=1，到此链接把归属地改到美国\\r\\n\\r\\n* 梯子打开TUN模式\\r\\n\\r\\n\\r\\n"'
+  });
 }
-function assertPath(path2) {
-  if (typeof path2 !== "string") {
-    throw new TypeError("Path must be a string. Received " + JSON.stringify(path2));
-  }
+function MDXContent$2(props = {}) {
+  const { wrapper: MDXLayout } = props.components || {};
+  return MDXLayout ? jsx(MDXLayout, {
+    ...props,
+    children: jsx(_createMdxContent$2, {
+      ...props
+    })
+  }) : _createMdxContent$2(props);
 }
-function normalizeStringPosix(path2, allowAboveRoot) {
-  var res = "";
-  var lastSegmentLength = 0;
-  var lastSlash = -1;
-  var dots = 0;
-  var code;
-  for (var i = 0; i <= path2.length; ++i) {
-    if (i < path2.length)
-      code = path2.charCodeAt(i);
-    else if (code === 47)
-      break;
-    else
-      code = 47;
-    if (code === 47) {
-      if (lastSlash === i - 1 || dots === 1) ;
-      else if (lastSlash !== i - 1 && dots === 2) {
-        if (res.length < 2 || lastSegmentLength !== 2 || res.charCodeAt(res.length - 1) !== 46 || res.charCodeAt(res.length - 2) !== 46) {
-          if (res.length > 2) {
-            var lastSlashIndex = res.lastIndexOf("/");
-            if (lastSlashIndex !== res.length - 1) {
-              if (lastSlashIndex === -1) {
-                res = "";
-                lastSegmentLength = 0;
-              } else {
-                res = res.slice(0, lastSlashIndex);
-                lastSegmentLength = res.length - 1 - res.lastIndexOf("/");
-              }
-              lastSlash = i;
-              dots = 0;
-              continue;
-            }
-          } else if (res.length === 2 || res.length === 1) {
-            res = "";
-            lastSegmentLength = 0;
-            lastSlash = i;
-            dots = 0;
-            continue;
-          }
-        }
-        if (allowAboveRoot) {
-          if (res.length > 0)
-            res += "/..";
-          else
-            res = "..";
-          lastSegmentLength = 2;
-        }
-      } else {
-        if (res.length > 0)
-          res += "/" + path2.slice(lastSlash + 1, i);
-        else
-          res = path2.slice(lastSlash + 1, i);
-        lastSegmentLength = i - lastSlash - 1;
-      }
-      lastSlash = i;
-      dots = 0;
-    } else if (code === 46 && dots !== -1) {
-      ++dots;
-    } else {
-      dots = -1;
-    }
-  }
-  return res;
+function _createMdxContent$1(props) {
+  const _components = {
+    p: "p",
+    ...props.components
+  };
+  return jsx(_components.p, {
+    children: 'export default "---\\r\\ntitle: Antigravity登入\\r\\n---\\r\\n\\r\\n\\r\\n#### 下载安装\\r\\n#### 登入\\r\\n    ##### 1. 修改google账号归属地到美国，https://policies.google.com/country-association-form?pli=1\\r\\n    ##### 2. 梯子TUN\\r\\n#### 运行Antigravity并使用google登入\\r\\n"'
+  });
 }
-function _format(sep, pathObject) {
-  var dir = pathObject.dir || pathObject.root;
-  var base = pathObject.base || (pathObject.name || "") + (pathObject.ext || "");
-  if (!dir) {
-    return base;
-  }
-  if (dir === pathObject.root) {
-    return dir + base;
-  }
-  return dir + sep + base;
+function MDXContent$1(props = {}) {
+  const { wrapper: MDXLayout } = props.components || {};
+  return MDXLayout ? jsx(MDXLayout, {
+    ...props,
+    children: jsx(_createMdxContent$1, {
+      ...props
+    })
+  }) : _createMdxContent$1(props);
 }
-var posix = {
-  // path.resolve([from ...], to)
-  resolve: function resolve() {
-    var resolvedPath = "";
-    var resolvedAbsolute = false;
-    var cwd;
-    for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-      var path2;
-      if (i >= 0)
-        path2 = arguments[i];
-      else {
-        if (cwd === void 0)
-          cwd = process.cwd();
-        path2 = cwd;
+function _createMdxContent(props) {
+  const _components = {
+    p: "p",
+    ...props.components
+  };
+  return jsx(_components.p, {
+    children: 'export default "---\\r\\ntitle: 项目进度\\r\\n---\\r\\n\\r\\n# 项目进度\\r\\n\\r\\n## 本周完成\\r\\n\\r\\n- 完成了用户界面设计\\r\\n- 修复了登录问题\\r\\n\\r\\n## 下周计划\\r\\n\\r\\n- 开始后端开发\\r\\n- 编写测试用例\\r\\n"'
+  });
+}
+function MDXContent(props = {}) {
+  const { wrapper: MDXLayout } = props.components || {};
+  return MDXLayout ? jsx(MDXLayout, {
+    ...props,
+    children: jsx(_createMdxContent, {
+      ...props
+    })
+  }) : _createMdxContent(props);
+}
+const modules = /* @__PURE__ */ Object.assign({ "/content/Google/anitvity登入问题.md": MDXContent$2, "/content/学习/React学习笔记.md": MDXContent$1, "/content/工作/项目进度.md": MDXContent });
+function parseFrontmatter(text) {
+  const frontmatterRegex = /^---\s*([\s\S]*?)\s*---/;
+  const match = text.match(frontmatterRegex);
+  if (match) {
+    const frontmatterBlock = match[1];
+    const content = text.slice(match[0].length).trim();
+    const data = {};
+    frontmatterBlock.split("\n").forEach((line) => {
+      const [key, ...values] = line.split(":");
+      if (key && values.length) {
+        data[key.trim()] = values.join(":").trim();
       }
-      assertPath(path2);
-      if (path2.length === 0) {
-        continue;
-      }
-      resolvedPath = path2 + "/" + resolvedPath;
-      resolvedAbsolute = path2.charCodeAt(0) === 47;
-    }
-    resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute);
-    if (resolvedAbsolute) {
-      if (resolvedPath.length > 0)
-        return "/" + resolvedPath;
-      else
-        return "/";
-    } else if (resolvedPath.length > 0) {
-      return resolvedPath;
-    } else {
-      return ".";
-    }
-  },
-  normalize: function normalize(path2) {
-    assertPath(path2);
-    if (path2.length === 0) return ".";
-    var isAbsolute2 = path2.charCodeAt(0) === 47;
-    var trailingSeparator = path2.charCodeAt(path2.length - 1) === 47;
-    path2 = normalizeStringPosix(path2, !isAbsolute2);
-    if (path2.length === 0 && !isAbsolute2) path2 = ".";
-    if (path2.length > 0 && trailingSeparator) path2 += "/";
-    if (isAbsolute2) return "/" + path2;
-    return path2;
-  },
-  isAbsolute: function isAbsolute(path2) {
-    assertPath(path2);
-    return path2.length > 0 && path2.charCodeAt(0) === 47;
-  },
-  join: function join() {
-    if (arguments.length === 0)
-      return ".";
-    var joined;
-    for (var i = 0; i < arguments.length; ++i) {
-      var arg = arguments[i];
-      assertPath(arg);
-      if (arg.length > 0) {
-        if (joined === void 0)
-          joined = arg;
-        else
-          joined += "/" + arg;
-      }
-    }
-    if (joined === void 0)
-      return ".";
-    return posix.normalize(joined);
-  },
-  relative: function relative(from, to) {
-    assertPath(from);
-    assertPath(to);
-    if (from === to) return "";
-    from = posix.resolve(from);
-    to = posix.resolve(to);
-    if (from === to) return "";
-    var fromStart = 1;
-    for (; fromStart < from.length; ++fromStart) {
-      if (from.charCodeAt(fromStart) !== 47)
-        break;
-    }
-    var fromEnd = from.length;
-    var fromLen = fromEnd - fromStart;
-    var toStart = 1;
-    for (; toStart < to.length; ++toStart) {
-      if (to.charCodeAt(toStart) !== 47)
-        break;
-    }
-    var toEnd = to.length;
-    var toLen = toEnd - toStart;
-    var length = fromLen < toLen ? fromLen : toLen;
-    var lastCommonSep = -1;
-    var i = 0;
-    for (; i <= length; ++i) {
-      if (i === length) {
-        if (toLen > length) {
-          if (to.charCodeAt(toStart + i) === 47) {
-            return to.slice(toStart + i + 1);
-          } else if (i === 0) {
-            return to.slice(toStart + i);
-          }
-        } else if (fromLen > length) {
-          if (from.charCodeAt(fromStart + i) === 47) {
-            lastCommonSep = i;
-          } else if (i === 0) {
-            lastCommonSep = 0;
-          }
-        }
-        break;
-      }
-      var fromCode = from.charCodeAt(fromStart + i);
-      var toCode = to.charCodeAt(toStart + i);
-      if (fromCode !== toCode)
-        break;
-      else if (fromCode === 47)
-        lastCommonSep = i;
-    }
-    var out = "";
-    for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
-      if (i === fromEnd || from.charCodeAt(i) === 47) {
-        if (out.length === 0)
-          out += "..";
-        else
-          out += "/..";
-      }
-    }
-    if (out.length > 0)
-      return out + to.slice(toStart + lastCommonSep);
-    else {
-      toStart += lastCommonSep;
-      if (to.charCodeAt(toStart) === 47)
-        ++toStart;
-      return to.slice(toStart);
-    }
-  },
-  _makeLong: function _makeLong(path2) {
-    return path2;
-  },
-  dirname: function dirname(path2) {
-    assertPath(path2);
-    if (path2.length === 0) return ".";
-    var code = path2.charCodeAt(0);
-    var hasRoot = code === 47;
-    var end = -1;
-    var matchedSlash = true;
-    for (var i = path2.length - 1; i >= 1; --i) {
-      code = path2.charCodeAt(i);
-      if (code === 47) {
-        if (!matchedSlash) {
-          end = i;
-          break;
-        }
-      } else {
-        matchedSlash = false;
-      }
-    }
-    if (end === -1) return hasRoot ? "/" : ".";
-    if (hasRoot && end === 1) return "//";
-    return path2.slice(0, end);
-  },
-  basename: function basename(path2, ext) {
-    if (ext !== void 0 && typeof ext !== "string") throw new TypeError('"ext" argument must be a string');
-    assertPath(path2);
-    var start = 0;
-    var end = -1;
-    var matchedSlash = true;
-    var i;
-    if (ext !== void 0 && ext.length > 0 && ext.length <= path2.length) {
-      if (ext.length === path2.length && ext === path2) return "";
-      var extIdx = ext.length - 1;
-      var firstNonSlashEnd = -1;
-      for (i = path2.length - 1; i >= 0; --i) {
-        var code = path2.charCodeAt(i);
-        if (code === 47) {
-          if (!matchedSlash) {
-            start = i + 1;
-            break;
-          }
-        } else {
-          if (firstNonSlashEnd === -1) {
-            matchedSlash = false;
-            firstNonSlashEnd = i + 1;
-          }
-          if (extIdx >= 0) {
-            if (code === ext.charCodeAt(extIdx)) {
-              if (--extIdx === -1) {
-                end = i;
-              }
-            } else {
-              extIdx = -1;
-              end = firstNonSlashEnd;
-            }
-          }
-        }
-      }
-      if (start === end) end = firstNonSlashEnd;
-      else if (end === -1) end = path2.length;
-      return path2.slice(start, end);
-    } else {
-      for (i = path2.length - 1; i >= 0; --i) {
-        if (path2.charCodeAt(i) === 47) {
-          if (!matchedSlash) {
-            start = i + 1;
-            break;
-          }
-        } else if (end === -1) {
-          matchedSlash = false;
-          end = i + 1;
-        }
-      }
-      if (end === -1) return "";
-      return path2.slice(start, end);
-    }
-  },
-  extname: function extname(path2) {
-    assertPath(path2);
-    var startDot = -1;
-    var startPart = 0;
-    var end = -1;
-    var matchedSlash = true;
-    var preDotState = 0;
-    for (var i = path2.length - 1; i >= 0; --i) {
-      var code = path2.charCodeAt(i);
-      if (code === 47) {
-        if (!matchedSlash) {
-          startPart = i + 1;
-          break;
-        }
-        continue;
-      }
-      if (end === -1) {
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code === 46) {
-        if (startDot === -1)
-          startDot = i;
-        else if (preDotState !== 1)
-          preDotState = 1;
-      } else if (startDot !== -1) {
-        preDotState = -1;
-      }
-    }
-    if (startDot === -1 || end === -1 || // We saw a non-dot character immediately before the dot
-    preDotState === 0 || // The (right-most) trimmed path component is exactly '..'
-    preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-      return "";
-    }
-    return path2.slice(startDot, end);
-  },
-  format: function format(pathObject) {
-    if (pathObject === null || typeof pathObject !== "object") {
-      throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof pathObject);
-    }
-    return _format("/", pathObject);
-  },
-  parse: function parse(path2) {
-    assertPath(path2);
-    var ret = { root: "", dir: "", base: "", ext: "", name: "" };
-    if (path2.length === 0) return ret;
-    var code = path2.charCodeAt(0);
-    var isAbsolute2 = code === 47;
-    var start;
-    if (isAbsolute2) {
-      ret.root = "/";
-      start = 1;
-    } else {
-      start = 0;
-    }
-    var startDot = -1;
-    var startPart = 0;
-    var end = -1;
-    var matchedSlash = true;
-    var i = path2.length - 1;
-    var preDotState = 0;
-    for (; i >= start; --i) {
-      code = path2.charCodeAt(i);
-      if (code === 47) {
-        if (!matchedSlash) {
-          startPart = i + 1;
-          break;
-        }
-        continue;
-      }
-      if (end === -1) {
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code === 46) {
-        if (startDot === -1) startDot = i;
-        else if (preDotState !== 1) preDotState = 1;
-      } else if (startDot !== -1) {
-        preDotState = -1;
-      }
-    }
-    if (startDot === -1 || end === -1 || // We saw a non-dot character immediately before the dot
-    preDotState === 0 || // The (right-most) trimmed path component is exactly '..'
-    preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-      if (end !== -1) {
-        if (startPart === 0 && isAbsolute2) ret.base = ret.name = path2.slice(1, end);
-        else ret.base = ret.name = path2.slice(startPart, end);
-      }
-    } else {
-      if (startPart === 0 && isAbsolute2) {
-        ret.name = path2.slice(1, startDot);
-        ret.base = path2.slice(1, end);
-      } else {
-        ret.name = path2.slice(startPart, startDot);
-        ret.base = path2.slice(startPart, end);
-      }
-      ret.ext = path2.slice(startDot, end);
-    }
-    if (startPart > 0) ret.dir = path2.slice(0, startPart - 1);
-    else if (isAbsolute2) ret.dir = "/";
-    return ret;
-  },
-  sep: "/",
-  delimiter: ":",
-  win32: null,
-  posix: null
-};
-posix.posix = posix;
-var pathBrowserify = posix;
-const path = /* @__PURE__ */ getDefaultExportFromCjs(pathBrowserify);
-const CONTENT_DIR = path.join(process.cwd(), "content");
+    });
+    return { data, content };
+  }
+  return { data: {}, content: text };
+}
 function getAllNotes() {
   const notes = [];
-  if (!fs.existsSync(CONTENT_DIR)) {
-    return notes;
-  }
-  const folders = fs.readdirSync(CONTENT_DIR, { withFileTypes: true }).filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name);
-  for (const folder of folders) {
-    const folderPath = path.join(CONTENT_DIR, folder);
-    const files = fs.readdirSync(folderPath).filter((file) => file.endsWith(".md") || file.endsWith(".mdx"));
-    for (const file of files) {
-      const filePath = path.join(folderPath, file);
-      const fileContent = fs.readFileSync(filePath, "utf-8");
-      const { data, content } = matter(fileContent);
-      const stats = fs.statSync(filePath);
-      notes.push({
-        slug: file.replace(/\.(md|mdx)$/, ""),
-        title: data.title || file.replace(/\.(md|mdx)$/, ""),
-        content: content.trim(),
-        tag: folder,
-        filePath: `${folder}/${file}`,
-        modifiedAt: stats.mtime.toISOString().split("T")[0]
-      });
-    }
+  for (const [path, rawContent] of Object.entries(modules)) {
+    const parts = path.split("/");
+    if (parts.length < 4) continue;
+    const tag = parts[2];
+    const filename = parts[3];
+    const slug = filename.replace(/\.(md|mdx)$/, "");
+    const { data, content } = parseFrontmatter(rawContent);
+    notes.push({
+      slug,
+      title: data.title || slug,
+      content,
+      tag,
+      filePath: `${tag}/${filename}`,
+      // We can't get real file mtime easily in bundled environment without plugins,
+      // so we'll use current date or a placeholder for now, or 2024-01-01.
+      // A better way is to use a Vite plugin to inject mtime, but simple is best for now.
+      modifiedAt: (/* @__PURE__ */ new Date()).toISOString().split("T")[0]
+    });
   }
   return notes;
 }
@@ -708,28 +369,8 @@ function getNotesByTag() {
   return Array.from(tagMap.entries()).map(([tag, notes]) => ({ tag, notes }));
 }
 function getNoteByPath(tag, slug) {
-  const filePath = path.join(CONTENT_DIR, tag, `${slug}.md`);
-  const mdxPath = path.join(CONTENT_DIR, tag, `${slug}.mdx`);
-  let actualPath = "";
-  if (fs.existsSync(filePath)) {
-    actualPath = filePath;
-  } else if (fs.existsSync(mdxPath)) {
-    actualPath = mdxPath;
-  } else {
-    return null;
-  }
-  const fileContent = fs.readFileSync(actualPath, "utf-8");
-  const { data, content } = matter(fileContent);
-  const stats = fs.statSync(actualPath);
-  const fileName = path.basename(actualPath);
-  return {
-    slug,
-    title: data.title || slug,
-    content: content.trim(),
-    tag,
-    filePath: `${tag}/${fileName}`,
-    modifiedAt: stats.mtime.toISOString().split("T")[0]
-  };
+  const allNotes = getAllNotes();
+  return allNotes.find((n) => n.tag === tag && n.slug === slug) || null;
 }
 function slugify(text) {
   return text.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, "-");
@@ -997,7 +638,7 @@ function MathGenerator() {
   const [count, setCount] = useState(30);
   const [problems, setProblems] = useState([]);
   const [operators, setOperators] = useState(["+"]);
-  const [format2, setFormat] = useState("horizontal");
+  const [format, setFormat] = useState("horizontal");
   const toggleOperator = (op) => {
     setOperators(
       (prev) => prev.includes(op) ? prev.filter((o) => o !== op) : [...prev, op]
@@ -1134,7 +775,7 @@ function MathGenerator() {
         ] }),
         /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
           /* @__PURE__ */ jsx(Label, { className: "text-xs text-muted-foreground", children: "格式" }),
-          /* @__PURE__ */ jsxs(RadioGroup, { value: format2, onValueChange: (v) => setFormat(v), className: "flex gap-4 items-center h-8", children: [
+          /* @__PURE__ */ jsxs(RadioGroup, { value: format, onValueChange: (v) => setFormat(v), className: "flex gap-4 items-center h-8", children: [
             /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-1.5", children: [
               /* @__PURE__ */ jsx(RadioGroupItem, { value: "horizontal", id: "r-horizontal", className: "h-4 w-4" }),
               /* @__PURE__ */ jsx(Label, { htmlFor: "r-horizontal", className: "text-[13px] font-normal cursor-pointer", children: "横式" })
@@ -1161,8 +802,8 @@ function MathGenerator() {
       /* @__PURE__ */ jsx(
         "div",
         {
-          className: `grid w-full ${format2 === "vertical" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 print:grid-cols-5 gap-x-12 gap-y-12" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-x-12 gap-y-8"}`,
-          children: problems.map((p, i) => /* @__PURE__ */ jsx("div", { className: "font-mono text-xl flex justify-center", style: { breakInside: "avoid" }, children: format2 === "vertical" ? p.operator === "/" ? (
+          className: `grid w-full ${format === "vertical" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 print:grid-cols-5 gap-x-12 gap-y-12" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-x-12 gap-y-8"}`,
+          children: problems.map((p, i) => /* @__PURE__ */ jsx("div", { className: "font-mono text-xl flex justify-center", style: { breakInside: "avoid" }, children: format === "vertical" ? p.operator === "/" ? (
             // Vertical Division Layout
             /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center text-lg", children: [
               /* @__PURE__ */ jsx("div", { className: "mr-2", children: p.num2 }),
@@ -1283,11 +924,11 @@ Built by Qihaibin correctly.
 function AboutPage() {
   const [htmlContent, setHtmlContent] = useState("");
   useEffect(() => {
-    async function parse2() {
+    async function parse() {
       const html = await marked.parse(CONTENT);
       setHtmlContent(html);
     }
-    parse2();
+    parse();
   }, []);
   return /* @__PURE__ */ jsx("div", { className: "max-w-[960px] mx-auto px-4 py-6", children: /* @__PURE__ */ jsx(
     "article",
@@ -1343,7 +984,7 @@ const route8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
 const serverManifest = { "entry": { "module": "/assets/entry.client-CcXv6cDh.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js", "/assets/components-CygCA5-A.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-_Bshli8p.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js", "/assets/components-CygCA5-A.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/utils-BafzuVJE.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-BAUJX8W4.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._tag._slug-DiBFHWut.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-CygCA5-A.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-VxqXupWN.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-CygCA5-A.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CsX_1i7s.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/utils-BafzuVJE.js", "/assets/react-icons.esm-hryL2ptm.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-D0_k_iqe.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/button-DzWdpVie.js", "/assets/components-CygCA5-A.js", "/assets/utils-BafzuVJE.js", "/assets/index-u55fAOmI.js", "/assets/index-Drv927az.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-wKbtEu1z.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-_8Q5ozeV.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-Drv927az.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-zBhqxjG2.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-Drv927az.js"], "css": [] } }, "url": "/assets/manifest-48e88b9f.js", "version": "48e88b9f" };
 const mode = "production";
 const assetsBuildDirectory = "build\\client";
-const basename2 = "/";
+const basename = "/";
 const future = { "v3_fetcherPersist": true, "v3_relativeSplatPath": true, "v3_throwAbortReason": true, "v3_routeConfig": false, "v3_singleFetch": false, "v3_lazyRouteDiscovery": false, "unstable_optimizeDeps": false };
 const isSpaMode = false;
 const publicPath = "/";
@@ -1425,7 +1066,7 @@ const routes = {
 export {
   serverManifest as assets,
   assetsBuildDirectory,
-  basename2 as basename,
+  basename,
   entry,
   future,
   isSpaMode,

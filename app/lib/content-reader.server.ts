@@ -11,9 +11,9 @@ export interface ContentNote {
 // We use a relative path to ensure Vite finds it relative to this file (app/lib/content-reader.server.ts).
 // This usually resolves to keys starting with ../../content/ or /content/ depending on configuration.
 // Use import.meta.glob to load all markdown files eagerly.
-// We remove specific query/import options to get the full Module Namespace.
-// This allows us to inspect if 'frontmatter' is exported or if we can use the default export.
-const modules = import.meta.glob("../../content/**/*.{md,mdx}", { eager: true });
+// We use the standard raw query to ensure we get strings.
+// Since we removed the MDX plugin, this should consistently return strings now.
+const modules = import.meta.glob("../../content/**/*.{md,mdx}", { eager: true, query: "?raw", import: "default" });
 
 // Helper to extract frontmatter locally without gray-matter if possible,
 // or just parse basic frontmatter since we removed the complex dependency.
@@ -47,56 +47,42 @@ export function getAllNotes(): ContentNote[] {
     const notes: ContentNote[] = [];
     debugLogs.length = 0; // Clear previous logs
 
-    for (const [path, mod] of Object.entries(modules)) {
+    for (const [path, rawContent] of Object.entries(modules)) {
         try {
             debugLogs.push(`Processing: ${path}`);
 
             // Normalize path
             const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
             debugLogs.push(`Normalized: ${normalizedPath}`);
+
             const parts = normalizedPath.split("/");
             if (parts.length < 3) {
                 debugLogs.push("SKIPPED: Parts < 3");
                 continue;
             }
+
             const tag = parts[1];
             const filename = parts[2];
             const slug = filename.replace(/\.(md|mdx)$/, "");
 
-            // Inspect Module
-            debugLogs.push(`Module Keys: ${Object.keys(mod as any).join(", ")}`);
-
-            // Check for frontmatter
-            // @ts-ignore
-            const frontmatter = mod.frontmatter || {};
-            debugLogs.push(`Frontmatter found: ${JSON.stringify(frontmatter)}`);
-
-            // If we have frontmatter, we can use it.
-            // But we still need 'content'. 
-            // If we can't get raw content string, we might need to render the component or look for other exports.
-            // For now, let's just log and see if we can find a way forward.
-
-            // fallback for content if simple string not available
-            let content = "";
-            // @ts-ignore
-            if (typeof mod.default === 'string') content = mod.default; // rare
-            else content = "Content unavailable in debug mode (component source)";
-
-            // Attempt to use 'parseFrontmatter' only if we have raw string, otherwise rely on exported keys
-            if (content.startsWith("Content unavailable")) {
-                // Try to see if we can get a raw export?
-                // If not, we will need to change strategy to SSR.
+            // rawContent should now be a string
+            if (typeof rawContent !== 'string') {
+                debugLogs.push(`ERROR: Content is not a string. Type: ${typeof rawContent}`);
+                throw new Error(`Content is not a string (Type: ${typeof rawContent})`);
             }
+
+            const { data, content } = parseFrontmatter(rawContent as string);
 
             notes.push({
                 slug,
-                title: frontmatter.title || slug, // Prefer exported frontmatter
-                content: content,
+                title: data.title || slug,
+                content,
                 tag,
                 filePath: `${tag}/${filename}`,
-                modifiedAt: "2024-01-01", // Placeholder
+                modifiedAt: "2024-01-01",
             });
             debugLogs.push("SUCCESS");
+
         } catch (e: any) {
             debugLogs.push(`ERROR: ${e.message}`);
             console.error("Error parsing note:", path, e);

@@ -10,9 +10,7 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 export default defineConfig({
     plugins: [
         cloudflareDevProxyVitePlugin(),
-        mdx({
-            remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
-        }),
+        /* mdx plugin removed to allow raw string imports of markdown files for manual parsing with marked */
         remix({
             future: {
                 v3_fetcherPersist: true,

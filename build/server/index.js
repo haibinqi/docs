@@ -1,4 +1,4 @@
-import { jsx, jsxs, Fragment } from "react/jsx-runtime";
+import { jsx, jsxs } from "react/jsx-runtime";
 import { RemixServer, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useLoaderData, useRouteError, isRouteErrorResponse, useLocation } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToReadableStream } from "react-dom/server";
@@ -262,142 +262,32 @@ const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   Layout,
   default: App
 }, Symbol.toStringTag, { value: "Module" }));
-const frontmatter$2 = {
-  "title": "Antigravity登入"
-};
-function _createMdxContent$2(props) {
-  const _components = {
-    h3: "h3",
-    li: "li",
-    p: "p",
-    ul: "ul",
-    ...props.components
-  };
-  return jsxs(Fragment, {
-    children: [jsx(_components.h3, {
-      children: "下载安装"
-    }), "\n", jsx(_components.h3, {
-      children: "登入"
-    }), "\n", jsx(_components.p, {
-      children: "会遇到跳转到浏览器登入后跳转不回IDE的场景，接下来的步骤是："
-    }), "\n", jsxs(_components.ul, {
-      children: ["\n", jsxs(_components.li, {
-        children: ["\n", jsx(_components.p, {
-          children: "https://policies.google.com/country-association-form?pli=1，到此链接把归属地改到美国"
-        }), "\n"]
-      }), "\n", jsxs(_components.li, {
-        children: ["\n", jsx(_components.p, {
-          children: "梯子打开TUN模式"
-        }), "\n"]
-      }), "\n"]
-    })]
-  });
-}
-function MDXContent$2(props = {}) {
-  const { wrapper: MDXLayout } = props.components || {};
-  return MDXLayout ? jsx(MDXLayout, {
-    ...props,
-    children: jsx(_createMdxContent$2, {
-      ...props
-    })
-  }) : _createMdxContent$2(props);
-}
-const __vite_glob_0_0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  default: MDXContent$2,
-  frontmatter: frontmatter$2
-}, Symbol.toStringTag, { value: "Module" }));
-const frontmatter$1 = {
-  "title": "Antigravity登入"
-};
-function _createMdxContent$1(props) {
-  const _components = {
-    code: "code",
-    h4: "h4",
-    pre: "pre",
-    ...props.components
-  };
-  return jsxs(Fragment, {
-    children: [jsx(_components.h4, {
-      children: "下载安装"
-    }), "\n", jsx(_components.h4, {
-      children: "登入"
-    }), "\n", jsx(_components.pre, {
-      children: jsx(_components.code, {
-        children: "##### 1. 修改google账号归属地到美国，https://policies.google.com/country-association-form?pli=1\r\n##### 2. 梯子TUN\n"
-      })
-    }), "\n", jsx(_components.h4, {
-      children: "运行Antigravity并使用google登入"
-    })]
-  });
-}
-function MDXContent$1(props = {}) {
-  const { wrapper: MDXLayout } = props.components || {};
-  return MDXLayout ? jsx(MDXLayout, {
-    ...props,
-    children: jsx(_createMdxContent$1, {
-      ...props
-    })
-  }) : _createMdxContent$1(props);
-}
-const __vite_glob_0_1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  default: MDXContent$1,
-  frontmatter: frontmatter$1
-}, Symbol.toStringTag, { value: "Module" }));
-const frontmatter = {
-  "title": "项目进度"
-};
-function _createMdxContent(props) {
-  const _components = {
-    h1: "h1",
-    h2: "h2",
-    li: "li",
-    ul: "ul",
-    ...props.components
-  };
-  return jsxs(Fragment, {
-    children: [jsx(_components.h1, {
-      children: "项目进度"
-    }), "\n", jsx(_components.h2, {
-      children: "本周完成"
-    }), "\n", jsxs(_components.ul, {
-      children: ["\n", jsx(_components.li, {
-        children: "完成了用户界面设计"
-      }), "\n", jsx(_components.li, {
-        children: "修复了登录问题"
-      }), "\n"]
-    }), "\n", jsx(_components.h2, {
-      children: "下周计划"
-    }), "\n", jsxs(_components.ul, {
-      children: ["\n", jsx(_components.li, {
-        children: "开始后端开发"
-      }), "\n", jsx(_components.li, {
-        children: "编写测试用例"
-      }), "\n"]
-    })]
-  });
-}
-function MDXContent(props = {}) {
-  const { wrapper: MDXLayout } = props.components || {};
-  return MDXLayout ? jsx(MDXLayout, {
-    ...props,
-    children: jsx(_createMdxContent, {
-      ...props
-    })
-  }) : _createMdxContent(props);
-}
-const __vite_glob_0_2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  default: MDXContent,
-  frontmatter
-}, Symbol.toStringTag, { value: "Module" }));
+const __vite_glob_0_0 = "---\r\ntitle: Antigravity登入\r\n---\r\n\r\n### 下载安装\r\n### 登入\r\n\r\n会遇到跳转到浏览器登入后跳转不回IDE的场景，接下来的步骤是：\r\n\r\n* https://policies.google.com/country-association-form?pli=1，到此链接把归属地改到美国\r\n\r\n* 梯子打开TUN模式\r\n\r\n\r\n";
+const __vite_glob_0_1 = "---\r\ntitle: Antigravity登入\r\n---\r\n\r\n\r\n#### 下载安装\r\n#### 登入\r\n    ##### 1. 修改google账号归属地到美国，https://policies.google.com/country-association-form?pli=1\r\n    ##### 2. 梯子TUN\r\n#### 运行Antigravity并使用google登入\r\n";
+const __vite_glob_0_2 = "---\r\ntitle: 项目进度\r\n---\r\n\r\n# 项目进度\r\n\r\n## 本周完成\r\n\r\n- 完成了用户界面设计\r\n- 修复了登录问题\r\n\r\n## 下周计划\r\n\r\n- 开始后端开发\r\n- 编写测试用例\r\n";
 const modules = /* @__PURE__ */ Object.assign({ "../../content/Google/anitvity登入问题.md": __vite_glob_0_0, "../../content/学习/React学习笔记.md": __vite_glob_0_1, "../../content/工作/项目进度.md": __vite_glob_0_2 });
+function parseFrontmatter(text) {
+  const frontmatterRegex = /^---\s*([\s\S]*?)\s*---/;
+  const match = text.match(frontmatterRegex);
+  if (match) {
+    const frontmatterBlock = match[1];
+    const content = text.slice(match[0].length).trim();
+    const data = {};
+    frontmatterBlock.split("\n").forEach((line) => {
+      const [key, ...values] = line.split(":");
+      if (key && values.length) {
+        data[key.trim()] = values.join(":").trim();
+      }
+    });
+    return { data, content };
+  }
+  return { data: {}, content: text };
+}
 const debugLogs = [];
 function getAllNotes() {
   const notes = [];
   debugLogs.length = 0;
-  for (const [path, mod] of Object.entries(modules)) {
+  for (const [path, rawContent] of Object.entries(modules)) {
     try {
       debugLogs.push(`Processing: ${path}`);
       const normalizedPath = path.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
@@ -410,23 +300,18 @@ function getAllNotes() {
       const tag = parts[1];
       const filename = parts[2];
       const slug = filename.replace(/\.(md|mdx)$/, "");
-      debugLogs.push(`Module Keys: ${Object.keys(mod).join(", ")}`);
-      const frontmatter2 = mod.frontmatter || {};
-      debugLogs.push(`Frontmatter found: ${JSON.stringify(frontmatter2)}`);
-      let content = "";
-      if (typeof mod.default === "string") content = mod.default;
-      else content = "Content unavailable in debug mode (component source)";
-      if (content.startsWith("Content unavailable")) {
+      if (typeof rawContent !== "string") {
+        debugLogs.push(`ERROR: Content is not a string. Type: ${typeof rawContent}`);
+        throw new Error(`Content is not a string (Type: ${typeof rawContent})`);
       }
+      const { data, content } = parseFrontmatter(rawContent);
       notes.push({
         slug,
-        title: frontmatter2.title || slug,
-        // Prefer exported frontmatter
+        title: data.title || slug,
         content,
         tag,
         filePath: `${tag}/${filename}`,
         modifiedAt: "2024-01-01"
-        // Placeholder
       });
       debugLogs.push("SUCCESS");
     } catch (e) {

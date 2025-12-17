@@ -10,7 +10,7 @@ const CONTENT = `
 - 小学生口算生成器
 - 基于文件系统的 Markdown 笔记
 
-Built by Qihaibin correctly.
+Built by Qihaibin correctly qihaibintc@gmail.com.
 `;
 
 export default function AboutPage() {
@@ -27,7 +27,7 @@ export default function AboutPage() {
     }, []);
 
     return (
-        <div className="max-w-[960px] mx-auto px-4 py-6">
+        <div className="max-w-[1200px] mx-auto px-4 py-6">
             <article
                 className="markdown-body"
                 style={{ fontSize: '13px', backgroundColor: 'transparent' }}

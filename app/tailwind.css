@@ -50,6 +50,16 @@
 }
 
 @layer base {
+    html {
+        scrollbar-gutter: stable both-edges;
+        overflow-y: scroll;
+    }
+
+    body {
+        scrollbar-gutter: stable both-edges;
+        overflow-y: scroll;
+    }
+
     * {
         @apply border-border;
     }

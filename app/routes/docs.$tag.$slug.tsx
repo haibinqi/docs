@@ -67,58 +67,31 @@ export async function loader({ params }: LoaderFunctionArgs) {
 // ... existing code ...
 
 export default function NoteDetailPage() {
-    const { note, toc, htmlContent } = useLoaderData<typeof loader>();
+    const { note, htmlContent } = useLoaderData<typeof loader>();
 
     return (
-        <div className="flex gap-8">
-            {/* Main Content */}
-            <div className="flex-1 min-w-0">
-                <Link
-                    to="/docs"
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
-                >
-                    <ArrowLeft className="h-4 w-4" />
-                    返回列表
-                </Link>
+        <div className="min-w-0">
+            <Link
+                to="/docs"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
+            >
+                <ArrowLeft className="h-4 w-4" />
+                返回列表
+            </Link>
 
-                <div className="border-b pb-4 mb-8">
-                    <h1 className="text-3xl font-bold mb-2">{note.title}</h1>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="bg-muted px-2 py-1 rounded text-xs">{note.tag}</span>
-                        <span>最后更新: {note.modifiedAt}</span>
-                    </div>
+            <div className="border-b pb-4 mb-8">
+                <h1 className="text-3xl font-bold mb-2">{note.title}</h1>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="bg-muted px-2 py-1 rounded text-xs">{note.tag}</span>
+                    <span>最后更新: {note.modifiedAt}</span>
                 </div>
-
-                <article
-                    className="markdown-body"
-                    style={{ fontSize: '13px', backgroundColor: 'transparent' }}
-                    dangerouslySetInnerHTML={{ __html: htmlContent }}
-                />
             </div>
 
-            {/* TOC Sidebar */}
-            {toc.length > 0 && (
-                <aside className="hidden lg:block w-64 shrink-0 pl-8 border-l">
-                    <div className="sticky top-20">
-                        <div className="flex items-center gap-2 text-sm font-semibold mb-4">
-                            <List className="h-4 w-4" />
-                            目录
-                        </div>
-                        <nav className="text-sm space-y-1.5">
-                            {toc.map((item) => (
-                                <a
-                                    key={item.id}
-                                    href={`#${item.id}`} // Use ID from slugify
-                                    className="block text-muted-foreground hover:text-foreground transition-colors truncate"
-                                    style={{ paddingLeft: `${(item.level - 1) * 12}px` }}
-                                >
-                                    {item.text}
-                                </a>
-                            ))}
-                        </nav>
-                    </div>
-                </aside>
-            )}
+            <article
+                className="markdown-body"
+                style={{ fontSize: '13px', backgroundColor: 'transparent' }}
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+            />
         </div>
     );
 }

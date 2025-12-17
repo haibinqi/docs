@@ -1,7 +1,7 @@
 import { json } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
-import { getNotesByTag, getDebugKeys, type ContentNote } from "~/lib/content-reader.server";
-import { Tag, FileText, FolderOpen } from "lucide-react";
+import { useLoaderData } from "@remix-run/react";
+import { getNotesByTag, getDebugKeys } from "~/lib/content-reader.server";
+import { FileText } from "lucide-react";
 
 export async function loader() {
     const notesByTag = getNotesByTag();
@@ -28,33 +28,8 @@ export default function DocsIndexPage() {
     }
 
     return (
-        <div className="mt-4 text-[13px]">
-            <div className="flex items-center justify-between mb-2">
-            </div>
-
-            <div className="space-y-8">
-                {notesByTag.map(({ tag, notes }) => (
-                    <div key={tag} className="border rounded-lg overflow-hidden">
-                        <div className="bg-muted/50 px-4 py-3 flex items-center gap-2">
-                            <FolderOpen className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">{tag}</span>
-                            <span className="text-muted-foreground">({notes.length})</span>
-                        </div>
-                        <div className="divide-y">
-                            {notes.map((note) => (
-                                <Link
-                                    key={note.filePath}
-                                    to={`/docs/${encodeURIComponent(note.tag)}/${encodeURIComponent(note.slug)}`}
-                                    className="px-4 py-3 hover:bg-muted/30 transition-colors flex items-center justify-between block"
-                                >
-                                    <h3 className="font-medium">{note.title}</h3>
-                                    <span className="text-muted-foreground">{note.modifiedAt}</span>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                ))}
-            </div>
+        <div className="mt-4 text-[13px] text-muted-foreground">
+            <p>从左侧选择一个笔记查看正文，右侧显示该页目录。</p>
         </div>
     );
 }

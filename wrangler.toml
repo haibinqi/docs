@@ -4,3 +4,12 @@ compatibility_date = "2024-12-09"
 
 
 compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "prompts_db"
+database_id="0cc1671a-979a-4a39-be1e-1620d3ab9b20"
+# Fill in after create: wrangler d1 create prompts_db -> database_id
+# database_id = "REPLACE_WITH_DATABASE_ID"
+
+migrations_dir = "db/migrations"

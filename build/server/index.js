@@ -215,7 +215,7 @@ function Header() {
   ] }) }) });
 }
 function Footer() {
-  return /* @__PURE__ */ jsx("footer", { className: "border-t py-6 md:py-0", children: /* @__PURE__ */ jsx("div", { className: "mx-auto flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row max-w-[1200px] px-4", children: /* @__PURE__ */ jsxs("p", { className: "text-center text-sm leading-loose text-muted-foreground md:text-left", children: [
+  return /* @__PURE__ */ jsx("footer", { className: "border-t py-6 md:py-0", children: /* @__PURE__ */ jsx("div", { className: "mx-auto flex flex-col items-center justify-between gap-4 md:h-20 md:flex-row max-w-[1200px] px-4", children: /* @__PURE__ */ jsxs("p", { className: "text-center text-sm leading-loose text-muted-foreground md:text-left", children: [
     "Built by ",
     /* @__PURE__ */ jsx("span", { className: "font-medium underline underline-offset-4", children: "Qihaibin" }),
     "."
@@ -1305,101 +1305,72 @@ function Index() {
     } catch {
     }
   }
-  return /* @__PURE__ */ jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsx("section", { className: "space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24", children: /* @__PURE__ */ jsx("div", { className: "mx-auto px-4 max-w-[1200px] grid gap-6", children: /* @__PURE__ */ jsxs(Card, { className: "p-4", children: [
-    /* @__PURE__ */ jsx("h3", { className: "font-bold mb-3", children: "提示词库" }),
-    /* @__PURE__ */ jsxs("div", { className: "grid gap-4", children: [
+  return /* @__PURE__ */ jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsx("section", { className: "space-y-6 bg-slate-50 dark:bg-transparent", children: /* @__PURE__ */ jsx("div", { className: "mx-auto px-4 max-w-[1200px] py-4", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-6", children: [
+    /* @__PURE__ */ jsx("div", { className: "md:col-span-4", children: /* @__PURE__ */ jsxs(Card, { className: "p-4 sticky top-4", children: [
+      /* @__PURE__ */ jsx("h3", { className: "font-bold mb-3", children: "新增提示词" }),
       /* @__PURE__ */ jsxs("div", { className: "grid gap-3", children: [
         /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "按分类筛选" }),
-          /* @__PURE__ */ jsxs(
-            "select",
-            {
-              value: filter,
-              onChange: (e) => setFilter(e.target.value),
-              className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
-              children: [
-                /* @__PURE__ */ jsx("option", { value: "ALL", children: "全部" }),
-                categories.map((c) => /* @__PURE__ */ jsx("option", { value: c, children: c }, c))
-              ]
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsxs(Dialog, { open: openAdd, onOpenChange: setOpenAdd, children: [
-          /* @__PURE__ */ jsx(DialogTrigger, { asChild: true, children: /* @__PURE__ */ jsx(Button, { size: "sm", className: "h-8 px-4 text-[13px]", children: "新增提示词" }) }),
-          /* @__PURE__ */ jsxs(DialogContent, { className: "sm:max-w-[640px]", children: [
-            /* @__PURE__ */ jsx(DialogHeader, { children: /* @__PURE__ */ jsx(DialogTitle, { children: "新增提示词" }) }),
-            /* @__PURE__ */ jsxs("div", { className: "grid gap-3", children: [
-              /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "选择分类" }),
-                /* @__PURE__ */ jsxs(
-                  "select",
-                  {
-                    value: category,
-                    onChange: (e) => {
-                      const v = e.target.value;
-                      if (v === "__ADD__") {
-                        setTimeout(() => setAddCatOpen(true), 0);
-                      } else {
-                        setCategory(v);
-                      }
-                    },
-                    className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
-                    children: [
-                      categories.length === 0 && /* @__PURE__ */ jsx("option", { value: "NONE", disabled: true, children: "暂无分类" }),
-                      categories.map((c) => /* @__PURE__ */ jsx("option", { value: c, children: c }, c)),
-                      /* @__PURE__ */ jsx("option", { value: "__ADD__", children: "新建分类…" })
-                    ]
+          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "分类" }),
+          /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
+            /* @__PURE__ */ jsxs(
+              "select",
+              {
+                value: category,
+                onChange: (e) => {
+                  const v = e.target.value;
+                  if (v !== "__NEW__") {
+                    setCategory(v);
+                  } else {
+                    setCategory("");
                   }
-                ),
-                addCatOpen && /* @__PURE__ */ jsxs("div", { className: "mt-2 grid gap-2 border rounded-md p-2 bg-muted/30", children: [
-                  /* @__PURE__ */ jsx(
-                    Input,
-                    {
-                      value: addCatName,
-                      onChange: (e) => setAddCatName(e.target.value),
-                      className: "h-8 text-[13px]",
-                      placeholder: "输入分类名称"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxs("div", { className: "flex gap-2 justify-end", children: [
-                    /* @__PURE__ */ jsx(Button, { variant: "outline", size: "sm", className: "h-8 px-3 text-[13px]", onClick: () => {
-                      setAddCatOpen(false);
-                      setAddCatName("");
-                    }, children: "取消" }),
-                    /* @__PURE__ */ jsx(
-                      Button,
-                      {
-                        size: "sm",
-                        className: "h-8 px-3 text-[13px]",
-                        onClick: () => {
-                          const name = addCatName.trim();
-                          if (!name) return;
-                          setCategories((prev) => Array.from(/* @__PURE__ */ new Set([name, ...prev])).sort((a, b) => a.localeCompare(b)));
-                          setCategory(name);
-                          setAddCatName("");
-                          setAddCatOpen(false);
-                        },
-                        children: "确定"
-                      }
-                    )
-                  ] })
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "标题" }),
-                /* @__PURE__ */ jsx(Input, { value: title, onChange: (e) => setTitle(e.target.value), className: "h-8 text-[13px]", placeholder: "提示词标题" })
-              ] }),
-              /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "内容" }),
-                /* @__PURE__ */ jsx(Textarea, { value: content, onChange: (e) => setContent(e.target.value), rows: 6, placeholder: "完整提示词内容" })
-              ] }),
-              /* @__PURE__ */ jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsx(Button, { size: "sm", className: "h-8 px-4 text-[13px]", onClick: async () => {
-                await addPrompt();
-                setOpenAdd(false);
-              }, children: "保存" }) })
-            ] })
+                },
+                className: "h-8 text-[13px] w-1/3 rounded-md border border-input bg-background px-3",
+                children: [
+                  /* @__PURE__ */ jsx("option", { value: "", disabled: true, children: "选择分类" }),
+                  categories.map((c) => /* @__PURE__ */ jsx("option", { value: c, children: c }, c)),
+                  /* @__PURE__ */ jsx("option", { value: "__NEW__", children: "输入新分类..." })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsx(
+              Input,
+              {
+                value: category,
+                onChange: (e) => setCategory(e.target.value),
+                className: "h-8 text-[13px] flex-1",
+                placeholder: "输入分类名称"
+              }
+            )
           ] })
-        ] }) }),
+        ] }),
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "标题" }),
+          /* @__PURE__ */ jsx(Input, { value: title, onChange: (e) => setTitle(e.target.value), className: "h-8 text-[13px]", placeholder: "提示词标题" })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "内容" }),
+          /* @__PURE__ */ jsx(Textarea, { value: content, onChange: (e) => setContent(e.target.value), rows: 6, placeholder: "完整提示词内容" })
+        ] }),
+        /* @__PURE__ */ jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsx(Button, { size: "sm", className: "h-8 px-4 text-[13px]", onClick: addPrompt, children: "保存" }) })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsx("div", { className: "md:col-span-8", children: /* @__PURE__ */ jsxs(Card, { className: "p-4", children: [
+      /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+        /* @__PURE__ */ jsx("h3", { className: "font-bold", children: "提示词库" }),
+        /* @__PURE__ */ jsx("div", { className: "w-[200px]", children: /* @__PURE__ */ jsxs(
+          "select",
+          {
+            value: filter,
+            onChange: (e) => setFilter(e.target.value),
+            className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
+            children: [
+              /* @__PURE__ */ jsx("option", { value: "ALL", children: "全部分类" }),
+              categories.map((c) => /* @__PURE__ */ jsx("option", { value: c, children: c }, c))
+            ]
+          }
+        ) })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: "grid gap-4", children: [
         /* @__PURE__ */ jsx("div", { className: "border rounded-md min-h-[120px]", children: prompts.length === 0 ? /* @__PURE__ */ jsx("div", { className: "p-3 text-sm text-muted-foreground", children: "暂无提示词" }) : /* @__PURE__ */ jsx("div", { className: "divide-y", children: prompts.map((p) => /* @__PURE__ */ jsxs("div", { className: "p-3 flex items-center justify-between gap-3", children: [
           /* @__PURE__ */ jsxs("div", { className: "min-w-0", children: [
             /* @__PURE__ */ jsx("div", { className: "text-xs text-muted-foreground", children: p.category }),
@@ -1423,10 +1394,10 @@ function Index() {
             ] }),
             /* @__PURE__ */ jsx(Button, { variant: "destructive", size: "sm", className: "h-8 px-3 text-[13px]", onClick: () => removePrompt(p.id), children: "删除" })
           ] })
-        ] }, p.id)) }) })
-      ] }),
-      notice && /* @__PURE__ */ jsx(Alert, { className: "mb-2", children: /* @__PURE__ */ jsx(AlertDescription, { children: notice }) })
-    ] })
+        ] }, p.id)) }) }),
+        notice && /* @__PURE__ */ jsx(Alert, { className: "mb-2", children: /* @__PURE__ */ jsx(AlertDescription, { children: notice }) })
+      ] })
+    ] }) })
   ] }) }) }) });
 }
 const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({

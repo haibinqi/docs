@@ -91299,101 +91299,72 @@ function Index() {
     }
   }
   __name(refetchAll, "refetchAll");
-  return /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "flex-1", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("section", { className: "space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "mx-auto px-4 max-w-[1200px] grid gap-6", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(Card, { className: "p-4", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("h3", { className: "font-bold mb-3", children: "\u63D0\u793A\u8BCD\u5E93" }),
-    /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "grid gap-4", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "flex-1", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("section", { className: "space-y-6 bg-slate-50 dark:bg-transparent", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "mx-auto px-4 max-w-[1200px] py-4", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-6", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "md:col-span-4", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(Card, { className: "p-4 sticky top-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("h3", { className: "font-bold mb-3", children: "\u65B0\u589E\u63D0\u793A\u8BCD" }),
       /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "grid gap-3", children: [
         /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("label", { className: "text-xs text-muted-foreground", children: "\u6309\u5206\u7C7B\u7B5B\u9009" }),
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
-            "select",
-            {
-              value: filter,
-              onChange: /* @__PURE__ */ __name((e) => setFilter(e.target.value), "onChange"),
-              className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: "ALL", children: "\u5168\u90E8" }),
-                categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: c, children: c }, c))
-              ]
-            }
-          )
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(Dialog2, { open: openAdd, onOpenChange: setOpenAdd, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DialogTrigger2, { asChild: true, children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { size: "sm", className: "h-8 px-4 text-[13px]", children: "\u65B0\u589E\u63D0\u793A\u8BCD" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(DialogContent2, { className: "sm:max-w-[640px]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(DialogTitle2, { children: "\u65B0\u589E\u63D0\u793A\u8BCD" }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "grid gap-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("label", { className: "text-xs text-muted-foreground", children: "\u9009\u62E9\u5206\u7C7B" }),
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
-                  "select",
-                  {
-                    value: category,
-                    onChange: /* @__PURE__ */ __name((e) => {
-                      const v2 = e.target.value;
-                      if (v2 === "__ADD__") {
-                        setTimeout(() => setAddCatOpen(true), 0);
-                      } else {
-                        setCategory(v2);
-                      }
-                    }, "onChange"),
-                    className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
-                    children: [
-                      categories.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: "NONE", disabled: true, children: "\u6682\u65E0\u5206\u7C7B" }),
-                      categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: c, children: c }, c)),
-                      /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: "__ADD__", children: "\u65B0\u5EFA\u5206\u7C7B\u2026" })
-                    ]
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("label", { className: "text-xs text-muted-foreground", children: "\u5206\u7C7B" }),
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
+              "select",
+              {
+                value: category,
+                onChange: /* @__PURE__ */ __name((e) => {
+                  const v2 = e.target.value;
+                  if (v2 !== "__NEW__") {
+                    setCategory(v2);
+                  } else {
+                    setCategory("");
                   }
-                ),
-                addCatOpen && /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "mt-2 grid gap-2 border rounded-md p-2 bg-muted/30", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-                    Input,
-                    {
-                      value: addCatName,
-                      onChange: /* @__PURE__ */ __name((e) => setAddCatName(e.target.value), "onChange"),
-                      className: "h-8 text-[13px]",
-                      placeholder: "\u8F93\u5165\u5206\u7C7B\u540D\u79F0"
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex gap-2 justify-end", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { variant: "outline", size: "sm", className: "h-8 px-3 text-[13px]", onClick: /* @__PURE__ */ __name(() => {
-                      setAddCatOpen(false);
-                      setAddCatName("");
-                    }, "onClick"), children: "\u53D6\u6D88" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
-                      Button,
-                      {
-                        size: "sm",
-                        className: "h-8 px-3 text-[13px]",
-                        onClick: /* @__PURE__ */ __name(() => {
-                          const name = addCatName.trim();
-                          if (!name) return;
-                          setCategories((prev) => Array.from(/* @__PURE__ */ new Set([name, ...prev])).sort((a, b2) => a.localeCompare(b2)));
-                          setCategory(name);
-                          setAddCatName("");
-                          setAddCatOpen(false);
-                        }, "onClick"),
-                        children: "\u786E\u5B9A"
-                      }
-                    )
-                  ] })
-                ] })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("label", { className: "text-xs text-muted-foreground", children: "\u6807\u9898" }),
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Input, { value: title2, onChange: /* @__PURE__ */ __name((e) => setTitle(e.target.value), "onChange"), className: "h-8 text-[13px]", placeholder: "\u63D0\u793A\u8BCD\u6807\u9898" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("label", { className: "text-xs text-muted-foreground", children: "\u5185\u5BB9" }),
-                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Textarea, { value: content, onChange: /* @__PURE__ */ __name((e) => setContent(e.target.value), "onChange"), rows: 6, placeholder: "\u5B8C\u6574\u63D0\u793A\u8BCD\u5185\u5BB9" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { size: "sm", className: "h-8 px-4 text-[13px]", onClick: /* @__PURE__ */ __name(async () => {
-                await addPrompt();
-                setOpenAdd(false);
-              }, "onClick"), children: "\u4FDD\u5B58" }) })
-            ] })
+                }, "onChange"),
+                className: "h-8 text-[13px] w-1/3 rounded-md border border-input bg-background px-3",
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: "", disabled: true, children: "\u9009\u62E9\u5206\u7C7B" }),
+                  categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: c, children: c }, c)),
+                  /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: "__NEW__", children: "\u8F93\u5165\u65B0\u5206\u7C7B..." })
+                ]
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+              Input,
+              {
+                value: category,
+                onChange: /* @__PURE__ */ __name((e) => setCategory(e.target.value), "onChange"),
+                className: "h-8 text-[13px] flex-1",
+                placeholder: "\u8F93\u5165\u5206\u7C7B\u540D\u79F0"
+              }
+            )
           ] })
-        ] }) }),
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("label", { className: "text-xs text-muted-foreground", children: "\u6807\u9898" }),
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Input, { value: title2, onChange: /* @__PURE__ */ __name((e) => setTitle(e.target.value), "onChange"), className: "h-8 text-[13px]", placeholder: "\u63D0\u793A\u8BCD\u6807\u9898" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("label", { className: "text-xs text-muted-foreground", children: "\u5185\u5BB9" }),
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Textarea, { value: content, onChange: /* @__PURE__ */ __name((e) => setContent(e.target.value), "onChange"), rows: 6, placeholder: "\u5B8C\u6574\u63D0\u793A\u8BCD\u5185\u5BB9" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { size: "sm", className: "h-8 px-4 text-[13px]", onClick: addPrompt, children: "\u4FDD\u5B58" }) })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "md:col-span-8", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(Card, { className: "p-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "flex items-center justify-between mb-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("h3", { className: "font-bold", children: "\u63D0\u793A\u8BCD\u5E93" }),
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "w-[200px]", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
+          "select",
+          {
+            value: filter,
+            onChange: /* @__PURE__ */ __name((e) => setFilter(e.target.value), "onChange"),
+            className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: "ALL", children: "\u5168\u90E8\u5206\u7C7B" }),
+              categories.map((c) => /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("option", { value: c, children: c }, c))
+            ]
+          }
+        ) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "grid gap-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "border rounded-md min-h-[120px]", children: prompts.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "p-3 text-sm text-muted-foreground", children: "\u6682\u65E0\u63D0\u793A\u8BCD" }) : /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "divide-y", children: prompts.map((p) => /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "p-3 flex items-center justify-between gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "min-w-0", children: [
             /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "text-xs text-muted-foreground", children: p.category }),
@@ -91417,10 +91388,10 @@ function Index() {
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { variant: "destructive", size: "sm", className: "h-8 px-3 text-[13px]", onClick: /* @__PURE__ */ __name(() => removePrompt(p.id), "onClick"), children: "\u5220\u9664" })
           ] })
-        ] }, p.id)) }) })
-      ] }),
-      notice && /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Alert, { className: "mb-2", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AlertDescription, { children: notice }) })
-    ] })
+        ] }, p.id)) }) }),
+        notice && /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Alert, { className: "mb-2", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AlertDescription, { children: notice }) })
+      ] })
+    ] }) })
   ] }) }) }) });
 }
 function AboutPage() {
@@ -92247,13 +92218,13 @@ var init_functionsRoutes_0_4521263763762364 = __esm({
   }
 });
 
-// ../.wrangler/tmp/bundle-SjJPXS/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-K1v2ff/middleware-loader.entry.ts
 init_functionsRoutes_0_4521263763762364();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
 init_performance2();
 
-// ../.wrangler/tmp/bundle-SjJPXS/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-K1v2ff/middleware-insertion-facade.js
 init_functionsRoutes_0_4521263763762364();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
@@ -92764,7 +92735,7 @@ var jsonError = /* @__PURE__ */ __name(async (request2, env2, _ctx, middlewareCt
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-SjJPXS/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-K1v2ff/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -92800,7 +92771,7 @@ function __facade_invoke__(request2, env2, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-SjJPXS/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-K1v2ff/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

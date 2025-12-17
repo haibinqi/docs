@@ -128,141 +128,120 @@ export default function Index() {
 
     return (
         <div className="flex-1">
-            <section className="space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24">
-                <div className="mx-auto px-4 max-w-[1200px] grid gap-6">
-                    <Card className="p-4">
-                        <h3 className="font-bold mb-3">提示词库</h3>
-                        <div className="grid gap-4">
-                            <div className="grid gap-3">
-                                <div>
-                                    <label className="text-xs text-muted-foreground">按分类筛选</label>
-                                    <select
-                                        value={filter}
-                                        onChange={(e) => setFilter(e.target.value)}
-                                        className="h-8 text-[13px] w-full rounded-md border border-input bg-background px-3"
-                                    >
-                                        <option value="ALL">全部</option>
-                                        {categories.map((c) => (
-                                            <option key={c} value={c}>{c}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="flex justify-end">
-                                    <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-                                        <DialogTrigger asChild>
-                                            <Button size="sm" className="h-8 px-4 text-[13px]">新增提示词</Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[640px]">
-                                            <DialogHeader>
-                                                <DialogTitle>新增提示词</DialogTitle>
-                                            </DialogHeader>
-                                            <div className="grid gap-3">
-                                                <div>
-                                                    <label className="text-xs text-muted-foreground">选择分类</label>
-                                                    <select
-                                                        value={category}
-                                                        onChange={(e) => {
-                                                            const v = e.target.value;
-                                                            if (v === "__ADD__") {
-                                                                setTimeout(() => setAddCatOpen(true), 0);
-                                                            } else {
-                                                                setCategory(v);
-                                                            }
-                                                        }}
-                                                        className="h-8 text-[13px] w-full rounded-md border border-input bg-background px-3"
-                                                    >
-                                                        {categories.length === 0 && (
-                                                            <option value="NONE" disabled>暂无分类</option>
-                                                        )}
-                                                        {categories.map((c) => (
-                                                            <option key={c} value={c}>{c}</option>
-                                                        ))}
-                                                        <option value="__ADD__">新建分类…</option>
-                                                    </select>
-                                                    {addCatOpen && (
-                                                        <div className="mt-2 grid gap-2 border rounded-md p-2 bg-muted/30">
-                                                            <Input
-                                                                value={addCatName}
-                                                                onChange={(e) => setAddCatName(e.target.value)}
-                                                                className="h-8 text-[13px]"
-                                                                placeholder="输入分类名称"
-                                                            />
-                                                            <div className="flex gap-2 justify-end">
-                                                                <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]" onClick={() => { setAddCatOpen(false); setAddCatName(""); }}>取消</Button>
-                                                                <Button
-                                                                    size="sm"
-                                                                    className="h-8 px-3 text-[13px]"
-                                                                    onClick={() => {
-                                                                        const name = addCatName.trim();
-                                                                        if (!name) return;
-                                                                        setCategories((prev) => Array.from(new Set([name, ...prev])).sort((a, b) => a.localeCompare(b)));
-                                                                        setCategory(name);
-                                                                        setAddCatName("");
-                                                                        setAddCatOpen(false);
-                                                                    }}
-                                                                >
-                                                                    确定
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <label className="text-xs text-muted-foreground">标题</label>
-                                                    <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-8 text-[13px]" placeholder="提示词标题" />
-                                                </div>
-                                                <div>
-                                                    <label className="text-xs text-muted-foreground">内容</label>
-                                                    <Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={6} placeholder="完整提示词内容" />
-                                                </div>
-                                                <div className="flex justify-end">
-                                                    <Button size="sm" className="h-8 px-4 text-[13px]" onClick={async () => { await addPrompt(); setOpenAdd(false); }}>保存</Button>
-                                                </div>
-                                            </div>
-                                        </DialogContent>
-                                    </Dialog>
-                                </div>
-                                <div className="border rounded-md min-h-[120px]">
-                                    {prompts.length === 0 ? (
-                                        <div className="p-3 text-sm text-muted-foreground">暂无提示词</div>
-                                    ) : (
-                                        <div className="divide-y">
-                                            {prompts.map((p) => (
-                                                <div key={p.id} className="p-3 flex items-center justify-between gap-3">
-                                                    <div className="min-w-0">
-                                                        <div className="text-xs text-muted-foreground">{p.category}</div>
-                                                        <div className="font-medium truncate max-w-[520px]">{p.title}</div>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]" onClick={() => { navigator.clipboard.writeText(p.content); setNotice("内容已复制"); setTimeout(() => setNotice(""), 2000); }}>
-                                                            <Copy className="w-3.5 h-3.5 mr-1" /> 复制
-                                                        </Button>
-                                                        <Dialog>
-                                                            <DialogTrigger asChild>
-                                                                <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]">查看</Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent className="sm:max-w-[640px]">
-                                                                <DialogHeader>
-                                                                    <DialogTitle>{p.title}</DialogTitle>
-                                                                </DialogHeader>
-                                                                <div className="text-sm whitespace-pre-wrap">{p.content}</div>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                        <Button variant="destructive" size="sm" className="h-8 px-3 text-[13px]" onClick={() => removePrompt(p.id)}>删除</Button>
-                                                    </div>
-                                                </div>
-                                            ))}
+            <section className="space-y-6 bg-slate-50 dark:bg-transparent">
+                <div className="mx-auto px-4 max-w-[1200px] py-4">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        {/* 左侧：新增提示词 (占 4 列) */}
+                        <div className="md:col-span-4">
+                            <Card className="p-4 sticky top-4">
+                                <h3 className="font-bold mb-3">新增提示词</h3>
+                                <div className="grid gap-3">
+                                    <div>
+                                        <label className="text-xs text-muted-foreground">分类</label>
+                                        <div className="flex gap-2">
+                                            <select
+                                                value={category}
+                                                onChange={(e) => {
+                                                    const v = e.target.value;
+                                                    if (v !== "__NEW__") {
+                                                        setCategory(v);
+                                                    } else {
+                                                        setCategory("");
+                                                    }
+                                                }}
+                                                className="h-8 text-[13px] w-1/3 rounded-md border border-input bg-background px-3"
+                                            >
+                                                <option value="" disabled>选择分类</option>
+                                                {categories.map((c) => (
+                                                    <option key={c} value={c}>{c}</option>
+                                                ))}
+                                                <option value="__NEW__">输入新分类...</option>
+                                            </select>
+                                            <Input
+                                                value={category}
+                                                onChange={(e) => setCategory(e.target.value)}
+                                                className="h-8 text-[13px] flex-1"
+                                                placeholder="输入分类名称"
+                                            />
                                         </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-muted-foreground">标题</label>
+                                        <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-8 text-[13px]" placeholder="提示词标题" />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-muted-foreground">内容</label>
+                                        <Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={6} placeholder="完整提示词内容" />
+                                    </div>
+                                    <div className="flex justify-end">
+                                        <Button size="sm" className="h-8 px-4 text-[13px]" onClick={addPrompt}>保存</Button>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* 右侧：提示词列表 (占 8 列) */}
+                        <div className="md:col-span-8">
+                            <Card className="p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="font-bold">提示词库</h3>
+                                    <div className="w-[200px]">
+                                        <select
+                                            value={filter}
+                                            onChange={(e) => setFilter(e.target.value)}
+                                            className="h-8 text-[13px] w-full rounded-md border border-input bg-background px-3"
+                                        >
+                                            <option value="ALL">全部分类</option>
+                                            {categories.map((c) => (
+                                                <option key={c} value={c}>{c}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-4">
+                                    <div className="border rounded-md min-h-[120px]">
+                                        {prompts.length === 0 ? (
+                                            <div className="p-3 text-sm text-muted-foreground">暂无提示词</div>
+                                        ) : (
+                                            <div className="divide-y">
+                                                {prompts.map((p) => (
+                                                    <div key={p.id} className="p-3 flex items-center justify-between gap-3">
+                                                        <div className="min-w-0">
+                                                            <div className="text-xs text-muted-foreground">{p.category}</div>
+                                                            <div className="font-medium truncate max-w-[520px]">{p.title}</div>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]" onClick={() => { navigator.clipboard.writeText(p.content); setNotice("内容已复制"); setTimeout(() => setNotice(""), 2000); }}>
+                                                                <Copy className="w-3.5 h-3.5 mr-1" /> 复制
+                                                            </Button>
+                                                            <Dialog>
+                                                                <DialogTrigger asChild>
+                                                                    <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]">查看</Button>
+                                                                </DialogTrigger>
+                                                                <DialogContent className="sm:max-w-[640px]">
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>{p.title}</DialogTitle>
+                                                                    </DialogHeader>
+                                                                    <div className="text-sm whitespace-pre-wrap">{p.content}</div>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                            <Button variant="destructive" size="sm" className="h-8 px-3 text-[13px]" onClick={() => removePrompt(p.id)}>删除</Button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    {notice && (
+                                        <Alert className="mb-2">
+                                            <AlertDescription>{notice}</AlertDescription>
+                                        </Alert>
                                     )}
                                 </div>
-                            </div>
-                            {notice && (
-                                <Alert className="mb-2">
-                                    <AlertDescription>{notice}</AlertDescription>
-                                </Alert>
-                            )}
+                            </Card>
                         </div>
-                    </Card>
+                    </div>
                 </div>
             </section>
         </div>

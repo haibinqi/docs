@@ -50,22 +50,15 @@
 }
 
 @layer base {
-    html {
-        scrollbar-gutter: stable both-edges;
-        overflow-y: scroll;
-    }
-
-    body {
-        scrollbar-gutter: stable both-edges;
-        overflow-y: scroll;
-    }
-
     * {
         @apply border-border;
     }
 
     body {
         @apply bg-background text-foreground;
+        /* 强制覆盖 Radix UI 的滚动锁定样式，彻底消除抖动 */
+        overflow-y: scroll !important;
+        padding-right: 0px !important;
     }
 }
 

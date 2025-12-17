@@ -5,6 +5,15 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 
 export default defineConfig({
+    build: {
+        rollupOptions: {
+            output: {
+                entryFileNames: 'assets/[name].js',
+                chunkFileNames: 'assets/[name].js',
+                assetFileNames: 'assets/[name][extname]'
+            }
+        }
+    },
     plugins: [
         remix({
             future: {

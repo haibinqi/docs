@@ -1,8 +1,7 @@
-import { jsx, jsxs } from "react/jsx-runtime";
-import { RemixServer, useLocation, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useLoaderData, useRouteError, isRouteErrorResponse, useMatches } from "@remix-run/react";
-import * as isbotModule from "isbot";
+import { jsx, jsxs, Fragment } from "react/jsx-runtime";
+import { RemixServer, useLocation, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useRouteError, isRouteErrorResponse, useLoaderData, useMatches } from "@remix-run/react";
 import { renderToReadableStream } from "react-dom/server";
-import { ChevronDown, Calculator, ArrowLeft, FileText, Printer, ChevronUp, Check, X, ChevronRight, FolderOpen } from "lucide-react";
+import { ChevronDown, Calculator, ArrowLeft, FileText, Printer, X, Copy, ChevronRight, FolderOpen } from "lucide-react";
 import * as React from "react";
 import { useState, useEffect } from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
@@ -16,41 +15,23 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import * as SelectPrimitive from "@radix-ui/react-select";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 async function handleRequest(request, responseStatusCode, responseHeaders, remixContext, loadContext) {
   const body = await renderToReadableStream(
     /* @__PURE__ */ jsx(RemixServer, { context: remixContext, url: request.url }),
     {
-      // If you wish to abort the rendering process, you can pass a signal here.
-      // Please refer to the templates for example son how to configure this.
-      // signal: controller.signal,
+      signal: request.signal,
       onError(error) {
         console.error(error);
         responseStatusCode = 500;
       }
     }
   );
-  if (isBotRequest(request.headers.get("user-agent"))) {
-    await body.allReady;
-  }
   responseHeaders.set("Content-Type", "text/html");
   return new Response(body, {
     headers: responseHeaders,
     status: responseStatusCode
   });
-}
-function isBotRequest(userAgent) {
-  if (!userAgent) {
-    return false;
-  }
-  if ("isbot" in isbotModule && typeof isbotModule.isbot === "function") {
-    return isbotModule.isbot(userAgent);
-  }
-  if ("default" in isbotModule && typeof isbotModule.default === "function") {
-    return isbotModule.default(userAgent);
-  }
-  return false;
 }
 const entryServer = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
@@ -240,15 +221,19 @@ function Footer() {
     "."
   ] }) }) });
 }
+const tailwindHref = "/assets/tailwind.css";
+const links = () => [
+  { rel: "stylesheet", href: tailwindHref }
+];
 function Layout({ children }) {
-  return /* @__PURE__ */ jsxs("html", { lang: "en", className: "overflow-y-scroll", children: [
+  return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
     /* @__PURE__ */ jsxs("head", { children: [
       /* @__PURE__ */ jsx("meta", { charSet: "utf-8" }),
       /* @__PURE__ */ jsx("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
       /* @__PURE__ */ jsx(Meta, {}),
       /* @__PURE__ */ jsx(Links, {})
     ] }),
-    /* @__PURE__ */ jsxs("body", { className: "min-h-screen bg-background font-sans antialiased overflow-y-scroll [scrollbar-gutter:stable]", children: [
+    /* @__PURE__ */ jsxs("body", { className: "min-h-screen bg-background font-sans antialiased", children: [
       /* @__PURE__ */ jsxs("div", { className: "relative flex min-h-screen flex-col", children: [
         /* @__PURE__ */ jsx(Header, {}),
         /* @__PURE__ */ jsx("div", { className: "flex-1", children }),
@@ -262,10 +247,40 @@ function Layout({ children }) {
 function App() {
   return /* @__PURE__ */ jsx(Outlet, {});
 }
+function ErrorBoundary$1() {
+  const error = useRouteError();
+  return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
+    /* @__PURE__ */ jsxs("head", { children: [
+      /* @__PURE__ */ jsx("title", { children: "Oh no!" }),
+      /* @__PURE__ */ jsx(Meta, {}),
+      /* @__PURE__ */ jsx(Links, {})
+    ] }),
+    /* @__PURE__ */ jsxs("body", { className: "min-h-screen bg-background font-sans antialiased p-4", children: [
+      /* @__PURE__ */ jsxs("div", { className: "container mx-auto py-8", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-4xl font-bold mb-4", children: "Application Error" }),
+        /* @__PURE__ */ jsx("div", { className: "bg-destructive/10 text-destructive p-4 rounded-md border border-destructive/20", children: isRouteErrorResponse(error) ? /* @__PURE__ */ jsxs(Fragment, { children: [
+          /* @__PURE__ */ jsxs("h2", { className: "text-xl font-semibold", children: [
+            error.status,
+            " ",
+            error.statusText
+          ] }),
+          /* @__PURE__ */ jsx("p", { children: error.data })
+        ] }) : error instanceof Error ? /* @__PURE__ */ jsxs(Fragment, { children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-xl font-semibold", children: "Error" }),
+          /* @__PURE__ */ jsx("p", { className: "font-mono mt-2", children: error.message }),
+          /* @__PURE__ */ jsx("pre", { className: "mt-4 p-2 bg-black/5 rounded text-xs overflow-auto", children: error.stack })
+        ] }) : /* @__PURE__ */ jsx("h2", { className: "text-xl font-semibold", children: "Unknown Error" }) })
+      ] }),
+      /* @__PURE__ */ jsx(Scripts, {})
+    ] })
+  ] });
+}
 const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
+  ErrorBoundary: ErrorBoundary$1,
   Layout,
-  default: App
+  default: App,
+  links
 }, Symbol.toStringTag, { value: "Module" }));
 const __vite_glob_0_0 = "---\r\ntitle: Antigravity登入\r\n---\r\n\r\n### 下载安装\r\n### 登入\r\n\r\n会遇到跳转到浏览器登入后跳转不回IDE的场景，接下来的步骤是：\r\n\r\n* https://policies.google.com/country-association-form?pli=1，到此链接把归属地改到美国\r\n\r\n* 梯子打开TUN模式\r\n\r\n\r\n";
 const __vite_glob_0_1 = "## 一、目的\r\n\r\n通过制定仓库的管理制度及操作流程规定,指导和规范仓库人员的日常工作行为，对有效提高工作效率起到激励作用。\r\n\r\n## 二、适用范围\r\n\r\n仓库的所用工作人员\r\n\r\n## 三、职责\r\n\r\n- 仓库主管负责仓库一切事务的安排和管理,协调部门间的事务和传达与执行上级下达的任务，培训和提高仓库人员行为规范及工作效率。\r\n- 仓管员负责物料的收料、报检、入库、发料、退料、储存、防护工作。\r\n- 仓务员负责单据追查、保管、入帐。\r\n- 仓库杂工负责货物的装卸、搬运、包装等工作。\r\n- 仓库主管、IQC、采购共同负责对原材料的检验、不良品处置方式的确定和废弃物的处置工作。\r\n\r\n## 四、仓储管理规定\r\n\r\n### 1、原材料收货及入库\r\n\r\n- 需严格按照 “收货入库单”的流程进行作业。\r\n- 采购员将“客户送货单”给到仓库后，仓库需将此物料放在指定的检验区内，作好防护措施。\r\n- 仓库收货时需要求采购人员给到“客户送货单”，没有时需追查，直到拿到单据为止，仓库人员有追查和保管单据的责任。\r\n- 仓库收货时的原材料必须有物料部门提供的采购订单(或者说PO)，否则拒绝收货。\r\n- 仓库人员与采购共同确认送货单的数量和实物,如不符由采购人员联系供货商处理，并由采购人员在送货单签字确认实收数量。\r\n- 仓库人员对已送往仓库的原材料及时通知IQC进行物料品质检验。\r\n- 对IQC检验的合格原材料进行开“物料入库单”并经仓库主管签名确认后进仓对不合格原材料进行退货。\r\n- 仓库原则上当天送来的原材料当天处理完毕，如有特殊最迟不得超过一个星期。\r\n- 仓库对已入库的原材料进行分区分类摆放，不得随意堆放，如有特殊情况需在当天内完成。\r\n- 仓库对不合格的原材料放在指定的退货区，由仓库主管、采购共同确定退货。\r\n\r\n### 2、原材料出库\r\n\r\n- 需严格按照“物料领料单”、“生产通知单”、“开发部调用单”的流程进行操作。\r\n- 仓库的生产原材料出库依据是物料部门提供的BOM(即单件用量通知单)，生产通知单中生产数量,及厂部所规定的原材料损耗进行核料,并由部长签名确认。\r\n- 仓库把所出库之原材料配好，并填好“物料领料单”后，通知相关的领料部门进库领料，并由领料部门负责人签名确认后方可让原材料出库。\r\n- 仓库出库物料的原则是同一原材料做到先进先出。\r\n- 超用物料的出库必须依据由生产部长签名确认“领用超单”，且超用人注明了超用原因，以及得到上级主管部门的批准的“领用超用单”，仓库方可发料。\r\n- 开发部门的物料调用依据是由开发部门填写“调用单”，并由开发部负责人签名确认，并经物料部门同意后，仓库才可以依此办理相关手续，否则予与拒绝。\r\n- 仓库任何人员都无权给没有办理相关手续的原材料出库。\r\n\r\n### 3、退厂原材料的处理\r\n\r\n- 需严格按照“退厂物料通知单”进行操作。\r\n- 对采购来的不良物料需要及时通知采购部,并由采购部给予处理意见且签名确认后，可暂放仓库，待采购部把原材料退与供应商。·\r\n- 对于不良原材料不可以办理出入库用续。\r\n\r\n### 4、原材料报废\r\n\r\n- 严格执行 “报废单”进行操作\r\n- 发现仓库库存物料不良时及时处理或通知上级主管部门处理。\r\n- 需要区别分开库存物料报废、来料不良的报废部分、客户退回的报废物料，并且分开保管。\r\n\r\n### 5、成品的收货及出库\r\n\r\nA.成品的收货及入库\r\n\r\n- 严格按照 “成品入库单”进行操作\r\n- 所有入库之成品必须为合格之产品，并由终查(即 QA)提供QC报告之允许入库的成品，否则拒绝入库。\r\n- 入库成品随货提供产品的数量，码数，颜色，款号，单价等信息的送货单，对产品与单不符的不予办理入库手续。\r\n- 对合格产品且与送货单一致的及时办理入库手续。并按要求存放好。\r\n\r\nB.成品的出货\r\n\r\n- 严格按照 “成品出货单”进行操作。\r\n- 成品出货的依据是由营销部提供“客户货物配送单”，进行检货，并把检好成品进行包装。\r\n- 对于即将出库之成品通知营销部，由营销部签名确认,并办理相关出库手续后方可发货。\r\n\r\nC.成品的退货\r\n\r\n- 严格按照“成品退货单”进行操作\r\n- 由客户退回之不合格产品进行核对款号、颜色、码数、数量无误后，办理相关的退货手续。\r\n- 客户退回之不合格产品及时通知生产部进行维修，尽快返还客户。\r\n\r\n## 五、货物管理\r\n\r\n- 货物的品质维护:物料在收货、点数、入库、搬运、摆放、归位、存放、储存、发货过程中遵守安全原则，做到防损、防水、防蛀、防晒等安全措施。\r\n- 每天检查货物信息，如发现储位不对、帐物不符、品质问题及时反馈和处理。\r\n- 保持货物的正确标示，由仓管负责，对于错误标示及时更正。\r\n- 货物的单据、咭、帐由仓库记帐人把电子档和手工单据一同交到财务。每月的单据由其分类保管好，原则上单据保管2年，在此期间不得销毁。做到帐、物、咭-致。\r\n\r\n## 六、货物的盘点\r\n\r\n- 仓库货物盘点由财务、仓库以及主管部门拟定盘点计划时间表和盘点流程。\r\n- 盘点过程中需要其他相关部门予以配合,需入库和发料统一按内部盘点安排操作。\r\n- 盘点时保证做到盘点数量的准确性、公正性，严禁弄虚作假、虚报数据。盘点过程中严禁更换不同的盘点人员，以免少盘、多盘、漏盘等。\r\n- 盘点分初盘、复盘，但所有的盘点数据都需盘点人员签名确认。\r\n\r\n## 七、仓库的安全、卫生管理\r\n\r\n- 仓库每天都对仓库区域进行清洁整理工作,清理掉不要、不用的东西和坏的东西，并将仓库内的物料整理到提定的区域内，达到整洁、整齐、干净、卫生、合理的摆放要求。\r\n- 对仓库内货物摆放做出合理的摆放和规划。\r\n- 仓库卫生可以在仓库空闲的时间进行。\r\n- 仓库内保持安全通道畅通，不可有堆积物，保证人员安全。\r\n- 仓库内严禁烟火，严禁非仓库人员非工作需要进入仓库。\r\n- 仓库内的规划区域要有明确标识(如:物料摆放区、安全通道、物料报废区、物料发放区、配料区、不合格物料存放区、待检物料存放区、消防设施摆放区、办公区等)，其中物料摆放区内要分类分小区存放，且有清楚的标识。\r\n- 上下班关闭窗户及锁上仓库门。\r\n- 做好及时检查物货，如有异常或者安全隐患及时处理和上报。\r\n- 仓库内需要高空作业时做好安全防范。\r\n\r\n## 八、人员的工作态度及作风\r\n\r\n- 仓库人员的工作态度及作风仓库工作人员应该培养良好的工作态度和作风，形成良好的工作习惯。\r\n- 仓库工作人员要求做事细心，认真，负责，诚实,有良好的团队意识及职业道德。\r\n- 对于上级下达的任务要按时按质完成。\r\n- 其他的工作制度和行为准则依厂部规定为准则。\r\n\r\n放得进-库容规划 良好的规划可以根据存放不同性质和规格的物料能够有计划的预留存储空间\r\n\r\n拿得出-通道顺畅 保持能够顺畅进出物料的通道，是仓库实现高效管理的必经之路\r\n\r\n现场好-注重仓库 5S 5S 能提升仓库的工作效率、减少浪费、确保安全并营造一个整洁有序的仓库环境\r\n\r\n常检查-管理落实 制定一套规则、流程、制度是容易的但能够落实才是管理好的关键\r\n\r\n找得到-分类清晰\r\n\r\n账物符-数量准确 仓库里实物数量和账面不一致的话对生产、销售乃至整个企业运作都会造成困扰\r\n\r\n重安全-安全第一 确保仓库安全不仅关乎员工的人身安全，也关系到企业的财产安全和业务连续性\r\n\r\n做保障-无缝对接 仓库在整个生产链条中的角色是保障和服务部门，仓库的工作要围绕生产展开，确保一切顺畅";
@@ -509,6 +524,9 @@ async function loader$2({ request, context }) {
     const health = url.searchParams.get("health");
     const category = url.searchParams.get("category");
     const db = requireDB(context);
+    await db.prepare(
+      "CREATE TABLE IF NOT EXISTS prompts (id TEXT PRIMARY KEY, category TEXT NOT NULL, title TEXT NOT NULL, content TEXT NOT NULL, created_at INTEGER NOT NULL)"
+    ).run();
     if (health === "1") {
       const res = await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='prompts'").all();
       return json$1({ ok: true, table: ((_b = (_a = res.results) == null ? void 0 : _a[0]) == null ? void 0 : _b.name) ?? null });
@@ -536,6 +554,9 @@ async function action({ request, context }) {
     const db = requireDB(context);
     const method = request.method.toUpperCase();
     if (method === "POST") {
+      await db.prepare(
+        "CREATE TABLE IF NOT EXISTS prompts (id TEXT PRIMARY KEY, category TEXT NOT NULL, title TEXT NOT NULL, content TEXT NOT NULL, created_at INTEGER NOT NULL)"
+      ).run();
       const body = await request.json();
       const { category, title, content } = body ?? {};
       if (!category || !title || !content) return json$1({ error: "missing fields" }, { status: 400 });
@@ -974,112 +995,6 @@ const Textarea = React.forwardRef(
   }
 );
 Textarea.displayName = "Textarea";
-const Select = SelectPrimitive.Root;
-const SelectValue = SelectPrimitive.Value;
-const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxs(
-  SelectPrimitive.Trigger,
-  {
-    ref,
-    className: cn(
-      "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-      className
-    ),
-    ...props,
-    children: [
-      children,
-      /* @__PURE__ */ jsx(SelectPrimitive.Icon, { asChild: true, children: /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4 opacity-50" }) })
-    ]
-  }
-));
-SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
-const SelectScrollUpButton = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  SelectPrimitive.ScrollUpButton,
-  {
-    ref,
-    className: cn(
-      "flex cursor-default items-center justify-center py-1",
-      className
-    ),
-    ...props,
-    children: /* @__PURE__ */ jsx(ChevronUp, { className: "h-4 w-4" })
-  }
-));
-SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
-const SelectScrollDownButton = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  SelectPrimitive.ScrollDownButton,
-  {
-    ref,
-    className: cn(
-      "flex cursor-default items-center justify-center py-1",
-      className
-    ),
-    ...props,
-    children: /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4" })
-  }
-));
-SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
-const SelectContent = React.forwardRef(({ className, children, position = "popper", ...props }, ref) => /* @__PURE__ */ jsx(SelectPrimitive.Portal, { children: /* @__PURE__ */ jsxs(
-  SelectPrimitive.Content,
-  {
-    ref,
-    className: cn(
-      "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-      position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-      className
-    ),
-    position,
-    ...props,
-    children: [
-      /* @__PURE__ */ jsx(SelectScrollUpButton, {}),
-      /* @__PURE__ */ jsx(
-        SelectPrimitive.Viewport,
-        {
-          className: cn(
-            "p-1",
-            position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
-          ),
-          children
-        }
-      ),
-      /* @__PURE__ */ jsx(SelectScrollDownButton, {})
-    ]
-  }
-) }));
-SelectContent.displayName = SelectPrimitive.Content.displayName;
-const SelectLabel = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  SelectPrimitive.Label,
-  {
-    ref,
-    className: cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className),
-    ...props
-  }
-));
-SelectLabel.displayName = SelectPrimitive.Label.displayName;
-const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxs(
-  SelectPrimitive.Item,
-  {
-    ref,
-    className: cn(
-      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    ),
-    ...props,
-    children: [
-      /* @__PURE__ */ jsx("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center", children: /* @__PURE__ */ jsx(SelectPrimitive.ItemIndicator, { children: /* @__PURE__ */ jsx(Check, { className: "h-4 w-4" }) }) }),
-      /* @__PURE__ */ jsx(SelectPrimitive.ItemText, { children })
-    ]
-  }
-));
-SelectItem.displayName = SelectPrimitive.Item.displayName;
-const SelectSeparator = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  SelectPrimitive.Separator,
-  {
-    ref,
-    className: cn("-mx-1 my-1 h-px bg-muted", className),
-    ...props
-  }
-));
-SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 const Card = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
   "div",
   {
@@ -1205,6 +1120,48 @@ const DialogDescription = React.forwardRef(({ className, ...props }, ref) => /* 
   }
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
+const alertVariants = cva(
+  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
+  {
+    variants: {
+      variant: {
+        default: "bg-background text-foreground",
+        destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive"
+      }
+    },
+    defaultVariants: {
+      variant: "default"
+    }
+  }
+);
+const Alert = React.forwardRef(({ className, variant, ...props }, ref) => /* @__PURE__ */ jsx(
+  "div",
+  {
+    ref,
+    role: "alert",
+    className: cn(alertVariants({ variant }), className),
+    ...props
+  }
+));
+Alert.displayName = "Alert";
+const AlertTitle = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  "h5",
+  {
+    ref,
+    className: cn("mb-1 font-medium leading-none tracking-tight", className),
+    ...props
+  }
+));
+AlertTitle.displayName = "AlertTitle";
+const AlertDescription = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  "div",
+  {
+    ref,
+    className: cn("text-sm [&_p]:leading-relaxed", className),
+    ...props
+  }
+));
+AlertDescription.displayName = "AlertDescription";
 const STORAGE_KEY = "docs-prompts";
 function getPrompts() {
   if (typeof window === "undefined") return [];
@@ -1244,6 +1201,9 @@ function Index() {
   const [filter, setFilter] = useState("ALL");
   const [addCatOpen, setAddCatOpen] = useState(false);
   const [addCatName, setAddCatName] = useState("");
+  const [query, setQuery] = useState("");
+  const [openAdd, setOpenAdd] = useState(false);
+  const [notice, setNotice] = useState("");
   useEffect(() => {
     async function load() {
       try {
@@ -1252,7 +1212,7 @@ function Index() {
           const data = await res.json();
           setAllPrompts(data.prompts);
           setCategories(data.categories);
-          setPrompts(data.prompts);
+          setPrompts(query ? data.prompts.filter((p) => p.title.includes(query) || p.content.includes(query)) : data.prompts);
           return;
         }
       } catch {
@@ -1260,7 +1220,8 @@ function Index() {
       const list = getPrompts();
       setAllPrompts(list);
       setCategories(Array.from(new Set(list.map((p) => p.category))).sort((a, b) => a.localeCompare(b)));
-      setPrompts(filter === "ALL" ? list : list.filter((p) => p.category === filter));
+      const base = filter === "ALL" ? list : list.filter((p) => p.category === filter);
+      setPrompts(query ? base.filter((p) => p.title.includes(query) || p.content.includes(query)) : base);
     }
     load();
   }, []);
@@ -1272,15 +1233,20 @@ function Index() {
           const data = await res.json();
           setAllPrompts(data.prompts);
           setCategories(data.categories);
-          setPrompts(data.prompts);
+          setPrompts(query ? data.prompts.filter((p) => p.title.includes(query) || p.content.includes(query)) : data.prompts);
           return;
         }
       } catch {
       }
-      setPrompts(filter === "ALL" ? allPrompts : allPrompts.filter((p) => p.category === filter));
+      const base = filter === "ALL" ? allPrompts : allPrompts.filter((p) => p.category === filter);
+      setPrompts(query ? base.filter((p) => p.title.includes(query) || p.content.includes(query)) : base);
     }
     refilter();
   }, [filter]);
+  useEffect(() => {
+    const base = filter === "ALL" ? allPrompts : allPrompts.filter((p) => p.category === filter);
+    setPrompts(query ? base.filter((p) => p.title.includes(query) || p.content.includes(query)) : base);
+  }, [query, allPrompts]);
   async function addPrompt() {
     const usedCategory = category.trim();
     if (!usedCategory || !title.trim() || !content.trim()) return;
@@ -1288,6 +1254,8 @@ function Index() {
       const res = await fetch(`/api/prompts`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ category: usedCategory, title: title.trim(), content: content.trim() }) });
       if (res.ok) {
         await refetchAll();
+        setNotice("新增成功");
+        setTimeout(() => setNotice(""), 2e3);
       } else {
         throw new Error("server");
       }
@@ -1298,6 +1266,8 @@ function Index() {
         setCategories(Array.from(new Set(updated.map((p) => p.category))).sort((a, b) => a.localeCompare(b)));
         return updated;
       });
+      setNotice("已保存到本地");
+      setTimeout(() => setNotice(""), 2e3);
     }
     setTitle("");
     setContent("");
@@ -1307,6 +1277,8 @@ function Index() {
       const res = await fetch(`/api/prompts?id=${encodeURIComponent(id)}`, { method: "DELETE" });
       if (res.ok) {
         await refetchAll();
+        setNotice("删除成功");
+        setTimeout(() => setNotice(""), 2e3);
         return;
       }
     } catch {
@@ -1318,6 +1290,8 @@ function Index() {
       setCategories(Array.from(new Set(updated.map((p) => p.category))).sort((a, b) => a.localeCompare(b)));
       return updated;
     });
+    setNotice("已从本地删除");
+    setTimeout(() => setNotice(""), 2e3);
   }
   async function refetchAll() {
     try {
@@ -1333,92 +1307,113 @@ function Index() {
   }
   return /* @__PURE__ */ jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsx("section", { className: "space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24", children: /* @__PURE__ */ jsx("div", { className: "mx-auto px-4 max-w-[1200px] grid gap-6", children: /* @__PURE__ */ jsxs(Card, { className: "p-4", children: [
     /* @__PURE__ */ jsx("h3", { className: "font-bold mb-3", children: "提示词库" }),
-    /* @__PURE__ */ jsxs("div", { className: "grid md:grid-cols-2 gap-4", children: [
-      /* @__PURE__ */ jsxs("div", { className: "grid gap-3", children: [
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "选择分类" }),
-          /* @__PURE__ */ jsxs(
-            Select,
-            {
-              value: category,
-              onValueChange: (v) => {
-                if (v === "__ADD__") {
-                  setTimeout(() => setAddCatOpen(true), 0);
-                } else {
-                  setCategory(v);
-                }
-              },
-              children: [
-                /* @__PURE__ */ jsx(SelectTrigger, { className: "h-8 text-[13px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "选择已有分类或新建" }) }),
-                /* @__PURE__ */ jsxs(SelectContent, { children: [
-                  categories.length === 0 && /* @__PURE__ */ jsx(SelectItem, { value: "NONE", disabled: true, children: "暂无分类" }),
-                  categories.map((c) => /* @__PURE__ */ jsx(SelectItem, { value: c, children: c }, c)),
-                  /* @__PURE__ */ jsx(SelectItem, { value: "__ADD__", children: "新建分类…" })
-                ] })
-              ]
-            }
-          ),
-          addCatOpen && /* @__PURE__ */ jsxs("div", { className: "mt-2 grid gap-2 border rounded-md p-2 bg-muted/30", children: [
-            /* @__PURE__ */ jsx(
-              Input,
-              {
-                value: addCatName,
-                onChange: (e) => setAddCatName(e.target.value),
-                className: "h-8 text-[13px]",
-                placeholder: "输入分类名称"
-              }
-            ),
-            /* @__PURE__ */ jsxs("div", { className: "flex gap-2 justify-end", children: [
-              /* @__PURE__ */ jsx(Button, { variant: "outline", size: "sm", className: "h-8 px-3 text-[13px]", onClick: () => {
-                setAddCatOpen(false);
-                setAddCatName("");
-              }, children: "取消" }),
-              /* @__PURE__ */ jsx(
-                Button,
-                {
-                  size: "sm",
-                  className: "h-8 px-3 text-[13px]",
-                  onClick: () => {
-                    const name = addCatName.trim();
-                    if (!name) return;
-                    setCategories((prev) => Array.from(/* @__PURE__ */ new Set([name, ...prev])).sort((a, b) => a.localeCompare(b)));
-                    setCategory(name);
-                    setAddCatName("");
-                    setAddCatOpen(false);
-                  },
-                  children: "确定"
-                }
-              )
-            ] })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "标题" }),
-          /* @__PURE__ */ jsx(Input, { value: title, onChange: (e) => setTitle(e.target.value), className: "h-8 text-[13px]", placeholder: "提示词标题" })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "内容" }),
-          /* @__PURE__ */ jsx(Textarea, { value: content, onChange: (e) => setContent(e.target.value), rows: 6, placeholder: "完整提示词内容" })
-        ] }),
-        /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx(Button, { size: "sm", className: "h-8 px-4 text-[13px]", onClick: addPrompt, children: "新增提示词" }) })
-      ] }),
+    /* @__PURE__ */ jsxs("div", { className: "grid gap-4", children: [
       /* @__PURE__ */ jsxs("div", { className: "grid gap-3", children: [
         /* @__PURE__ */ jsxs("div", { children: [
           /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "按分类筛选" }),
-          /* @__PURE__ */ jsxs(Select, { value: filter, onValueChange: setFilter, children: [
-            /* @__PURE__ */ jsx(SelectTrigger, { className: "h-8 text-[13px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "全部分类" }) }),
-            /* @__PURE__ */ jsxs(SelectContent, { children: [
-              /* @__PURE__ */ jsx(SelectItem, { value: "ALL", children: "全部" }),
-              categories.map((c) => /* @__PURE__ */ jsx(SelectItem, { value: c, children: c }, c))
+          /* @__PURE__ */ jsxs(
+            "select",
+            {
+              value: filter,
+              onChange: (e) => setFilter(e.target.value),
+              className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
+              children: [
+                /* @__PURE__ */ jsx("option", { value: "ALL", children: "全部" }),
+                categories.map((c) => /* @__PURE__ */ jsx("option", { value: c, children: c }, c))
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsxs(Dialog, { open: openAdd, onOpenChange: setOpenAdd, children: [
+          /* @__PURE__ */ jsx(DialogTrigger, { asChild: true, children: /* @__PURE__ */ jsx(Button, { size: "sm", className: "h-8 px-4 text-[13px]", children: "新增提示词" }) }),
+          /* @__PURE__ */ jsxs(DialogContent, { className: "sm:max-w-[640px]", children: [
+            /* @__PURE__ */ jsx(DialogHeader, { children: /* @__PURE__ */ jsx(DialogTitle, { children: "新增提示词" }) }),
+            /* @__PURE__ */ jsxs("div", { className: "grid gap-3", children: [
+              /* @__PURE__ */ jsxs("div", { children: [
+                /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "选择分类" }),
+                /* @__PURE__ */ jsxs(
+                  "select",
+                  {
+                    value: category,
+                    onChange: (e) => {
+                      const v = e.target.value;
+                      if (v === "__ADD__") {
+                        setTimeout(() => setAddCatOpen(true), 0);
+                      } else {
+                        setCategory(v);
+                      }
+                    },
+                    className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
+                    children: [
+                      categories.length === 0 && /* @__PURE__ */ jsx("option", { value: "NONE", disabled: true, children: "暂无分类" }),
+                      categories.map((c) => /* @__PURE__ */ jsx("option", { value: c, children: c }, c)),
+                      /* @__PURE__ */ jsx("option", { value: "__ADD__", children: "新建分类…" })
+                    ]
+                  }
+                ),
+                addCatOpen && /* @__PURE__ */ jsxs("div", { className: "mt-2 grid gap-2 border rounded-md p-2 bg-muted/30", children: [
+                  /* @__PURE__ */ jsx(
+                    Input,
+                    {
+                      value: addCatName,
+                      onChange: (e) => setAddCatName(e.target.value),
+                      className: "h-8 text-[13px]",
+                      placeholder: "输入分类名称"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxs("div", { className: "flex gap-2 justify-end", children: [
+                    /* @__PURE__ */ jsx(Button, { variant: "outline", size: "sm", className: "h-8 px-3 text-[13px]", onClick: () => {
+                      setAddCatOpen(false);
+                      setAddCatName("");
+                    }, children: "取消" }),
+                    /* @__PURE__ */ jsx(
+                      Button,
+                      {
+                        size: "sm",
+                        className: "h-8 px-3 text-[13px]",
+                        onClick: () => {
+                          const name = addCatName.trim();
+                          if (!name) return;
+                          setCategories((prev) => Array.from(/* @__PURE__ */ new Set([name, ...prev])).sort((a, b) => a.localeCompare(b)));
+                          setCategory(name);
+                          setAddCatName("");
+                          setAddCatOpen(false);
+                        },
+                        children: "确定"
+                      }
+                    )
+                  ] })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxs("div", { children: [
+                /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "标题" }),
+                /* @__PURE__ */ jsx(Input, { value: title, onChange: (e) => setTitle(e.target.value), className: "h-8 text-[13px]", placeholder: "提示词标题" })
+              ] }),
+              /* @__PURE__ */ jsxs("div", { children: [
+                /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "内容" }),
+                /* @__PURE__ */ jsx(Textarea, { value: content, onChange: (e) => setContent(e.target.value), rows: 6, placeholder: "完整提示词内容" })
+              ] }),
+              /* @__PURE__ */ jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsx(Button, { size: "sm", className: "h-8 px-4 text-[13px]", onClick: async () => {
+                await addPrompt();
+                setOpenAdd(false);
+              }, children: "保存" }) })
             ] })
           ] })
-        ] }),
+        ] }) }),
         /* @__PURE__ */ jsx("div", { className: "border rounded-md min-h-[120px]", children: prompts.length === 0 ? /* @__PURE__ */ jsx("div", { className: "p-3 text-sm text-muted-foreground", children: "暂无提示词" }) : /* @__PURE__ */ jsx("div", { className: "divide-y", children: prompts.map((p) => /* @__PURE__ */ jsxs("div", { className: "p-3 flex items-center justify-between gap-3", children: [
           /* @__PURE__ */ jsxs("div", { className: "min-w-0", children: [
             /* @__PURE__ */ jsx("div", { className: "text-xs text-muted-foreground", children: p.category }),
             /* @__PURE__ */ jsx("div", { className: "font-medium truncate max-w-[520px]", children: p.title })
           ] }),
           /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
+            /* @__PURE__ */ jsxs(Button, { variant: "outline", size: "sm", className: "h-8 px-3 text-[13px]", onClick: () => {
+              navigator.clipboard.writeText(p.content);
+              setNotice("内容已复制");
+              setTimeout(() => setNotice(""), 2e3);
+            }, children: [
+              /* @__PURE__ */ jsx(Copy, { className: "w-3.5 h-3.5 mr-1" }),
+              " 复制"
+            ] }),
             /* @__PURE__ */ jsxs(Dialog, { children: [
               /* @__PURE__ */ jsx(DialogTrigger, { asChild: true, children: /* @__PURE__ */ jsx(Button, { variant: "outline", size: "sm", className: "h-8 px-3 text-[13px]", children: "查看" }) }),
               /* @__PURE__ */ jsxs(DialogContent, { className: "sm:max-w-[640px]", children: [
@@ -1429,7 +1424,8 @@ function Index() {
             /* @__PURE__ */ jsx(Button, { variant: "destructive", size: "sm", className: "h-8 px-3 text-[13px]", onClick: () => removePrompt(p.id), children: "删除" })
           ] })
         ] }, p.id)) }) })
-      ] })
+      ] }),
+      notice && /* @__PURE__ */ jsx(Alert, { className: "mb-2", children: /* @__PURE__ */ jsx(AlertDescription, { children: notice }) })
     ] })
   ] }) }) }) });
 }
@@ -1559,7 +1555,7 @@ const route9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   default: DocsLayout,
   loader
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-Bv20kt1p.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DVoXHqTf.js", "/assets/components-B8XM-_5I.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-CgO2CV2x.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-u55fAOmI.js", "/assets/index-DVoXHqTf.js", "/assets/components-B8XM-_5I.js", "/assets/utils-D7Z33kxK.js", "/assets/Combination-C3FJAmT1.js", "/assets/react-icons.esm-WDdnR_m_.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": ["/assets/root-CXM7NCYJ.css"] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug-BSNqRq1n.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-B8XM-_5I.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-DVoXHqTf.js", "/assets/index-u55fAOmI.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index-C6d-v1ok.js", "imports": [], "css": [] }, "routes/api.prompts": { "id": "routes/api.prompts", "parentId": "root", "path": "api/prompts", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/api.prompts-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index-BMMGCMYW.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-B8XM-_5I.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js", "/assets/index-DVoXHqTf.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math-CBuSp_un.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-BROvIBo5.js", "/assets/utils-D7Z33kxK.js", "/assets/react-icons.esm-WDdnR_m_.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-u55fAOmI.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-fxsWHDYD.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-BROvIBo5.js", "/assets/utils-D7Z33kxK.js", "/assets/index-u55fAOmI.js", "/assets/Combination-C3FJAmT1.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about-BHlTjY6_.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js"], "css": ["/assets/github-markdown-Mfi8Kzjz.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools-BhxKV7Gj.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/index-DVoXHqTf.js", "/assets/createLucideIcon-3FgSs6nL.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs-Cge8rC6L.js", "imports": ["/assets/jsx-runtime-BDw8OB7t.js", "/assets/components-B8XM-_5I.js", "/assets/createLucideIcon-3FgSs6nL.js", "/assets/index-DVoXHqTf.js", "/assets/index-u55fAOmI.js"], "css": [] } }, "url": "/assets/manifest-1f2317a7.js", "version": "1f2317a7" };
+const serverManifest = { "entry": { "module": "/assets/entry.client.js", "imports": ["/assets/jsx-runtime.js", "/assets/index2.js", "/assets/index.js", "/assets/components.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/root.js", "imports": ["/assets/jsx-runtime.js", "/assets/index2.js", "/assets/index.js", "/assets/components.js", "/assets/utils.js", "/assets/react-icons.esm.js", "/assets/Combination.js", "/assets/createLucideIcon.js"], "css": [] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug.js", "imports": ["/assets/jsx-runtime.js", "/assets/components.js", "/assets/createLucideIcon.js", "/assets/index.js", "/assets/index2.js"], "css": ["/assets/github-markdown.css"] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index.js", "imports": [], "css": [] }, "routes/api.prompts": { "id": "routes/api.prompts", "parentId": "root", "path": "api/prompts", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/api.prompts.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index.js", "imports": ["/assets/jsx-runtime.js", "/assets/components.js", "/assets/createLucideIcon.js", "/assets/index2.js", "/assets/index.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math.js", "imports": ["/assets/jsx-runtime.js", "/assets/input.js", "/assets/utils.js", "/assets/react-icons.esm.js", "/assets/createLucideIcon.js", "/assets/index2.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index.js", "imports": ["/assets/jsx-runtime.js", "/assets/input.js", "/assets/utils.js", "/assets/Combination.js", "/assets/createLucideIcon.js", "/assets/index2.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about.js", "imports": ["/assets/jsx-runtime.js"], "css": ["/assets/github-markdown.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.js", "imports": ["/assets/jsx-runtime.js", "/assets/index.js", "/assets/createLucideIcon.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs.js", "imports": ["/assets/jsx-runtime.js", "/assets/components.js", "/assets/createLucideIcon.js", "/assets/index.js", "/assets/index2.js"], "css": [] } }, "url": "/assets/manifest-6e89e0d6.js", "version": "6e89e0d6" };
 const mode = "production";
 const assetsBuildDirectory = "build\\client";
 const basename = "/";

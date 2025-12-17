@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+//
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Copy } from "lucide-react";
 import { getPrompts, savePrompt, deletePrompt, type PromptItem } from "@/lib/prompts-storage";
 
 export default function Index() {
@@ -17,6 +19,9 @@ export default function Index() {
     const [filter, setFilter] = useState<string>("ALL");
     const [addCatOpen, setAddCatOpen] = useState(false);
     const [addCatName, setAddCatName] = useState("");
+    const [query, setQuery] = useState("");
+    const [openAdd, setOpenAdd] = useState(false);
+    const [notice, setNotice] = useState("");
 
     useEffect(() => {
         async function load() {
@@ -26,14 +31,15 @@ export default function Index() {
                     const data = await res.json();
                     setAllPrompts(data.prompts);
                     setCategories(data.categories);
-                    setPrompts(data.prompts);
+                    setPrompts(query ? data.prompts.filter((p: PromptItem) => p.title.includes(query) || p.content.includes(query)) : data.prompts);
                     return;
                 }
             } catch {}
             const list = getPrompts();
             setAllPrompts(list);
             setCategories(Array.from(new Set(list.map((p) => p.category))).sort((a, b) => a.localeCompare(b)));
-            setPrompts(filter === "ALL" ? list : list.filter((p) => p.category === filter));
+            const base = filter === "ALL" ? list : list.filter((p) => p.category === filter);
+            setPrompts(query ? base.filter((p) => p.title.includes(query) || p.content.includes(query)) : base);
         }
         load();
     }, []);
@@ -46,14 +52,20 @@ export default function Index() {
                     const data = await res.json();
                     setAllPrompts(data.prompts);
                     setCategories(data.categories);
-                    setPrompts(data.prompts);
+                    setPrompts(query ? data.prompts.filter((p: PromptItem) => p.title.includes(query) || p.content.includes(query)) : data.prompts);
                     return;
                 }
             } catch {}
-            setPrompts(filter === "ALL" ? allPrompts : allPrompts.filter((p) => p.category === filter));
+            const base = filter === "ALL" ? allPrompts : allPrompts.filter((p) => p.category === filter);
+            setPrompts(query ? base.filter((p) => p.title.includes(query) || p.content.includes(query)) : base);
         }
         refilter();
     }, [filter]);
+
+    useEffect(() => {
+        const base = filter === "ALL" ? allPrompts : allPrompts.filter((p) => p.category === filter);
+        setPrompts(query ? base.filter((p) => p.title.includes(query) || p.content.includes(query)) : base);
+    }, [query, allPrompts]);
 
     async function addPrompt() {
         const usedCategory = category.trim();
@@ -62,6 +74,8 @@ export default function Index() {
             const res = await fetch(`/api/prompts`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ category: usedCategory, title: title.trim(), content: content.trim() }) });
             if (res.ok) {
                 await refetchAll();
+                setNotice("新增成功");
+                setTimeout(() => setNotice(""), 2000);
             } else {
                 throw new Error('server');
             }
@@ -72,6 +86,8 @@ export default function Index() {
                 setCategories(Array.from(new Set(updated.map((p) => p.category))).sort((a, b) => a.localeCompare(b)));
                 return updated;
             });
+            setNotice("已保存到本地");
+            setTimeout(() => setNotice(""), 2000);
         }
         setTitle("");
         setContent("");
@@ -82,6 +98,8 @@ export default function Index() {
             const res = await fetch(`/api/prompts?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
             if (res.ok) {
                 await refetchAll();
+                setNotice("删除成功");
+                setTimeout(() => setNotice(""), 2000);
                 return;
             }
         } catch {}
@@ -92,6 +110,8 @@ export default function Index() {
             setCategories(Array.from(new Set(updated.map((p) => p.category))).sort((a, b) => a.localeCompare(b)));
             return updated;
         });
+        setNotice("已从本地删除");
+        setTimeout(() => setNotice(""), 2000);
     }
 
     async function refetchAll() {
@@ -112,87 +132,95 @@ export default function Index() {
                 <div className="mx-auto px-4 max-w-[1200px] grid gap-6">
                     <Card className="p-4">
                         <h3 className="font-bold mb-3">提示词库</h3>
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <div className="grid gap-3">
-                                <div>
-                                    <label className="text-xs text-muted-foreground">选择分类</label>
-                                    <Select
-                                        value={category}
-                                        onValueChange={(v) => {
-                                            if (v === "__ADD__") {
-                                                setTimeout(() => setAddCatOpen(true), 0);
-                                            } else {
-                                                setCategory(v);
-                                            }
-                                        }}
-                                    >
-                                        <SelectTrigger className="h-8 text-[13px]">
-                                            <SelectValue placeholder="选择已有分类或新建" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {categories.length === 0 && (
-                                                <SelectItem value="NONE" disabled>暂无分类</SelectItem>
-                                            )}
-                                            {categories.map((c) => (
-                                                <SelectItem key={c} value={c}>{c}</SelectItem>
-                                            ))}
-                                            <SelectItem value="__ADD__">新建分类…</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {addCatOpen && (
-                                        <div className="mt-2 grid gap-2 border rounded-md p-2 bg-muted/30">
-                                            <Input
-                                                value={addCatName}
-                                                onChange={(e) => setAddCatName(e.target.value)}
-                                                className="h-8 text-[13px]"
-                                                placeholder="输入分类名称"
-                                            />
-                                            <div className="flex gap-2 justify-end">
-                                                <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]" onClick={() => { setAddCatOpen(false); setAddCatName(""); }}>取消</Button>
-                                                <Button
-                                                    size="sm"
-                                                    className="h-8 px-3 text-[13px]"
-                                                    onClick={() => {
-                                                        const name = addCatName.trim();
-                                                        if (!name) return;
-                                                        setCategories((prev) => Array.from(new Set([name, ...prev])).sort((a, b) => a.localeCompare(b)));
-                                                        setCategory(name);
-                                                        setAddCatName("");
-                                                        setAddCatOpen(false);
-                                                    }}
-                                                >
-                                                    确定
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="text-xs text-muted-foreground">标题</label>
-                                    <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-8 text-[13px]" placeholder="提示词标题" />
-                                </div>
-                                <div>
-                                    <label className="text-xs text-muted-foreground">内容</label>
-                                    <Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={6} placeholder="完整提示词内容" />
-                                </div>
-                                <div>
-                                    <Button size="sm" className="h-8 px-4 text-[13px]" onClick={addPrompt}>新增提示词</Button>
-                                </div>
-                            </div>
+                        <div className="grid gap-4">
                             <div className="grid gap-3">
                                 <div>
                                     <label className="text-xs text-muted-foreground">按分类筛选</label>
-                                    <Select value={filter} onValueChange={setFilter}>
-                                        <SelectTrigger className="h-8 text-[13px]">
-                                            <SelectValue placeholder="全部分类" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="ALL">全部</SelectItem>
-                                            {categories.map((c) => (
-                                                <SelectItem key={c} value={c}>{c}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <select
+                                        value={filter}
+                                        onChange={(e) => setFilter(e.target.value)}
+                                        className="h-8 text-[13px] w-full rounded-md border border-input bg-background px-3"
+                                    >
+                                        <option value="ALL">全部</option>
+                                        {categories.map((c) => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex justify-end">
+                                    <Dialog open={openAdd} onOpenChange={setOpenAdd}>
+                                        <DialogTrigger asChild>
+                                            <Button size="sm" className="h-8 px-4 text-[13px]">新增提示词</Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[640px]">
+                                            <DialogHeader>
+                                                <DialogTitle>新增提示词</DialogTitle>
+                                            </DialogHeader>
+                                            <div className="grid gap-3">
+                                                <div>
+                                                    <label className="text-xs text-muted-foreground">选择分类</label>
+                                                    <select
+                                                        value={category}
+                                                        onChange={(e) => {
+                                                            const v = e.target.value;
+                                                            if (v === "__ADD__") {
+                                                                setTimeout(() => setAddCatOpen(true), 0);
+                                                            } else {
+                                                                setCategory(v);
+                                                            }
+                                                        }}
+                                                        className="h-8 text-[13px] w-full rounded-md border border-input bg-background px-3"
+                                                    >
+                                                        {categories.length === 0 && (
+                                                            <option value="NONE" disabled>暂无分类</option>
+                                                        )}
+                                                        {categories.map((c) => (
+                                                            <option key={c} value={c}>{c}</option>
+                                                        ))}
+                                                        <option value="__ADD__">新建分类…</option>
+                                                    </select>
+                                                    {addCatOpen && (
+                                                        <div className="mt-2 grid gap-2 border rounded-md p-2 bg-muted/30">
+                                                            <Input
+                                                                value={addCatName}
+                                                                onChange={(e) => setAddCatName(e.target.value)}
+                                                                className="h-8 text-[13px]"
+                                                                placeholder="输入分类名称"
+                                                            />
+                                                            <div className="flex gap-2 justify-end">
+                                                                <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]" onClick={() => { setAddCatOpen(false); setAddCatName(""); }}>取消</Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    className="h-8 px-3 text-[13px]"
+                                                                    onClick={() => {
+                                                                        const name = addCatName.trim();
+                                                                        if (!name) return;
+                                                                        setCategories((prev) => Array.from(new Set([name, ...prev])).sort((a, b) => a.localeCompare(b)));
+                                                                        setCategory(name);
+                                                                        setAddCatName("");
+                                                                        setAddCatOpen(false);
+                                                                    }}
+                                                                >
+                                                                    确定
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs text-muted-foreground">标题</label>
+                                                    <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-8 text-[13px]" placeholder="提示词标题" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs text-muted-foreground">内容</label>
+                                                    <Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={6} placeholder="完整提示词内容" />
+                                                </div>
+                                                <div className="flex justify-end">
+                                                    <Button size="sm" className="h-8 px-4 text-[13px]" onClick={async () => { await addPrompt(); setOpenAdd(false); }}>保存</Button>
+                                                </div>
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                                 <div className="border rounded-md min-h-[120px]">
                                     {prompts.length === 0 ? (
@@ -206,6 +234,9 @@ export default function Index() {
                                                         <div className="font-medium truncate max-w-[520px]">{p.title}</div>
                                                     </div>
                                                     <div className="flex gap-2">
+                                                        <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]" onClick={() => { navigator.clipboard.writeText(p.content); setNotice("内容已复制"); setTimeout(() => setNotice(""), 2000); }}>
+                                                            <Copy className="w-3.5 h-3.5 mr-1" /> 复制
+                                                        </Button>
                                                         <Dialog>
                                                             <DialogTrigger asChild>
                                                                 <Button variant="outline" size="sm" className="h-8 px-3 text-[13px]">查看</Button>
@@ -225,6 +256,11 @@ export default function Index() {
                                     )}
                                 </div>
                             </div>
+                            {notice && (
+                                <Alert className="mb-2">
+                                    <AlertDescription>{notice}</AlertDescription>
+                                </Alert>
+                            )}
                         </div>
                     </Card>
                 </div>

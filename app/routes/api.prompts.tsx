@@ -14,6 +14,12 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     const category = url.searchParams.get("category");
     const db = requireDB(context);
 
+    await db
+      .prepare(
+        "CREATE TABLE IF NOT EXISTS prompts (id TEXT PRIMARY KEY, category TEXT NOT NULL, title TEXT NOT NULL, content TEXT NOT NULL, created_at INTEGER NOT NULL)"
+      )
+      .run();
+
     if (health === "1") {
       const res = await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='prompts'").all();
       return json({ ok: true, table: res.results?.[0]?.name ?? null });
@@ -47,7 +53,12 @@ export async function action({ request, context }: ActionFunctionArgs) {
     const db = requireDB(context);
     const method = request.method.toUpperCase();
 
-    if (method === "POST") {
+  if (method === "POST") {
+      await db
+        .prepare(
+          "CREATE TABLE IF NOT EXISTS prompts (id TEXT PRIMARY KEY, category TEXT NOT NULL, title TEXT NOT NULL, content TEXT NOT NULL, created_at INTEGER NOT NULL)"
+        )
+        .run();
       const body = await request.json();
       const { category, title, content } = body ?? {};
       if (!category || !title || !content) return json({ error: "missing fields" }, { status: 400 });

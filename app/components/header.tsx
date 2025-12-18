@@ -52,6 +52,32 @@ export function Header() {
                                     <div className="space-y-4">
                                         <h4 className="font-medium leading-none text-muted-foreground">开发工具</h4>
                                         <div className="grid gap-1">
+                                            <Link
+                                                to="/tools/prompts"
+                                                className="group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                onClick={() => setToolsOpen(false)}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-4 w-4 rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center text-[10px] font-bold">P</div>
+                                                    <div className="text-sm font-medium leading-none">提示词库</div>
+                                                </div>
+                                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1 pl-6">
+                                                    管理和检索常用的 AI 提示词
+                                                </p>
+                                            </Link>
+                                            <Link
+                                                to="/tools/project"
+                                                className="group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                onClick={() => setToolsOpen(false)}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-4 w-4 rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center text-[10px] font-bold">G</div>
+                                                    <div className="text-sm font-medium leading-none">项目管理</div>
+                                                </div>
+                                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1 pl-6">
+                                                    基于 SVAR Gantt 的项目进度管理
+                                                </p>
+                                            </Link>
                                             <div className="group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none opacity-50 cursor-not-allowed">
                                                 <div className="flex items-center gap-2">
                                                     <div className="h-4 w-4 rounded-full border border-primary/20 bg-primary/10" />

@@ -1,10 +1,10 @@
-import { useEffect, useState, Component } from "react";
+import { useEffect, useState, Component, useRef } from "react";
 import { Gantt, Willow, Toolbar, Editor, defaultToolbarButtons } from "@svar-ui/react-gantt";
 import ganttCss from "@svar-ui/react-gantt/all.css?url";
 import type { LinksFunction } from "@remix-run/cloudflare";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Plus, Trash2, FolderOpen } from "lucide-react";
+import { Download, Plus, Trash2, FolderOpen, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
@@ -71,6 +71,13 @@ export default function Project() {
     const [projects, setProjects] = useState<ProjectData[]>([]);
     const [currentProjectId, setCurrentProjectId] = useState<string>("");
     const [isSidebarOpen, setSidebarOpen] = useState(true);
+    const [lastSaved, setLastSaved] = useState<Date | null>(null);
+    const projectsRef = useRef<ProjectData[]>([]);
+
+    // 同步 projects 到 ref，解决闭包问题
+    useEffect(() => {
+        projectsRef.current = projects;
+    }, [projects]);
 
     // 初始化加载项目
     useEffect(() => {
@@ -121,11 +128,13 @@ export default function Project() {
         .then(res => res.json())
         .then((data: any) => {
             if (data.ok) {
+                setLastSaved(new Date());
                 if (isNew) {
                     setProjects(prev => [...prev, project]);
                     setCurrentProjectId(project.id);
                 } else {
-                    setProjects(prev => prev.map(p => p.id === project.id ? project : p));
+                    // Update projects state if we have a new timestamp or other data from server
+                    // But for now, we optimistically updated state in saveCurrentProject
                 }
             } else {
                 console.error("Failed to save project", data.error);
@@ -134,27 +143,96 @@ export default function Project() {
         .catch(e => console.error("API save error", e));
     };
 
-    // 自动保存当前项目的数据变更
+    // 保存当前项目（核心逻辑）
+    const saveCurrentProject = (projectId: string) => {
+        if (!api) return;
+        
+        // 查找项目数据（优先从 Ref 中查找最新状态）
+        const currentList = projectsRef.current;
+        const projectToSave = currentList.find(p => p.id === projectId);
+        
+        if (!projectToSave) return;
+
+        const currentTasks = api.serialize();
+        let currentLinks: any[] = [];
+        try {
+             // @ts-ignore
+             currentLinks = api.getStores().data.links.serialize();
+        } catch (e) {
+            console.warn("Could not serialize links", e);
+        }
+
+        const updatedProject = { 
+            ...projectToSave, 
+            tasks: currentTasks,
+            links: currentLinks.length > 0 ? currentLinks : projectToSave.links 
+        };
+        
+        // 更新本地状态
+        setProjects(prev => prev.map(p => p.id === projectId ? updatedProject : p));
+        
+        // 保存到 API
+        saveProjectToApi(updatedProject, false);
+    };
+
+    // 自动保存监听
     useEffect(() => {
         if (!api || !currentProjectId) return;
         
-        // This effect is tricky because we don't want to save on every render or state change loop
-        // SVAR Gantt API doesn't have a simple "onChange" event for everything.
-        // We rely on switchProject to save.
-        // Maybe we can add a "Save" button or auto-save interval?
-        // For now, let's keep the manual switch/delete logic handling saves.
-        // But we should save when the user edits tasks. 
-        // Ideally we hook into Gantt events, but let's stick to the previous logic of saving on switch/create/delete for now to avoid complexity.
-        // However, if I edit a task and then refresh, data is lost if I don't switch projects.
-        // Let's add a simple auto-save interval or save button? 
-        // User didn't ask for auto-save, but it's good UX.
-        // Let's just save on unmount or visibility change? Hard in SPA.
-        // Let's add a "Save" button to the toolbar for clarity? Or just rely on switchProject.
-        // Wait, the previous implementation `saveProjects` was updating localStorage synchronously on state change.
-        // Here `setProjects` updates state, but we need to push to API.
+        let timeoutId: NodeJS.Timeout;
+        const currentId = currentProjectId; // Capture ID for closure
+
+        const handleDataChange = (ev: any) => {
+            console.log("Gantt event triggered:", ev);
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                console.log("Auto-saving project:", currentId);
+                saveCurrentProject(currentId);
+            }, 1000); // 1秒防抖
+        };
+
+        const events = [
+            "add-task", "update-task", "delete-task", "move-task", "indent-task",
+            "add-link", "update-link", "delete-link"
+        ];
+
+        // Store event IDs for detachment
+        const eventIds: any[] = [];
+
+        // 绑定事件
+        events.forEach(event => {
+            try {
+                // @ts-ignore
+                const id = api.on(event, handleDataChange);
+                if (id) eventIds.push({ event, id });
+            } catch (e) {
+                console.error(`Failed to attach event ${event}`, e);
+            }
+        });
         
         return () => {
-            // Cleanup
+            clearTimeout(timeoutId);
+            if (api && api.detach) {
+                eventIds.forEach(({ event, id }) => {
+                    try {
+                        // @ts-ignore
+                        api.detach(event, id); 
+                        // Note: SVAR/DHTMLX usually uses detach(event, id) or detachEvent(id). 
+                        // If detach takes only ID, we might need to check docs.
+                        // Assuming api.detach(event, id) based on some patterns, or api.detachEvent(id).
+                        // Let's try to be safe.
+                        if (typeof api.detachEvent === 'function') {
+                             // @ts-ignore
+                            api.detachEvent(id);
+                        } else {
+                             // @ts-ignore
+                            api.detach(event, id);
+                        }
+                    } catch (e) {
+                        console.warn("Detach failed", e);
+                    }
+                });
+            }
         };
     }, [api, currentProjectId]);
 
@@ -189,49 +267,12 @@ export default function Project() {
         }
     };
 
-    // 切换项目前保存当前数据
     const switchProject = (id: string) => {
         if (currentProjectId === id) return;
         
+        // 切换前先保存当前项目（立即执行，不防抖）
         if (currentProjectId && api) {
-            const currentTasks = api.serialize();
-            // Assuming links are also managed by API or we just save tasks for now as links are part of the state?
-            // SVAR Gantt stores links separately. api.serialize() only returns tasks.
-            // We need to get links. api.getLinks()? 
-            // Looking at types: api.getState().links might work?
-            // api.getReactiveState().links?
-            // Let's check api.serialize(). It returns ITask[].
-            // To get links: api.getStores().data.links.serialize()? 
-            // Or api.getState().links.
-            
-            // Let's try to capture links if possible.
-            // If we can't easily get links, we might lose them.
-            // SVAR Gantt v2: api.serialize() returns tasks.
-            // Links are usually in api.getStores().data.links.
-            // Let's try a safe approach.
-            
-            let currentLinks: any[] = [];
-            try {
-                 // @ts-ignore
-                 currentLinks = api.getStores().data.links.serialize();
-            } catch (e) {
-                console.warn("Could not serialize links", e);
-            }
-
-            const projectToSave = projects.find(p => p.id === currentProjectId);
-            if (projectToSave) {
-                const updatedProject = { 
-                    ...projectToSave, 
-                    tasks: currentTasks,
-                    links: currentLinks.length > 0 ? currentLinks : projectToSave.links 
-                };
-                
-                // Update local state first to feel responsive
-                setProjects(prev => prev.map(p => p.id === currentProjectId ? updatedProject : p));
-                
-                // Save to API
-                saveProjectToApi(updatedProject, false);
-            }
+            saveCurrentProject(currentProjectId);
         }
         setCurrentProjectId(id);
     };
@@ -344,9 +385,14 @@ export default function Project() {
                             <Download className="w-3.5 h-3.5 mr-2" />
                             导出 Excel
                         </Button>
+                        <Button variant="default" size="sm" onClick={() => saveCurrentProject(currentProjectId)} disabled={!api} className="h-8">
+                            <Save className="w-3.5 h-3.5 mr-2" />
+                            保存
+                        </Button>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                        当前项目: {currentProject?.name}
+                    <div className="text-sm text-muted-foreground flex items-center gap-2">
+                        {lastSaved && <span className="text-xs text-muted-foreground/60">已保存 {lastSaved.toLocaleTimeString()}</span>}
+                        <span>当前项目: {currentProject?.name}</span>
                     </div>
                 </div>
                 <ClientOnly fallback={<div className="flex items-center justify-center h-full text-muted-foreground">Loading Gantt Chart...</div>}>

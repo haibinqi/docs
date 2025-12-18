@@ -1,9 +1,9 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { RemixServer, useLocation, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useRouteError, isRouteErrorResponse, useLoaderData, useMatches } from "@remix-run/react";
 import { renderToReadableStream } from "react-dom/server";
-import { ChevronDown, Calculator, ArrowLeft, ChevronUp, Check, FolderOpen, Plus, Trash2, Download, X, Copy, FileText, Printer, ChevronRight } from "lucide-react";
+import { ChevronDown, Calculator, ArrowLeft, ChevronUp, Check, FolderOpen, Plus, Trash2, Download, Save, X, Copy, FileText, Printer, ChevronRight } from "lucide-react";
 import * as React from "react";
-import { useState, useEffect, Component } from "react";
+import { useState, useEffect, useRef, Component } from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -731,6 +731,11 @@ function Project() {
   const [projects, setProjects] = useState([]);
   const [currentProjectId, setCurrentProjectId] = useState("");
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [lastSaved, setLastSaved] = useState(null);
+  const projectsRef = useRef([]);
+  useEffect(() => {
+    projectsRef.current = projects;
+  }, [projects]);
   useEffect(() => {
     fetch("/api/projects").then((res) => res.json()).then((data) => {
       if (data.projects && data.projects.length > 0) {
@@ -769,20 +774,83 @@ function Project() {
       body: JSON.stringify(project)
     }).then((res) => res.json()).then((data) => {
       if (data.ok) {
+        setLastSaved(/* @__PURE__ */ new Date());
         if (isNew) {
           setProjects((prev) => [...prev, project]);
           setCurrentProjectId(project.id);
-        } else {
-          setProjects((prev) => prev.map((p) => p.id === project.id ? project : p));
         }
       } else {
         console.error("Failed to save project", data.error);
       }
     }).catch((e) => console.error("API save error", e));
   };
+  const saveCurrentProject = (projectId) => {
+    if (!api) return;
+    const currentList = projectsRef.current;
+    const projectToSave = currentList.find((p) => p.id === projectId);
+    if (!projectToSave) return;
+    const currentTasks = api.serialize();
+    let currentLinks = [];
+    try {
+      currentLinks = api.getStores().data.links.serialize();
+    } catch (e) {
+      console.warn("Could not serialize links", e);
+    }
+    const updatedProject = {
+      ...projectToSave,
+      tasks: currentTasks,
+      links: currentLinks.length > 0 ? currentLinks : projectToSave.links
+    };
+    setProjects((prev) => prev.map((p) => p.id === projectId ? updatedProject : p));
+    saveProjectToApi(updatedProject, false);
+  };
   useEffect(() => {
     if (!api || !currentProjectId) return;
+    let timeoutId;
+    const currentId = currentProjectId;
+    const handleDataChange = (ev) => {
+      console.log("Gantt event triggered:", ev);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        console.log("Auto-saving project:", currentId);
+        saveCurrentProject(currentId);
+      }, 1e3);
+    };
+    const events = [
+      "add-task",
+      "update-task",
+      "delete-task",
+      "move-task",
+      "indent-task",
+      "add-link",
+      "update-link",
+      "delete-link"
+    ];
+    const eventIds = [];
+    events.forEach((event) => {
+      try {
+        const id = api.on(event, handleDataChange);
+        if (id) eventIds.push({ event, id });
+      } catch (e) {
+        console.error(`Failed to attach event ${event}`, e);
+      }
+    });
     return () => {
+      clearTimeout(timeoutId);
+      if (api && api.detach) {
+        eventIds.forEach(({ event, id }) => {
+          try {
+            api.detach(event, id);
+            if (typeof api.detachEvent === "function") {
+              api.detachEvent(id);
+            } else {
+              api.detach(event, id);
+            }
+          } catch (e) {
+            console.warn("Detach failed", e);
+          }
+        });
+      }
     };
   }, [api, currentProjectId]);
   const handleCreateProject = () => {
@@ -815,23 +883,7 @@ function Project() {
   const switchProject = (id) => {
     if (currentProjectId === id) return;
     if (currentProjectId && api) {
-      const currentTasks = api.serialize();
-      let currentLinks = [];
-      try {
-        currentLinks = api.getStores().data.links.serialize();
-      } catch (e) {
-        console.warn("Could not serialize links", e);
-      }
-      const projectToSave = projects.find((p) => p.id === currentProjectId);
-      if (projectToSave) {
-        const updatedProject = {
-          ...projectToSave,
-          tasks: currentTasks,
-          links: currentLinks.length > 0 ? currentLinks : projectToSave.links
-        };
-        setProjects((prev) => prev.map((p) => p.id === currentProjectId ? updatedProject : p));
-        saveProjectToApi(updatedProject, false);
-      }
+      saveCurrentProject(currentProjectId);
     }
     setCurrentProjectId(id);
   };
@@ -927,11 +979,21 @@ function Project() {
           /* @__PURE__ */ jsxs(Button, { variant: "outline", size: "sm", onClick: handleExport, disabled: !api, className: "h-8", children: [
             /* @__PURE__ */ jsx(Download, { className: "w-3.5 h-3.5 mr-2" }),
             "导出 Excel"
+          ] }),
+          /* @__PURE__ */ jsxs(Button, { variant: "default", size: "sm", onClick: () => saveCurrentProject(currentProjectId), disabled: !api, className: "h-8", children: [
+            /* @__PURE__ */ jsx(Save, { className: "w-3.5 h-3.5 mr-2" }),
+            "保存"
           ] })
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: "text-sm text-muted-foreground", children: [
-          "当前项目: ",
-          currentProject == null ? void 0 : currentProject.name
+        /* @__PURE__ */ jsxs("div", { className: "text-sm text-muted-foreground flex items-center gap-2", children: [
+          lastSaved && /* @__PURE__ */ jsxs("span", { className: "text-xs text-muted-foreground/60", children: [
+            "已保存 ",
+            lastSaved.toLocaleTimeString()
+          ] }),
+          /* @__PURE__ */ jsxs("span", { children: [
+            "当前项目: ",
+            currentProject == null ? void 0 : currentProject.name
+          ] })
         ] })
       ] }),
       /* @__PURE__ */ jsx(ClientOnly, { fallback: /* @__PURE__ */ jsx("div", { className: "flex items-center justify-center h-full text-muted-foreground", children: "Loading Gantt Chart..." }), children: () => /* @__PURE__ */ jsxs(Willow, { children: [

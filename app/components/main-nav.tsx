@@ -33,6 +33,15 @@ export function MainNav() {
           工具
         </Link>
         <Link
+          to="/animations"
+          className={cn(
+            "transition-colors hover:text-foreground/80",
+            pathname.startsWith("/animations") ? "text-foreground" : "text-foreground/60"
+          )}
+        >
+          动画
+        </Link>
+        <Link
           to="/about"
           className={cn(
             "transition-colors hover:text-foreground/80",

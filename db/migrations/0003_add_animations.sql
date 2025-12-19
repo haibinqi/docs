@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS animations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    category TEXT DEFAULT 'science4',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

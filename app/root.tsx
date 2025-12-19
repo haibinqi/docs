@@ -10,9 +10,13 @@ import {
     useRouteLoaderData,
 } from "@remix-run/react";
 import { SiteHeader } from "@/components/site-header";
-import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import type { LinksFunction, LoaderFunctionArgs, HeadersFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import tailwindHref from "./tailwind.css?url";
+
+export const headers: HeadersFunction = () => ({
+    "Cache-Control": "public, max-age=0, must-revalidate",
+});
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: tailwindHref },

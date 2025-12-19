@@ -12,8 +12,9 @@ export const meta: MetaFunction = ({ data }) => {
 export const loader = async ({ params, context }: LoaderFunctionArgs) => {
   const { id } = params;
   
-  if (!context.cloudflare.env.DB) {
-    throw new Error("Database binding not found");
+  if (!context?.cloudflare?.env?.DB) {
+     console.warn("DB binding missing in detail loader");
+     throw new Response("Database Error", { status: 500, statusText: "Database connection failed" });
   }
 
   try {

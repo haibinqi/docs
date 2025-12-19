@@ -4,15 +4,19 @@ import { AnimationsSidebar, type AnimationItem } from "@/components/animations-s
 
 export const loader = async ({ context }: LoaderFunctionArgs) => {
   try {
-    if (!context.cloudflare.env.DB) {
-      console.error("DB binding missing in loader");
+    // Check if context.cloudflare is available
+    if (!context?.cloudflare?.env?.DB) {
+      console.warn("Cloudflare context or DB binding missing. This is expected during build time or if bindings are not configured.");
+      // In development or build environments without bindings, return empty array to prevent crash
       return json({ animations: [] });
     }
 
     const { results } = await context.cloudflare.env.DB.prepare(
       "SELECT id, title, category FROM animations ORDER BY created_at DESC"
     ).all<AnimationItem>();
-    return json({ animations: results });
+    
+    // Ensure results is an array
+    return json({ animations: Array.isArray(results) ? results : [] });
   } catch (error) {
     console.error("Error fetching animations:", error);
     // Return empty list instead of crashing

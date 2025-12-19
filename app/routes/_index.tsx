@@ -1,10 +1,10 @@
-import { Link } from "@remix-run/react";
+import { Link, useFetcher } from "@remix-run/react";
 import { Button } from "@/components/ui/button";
 
 export default function Index() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-14rem)]">
-            <div className="text-center space-y-6 max-w-2xl px-4">
+        <div className="container flex flex-col items-center justify-center min-h-[calc(100vh-14rem)] w-full px-[5px] pt-[5px]">
+            <div className="text-center space-y-6 w-full px-0">
                 <h1 className="text-4xl font-bold tracking-tight sm:text-6xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                     Haibin's Docs
                 </h1>

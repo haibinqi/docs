@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Printer, Calculator } from "lucide-react";
+import { Printer, Calculator, Settings2 } from "lucide-react";
 
 interface Problem {
     num1: number;
@@ -101,159 +101,168 @@ export default function MathGenerator() {
     };
 
     return (
-        <div className="space-y-6 text-[13px]">
-            <div className="print:hidden space-y-6">
-                <div>
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-[16px] font-bold tracking-tight flex items-center gap-2">
-                            <Calculator className="h-5 w-5 text-primary" />
-                            小学生口算生成器，自定义生成加减乘除口算题，支持竖式和横式。
-                        </h1>
-                        <div className="flex gap-2">
-                            <Button onClick={generateProblems} size="sm" className="h-8 px-4 text-[13px]" disabled={operators.length === 0}>
-                                生成试卷
-                            </Button>
-                            <Button variant="outline" onClick={handlePrint} size="sm" className="h-8 px-4 text-[13px]">
-                                <Printer className="mr-2 h-3.5 w-3.5" /> 打印A4
-                            </Button>
-                        </div>
-                    </div>
+        <div className="flex-1 w-full bg-background flex min-h-0 h-[calc(100vh-8rem)] border rounded-lg overflow-hidden mt-[5px]">
+            {/* 左侧：配置面板 */}
+            <div className="w-[300px] border-r bg-muted/10 flex flex-col shrink-0 print:hidden">
+                <div className="h-12 px-4 border-b flex items-center justify-between bg-muted/30">
+                    <span className="font-medium text-sm flex items-center gap-2">
+                        <Settings2 className="w-4 h-4" />
+                        出题配置
+                    </span>
                 </div>
-
-                <div className="bg-muted/30 p-4 rounded-lg border space-y-4">
-                    {/* Parameters Row */}
-                    <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
-                        <div className="space-y-1">
-                            <Label htmlFor="range1" className="text-xs text-muted-foreground">数字1范围</Label>
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    <div className="space-y-3">
+                         <div className="space-y-1.5">
+                            <Label htmlFor="range1" className="text-xs text-muted-foreground font-medium">数字1范围</Label>
                             <Input
                                 id="range1"
-                                className="w-24 h-8 text-[13px]"
+                                className="h-8 text-[13px]"
                                 value={range1}
                                 onChange={(e) => setRange1(e.target.value)}
                                 placeholder="1-100"
                             />
                         </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="range2" className="text-xs text-muted-foreground">数字2范围</Label>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="range2" className="text-xs text-muted-foreground font-medium">数字2范围</Label>
                             <Input
                                 id="range2"
-                                className="w-24 h-8 text-[13px]"
+                                className="h-8 text-[13px]"
                                 value={range2}
                                 onChange={(e) => setRange2(e.target.value)}
                                 placeholder="1-100"
                             />
                         </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="count" className="text-xs text-muted-foreground">数量</Label>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="count" className="text-xs text-muted-foreground font-medium">题目数量</Label>
                             <Input
                                 id="count"
                                 type="number"
-                                className="w-16 h-8 text-[13px]"
+                                className="h-8 text-[13px]"
                                 value={count}
                                 onChange={(e) => setCount(parseInt(e.target.value) || 0)}
                             />
                         </div>
+                    </div>
 
-                        {/* Operators */}
-                        <div className="space-y-2">
-                            <Label className="text-xs text-muted-foreground">符号</Label>
-                            <div className="flex gap-3 items-center h-8">
-                                {["+", "-", "*", "/"].map(op => (
-                                    <div key={op} className="flex items-center space-x-1.5">
-                                        <Checkbox
-                                            id={`op-${op}`}
-                                            checked={operators.includes(op)}
-                                            onCheckedChange={() => toggleOperator(op)}
-                                            className="h-4 w-4"
-                                        />
-                                        <label
-                                            htmlFor={`op-${op}`}
-                                            className="text-[13px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                        >
-                                            {getOperatorSymbol(op)}
-                                        </label>
-                                    </div>
-                                ))}
+                    <div className="space-y-3">
+                        <Label className="text-xs text-muted-foreground font-medium">运算符号</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {["+", "-", "*", "/"].map(op => (
+                                <div key={op} className="flex items-center space-x-2 border rounded-md p-2 bg-background">
+                                    <Checkbox
+                                        id={`op-${op}`}
+                                        checked={operators.includes(op)}
+                                        onCheckedChange={() => toggleOperator(op)}
+                                        className="h-4 w-4"
+                                    />
+                                    <label
+                                        htmlFor={`op-${op}`}
+                                        className="text-[13px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 cursor-pointer"
+                                    >
+                                        {getOperatorSymbol(op)}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        <Label className="text-xs text-muted-foreground font-medium">试卷格式</Label>
+                        <RadioGroup value={format} onValueChange={(v: "vertical" | "horizontal") => setFormat(v)} className="grid grid-cols-2 gap-2">
+                            <div className="flex items-center space-x-2 border rounded-md p-2 bg-background">
+                                <RadioGroupItem value="horizontal" id="r-horizontal" className="h-4 w-4" />
+                                <Label htmlFor="r-horizontal" className="text-[13px] font-normal cursor-pointer flex-1">横式</Label>
                             </div>
-                        </div>
+                            <div className="flex items-center space-x-2 border rounded-md p-2 bg-background">
+                                <RadioGroupItem value="vertical" id="r-vertical" className="h-4 w-4" />
+                                <Label htmlFor="r-vertical" className="text-[13px] font-normal cursor-pointer flex-1">竖式</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
 
-                        {/* Format */}
-                        <div className="space-y-2">
-                            <Label className="text-xs text-muted-foreground">格式</Label>
-                            <RadioGroup value={format} onValueChange={(v: "vertical" | "horizontal") => setFormat(v)} className="flex gap-4 items-center h-8">
-                                <div className="flex items-center space-x-1.5">
-                                    <RadioGroupItem value="horizontal" id="r-horizontal" className="h-4 w-4" />
-                                    <Label htmlFor="r-horizontal" className="text-[13px] font-normal cursor-pointer">横式</Label>
-                                </div>
-                                <div className="flex items-center space-x-1.5">
-                                    <RadioGroupItem value="vertical" id="r-vertical" className="h-4 w-4" />
-                                    <Label htmlFor="r-vertical" className="text-[13px] font-normal cursor-pointer">竖式</Label>
-                                </div>
-                            </RadioGroup>
-                        </div>
-
-                        {/* Buttons */}
-
-
-
+                    <div className="pt-2">
+                         <Button onClick={generateProblems} className="w-full h-8 text-[13px]" disabled={operators.length === 0}>
+                            生成试卷
+                        </Button>
                     </div>
                 </div>
             </div>
 
-            <div className="print:block min-h-[500px]" id="print-area">
-                {/* Print Header Removed as requested */}
-
-                {/* Problems Grid */}
-                <div
-                    className={`grid w-full ${format === 'vertical'
-                        ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 print:grid-cols-5 gap-x-12 gap-y-12"
-                        : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-x-12 gap-y-8"
-                        }`}
-                >
-                    {problems.map((p, i) => (
-                        <div key={i} className="font-mono text-xl flex justify-center" style={{ breakInside: "avoid" }}>
-                            {format === 'vertical' ? (
-                                p.operator === '/' ? (
-                                    // Vertical Division Layout
-                                    <div className="flex items-center justify-center text-lg">
-                                        <div className="mr-2">{p.num2}</div>
-                                        <div className="border-l border-t border-black px-2 pt-0.5 pb-0.5 min-w-[3em]">
-                                            {p.num1}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    // Vertical Standard Layout
-                                    <div className="inline-flex flex-col items-end" style={{ letterSpacing: "0.1em" }}>
-                                        <div className="text-right w-full">{p.num1}</div>
-                                        <div className="text-right w-full border-b-2 border-black relative">
-                                            <span className="absolute left-0 -translate-x-full pr-2">{getOperatorSymbol(p.operator)}</span>
-                                            {p.num2}
-                                        </div>
-                                        <div className="h-16"></div>
-                                    </div>
-                                )
-                            ) : (
-                                // Horizontal Layout
-                                <div className="flex items-baseline justify-between border-b border-dashed border-gray-300 pb-1 w-full">
-                                    <span>{p.num1} {getOperatorSymbol(p.operator)} {p.num2} = </span>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+            {/* 右侧：预览区域 */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
+                 <div className="h-12 px-4 border-b flex items-center justify-between bg-muted/30 print:hidden">
+                     <div className="flex items-center gap-2">
+                        <Calculator className="w-4 h-4 text-primary" />
+                        <span className="font-medium text-sm">试卷预览</span>
+                     </div>
+                     <Button variant="outline" onClick={handlePrint} size="sm" className="h-8 px-3 text-[13px]">
+                        <Printer className="mr-2 h-3.5 w-3.5" /> 打印A4
+                    </Button>
                 </div>
 
-                {problems.length === 0 && (
-                    <div className="print:hidden text-center py-20 text-muted-foreground border-2 border-dashed rounded-lg bg-muted/10">
-                        请选择配置并点击“生成试卷”
+                <div className="flex-1 overflow-y-auto p-8" id="print-area">
+                    {/* 打印页眉 (仅打印时显示或预览显示) */}
+                    <div className="text-center mb-8 hidden print:block">
+                        <h1 className="text-2xl font-bold mb-2">口算练习题</h1>
+                        <div className="flex justify-center gap-8 text-sm text-gray-500">
+                            <span>日期：______________</span>
+                            <span>用时：______________</span>
+                            <span>得分：______________</span>
+                        </div>
                     </div>
-                )}
+
+                    <div
+                        className={`grid w-full ${format === 'vertical'
+                            ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 print:grid-cols-5 gap-x-12 gap-y-12"
+                            : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-x-12 gap-y-8"
+                            }`}
+                    >
+                        {problems.map((p, i) => (
+                            <div key={i} className="font-mono text-xl flex justify-center" style={{ breakInside: "avoid" }}>
+                                {format === 'vertical' ? (
+                                    p.operator === '/' ? (
+                                        // Vertical Division Layout
+                                        <div className="flex items-center justify-center text-lg">
+                                            <div className="mr-2">{p.num2}</div>
+                                            <div className="border-l border-t border-black px-2 pt-0.5 pb-0.5 min-w-[3em]">
+                                                {p.num1}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // Vertical Standard Layout
+                                        <div className="inline-flex flex-col items-end" style={{ letterSpacing: "0.1em" }}>
+                                            <div className="text-right w-full">{p.num1}</div>
+                                            <div className="text-right w-full border-b-2 border-black relative">
+                                                <span className="absolute left-0 -translate-x-full pr-2">{getOperatorSymbol(p.operator)}</span>
+                                                {p.num2}
+                                            </div>
+                                            <div className="h-16"></div>
+                                        </div>
+                                    )
+                                ) : (
+                                    // Horizontal Layout
+                                    <div className="flex items-baseline justify-between border-b border-dashed border-gray-300 pb-1 w-full">
+                                        <span>{p.num1} {getOperatorSymbol(p.operator)} {p.num2} = </span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {problems.length === 0 && (
+                        <div className="print:hidden flex flex-col items-center justify-center h-full text-muted-foreground border-2 border-dashed rounded-lg bg-muted/5 m-4">
+                            <Calculator className="w-12 h-12 mb-4 opacity-20" />
+                            <p className="text-sm">请在左侧配置并点击“生成试卷”</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <style>{`
         @media print {
             @page {
                 size: A4;
-                margin: 20mm;
+                margin: 15mm;
             }
             body {
                 background: white;
@@ -278,6 +287,7 @@ export default function MathGenerator() {
                 margin: 0 !important;
                 padding: 0 !important;
                 display: block !important;
+                overflow: visible !important;
             }
 
             /* Ensure internal grid works */
@@ -286,7 +296,6 @@ export default function MathGenerator() {
             }
             
             /* Neutralize the root layout (Remix/Tailwind specific) */
-            /* This targets the div.relative.flex.min-h-screen in root.tsx */
             body > div {
                 display: block !important;
                 position: static !important;

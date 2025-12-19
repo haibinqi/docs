@@ -6,30 +6,43 @@ import {
     ScrollRestoration,
     isRouteErrorResponse,
     useRouteError,
+    useLoaderData,
+    useRouteLoaderData,
 } from "@remix-run/react";
-import { Header } from "./components/header";
-import { Footer } from "./components/footer";
-import type { LinksFunction } from "@remix-run/cloudflare";
+import { SiteHeader } from "@/components/site-header";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
 import tailwindHref from "./tailwind.css?url";
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: tailwindHref },
+    { rel: "icon", href: "/favicon.ico" },
 ];
+
+export async function loader({ request }: LoaderFunctionArgs) {
+    const cookieHeader = request.headers.get("Cookie");
+    const isOpen = cookieHeader?.includes("sidebar:state=true") ?? true;
+    if (cookieHeader?.includes("sidebar:state=false")) {
+        return json({ defaultOpen: false });
+    }
+    return json({ defaultOpen: true });
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en">
+        <html lang="en" className="h-full">
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <Meta />
                 <Links />
             </head>
-            <body className="min-h-screen bg-background font-sans antialiased">
-                <div className="relative flex min-h-screen flex-col">
-                    <Header />
-                    <div className="flex-1">{children}</div>
-                    <Footer />
+            <body className="h-full bg-background font-sans antialiased overflow-y-scroll">
+                <div className="relative flex min-h-screen flex-col bg-background">
+                    <SiteHeader />
+                    <div className="flex-1 flex flex-col">
+                        {children}
+                    </div>
                 </div>
                 <ScrollRestoration />
                 <Scripts />
@@ -37,6 +50,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </html>
     );
 }
+
+
 
 export default function App() {
     return <Outlet />;

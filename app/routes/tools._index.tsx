@@ -1,7 +1,7 @@
 import { redirect } from "@remix-run/cloudflare";
 
 export const loader = async () => {
-    return redirect("/tools/math");
+    return redirect("/tools/prompts");
 };
 
 export default function ToolsIndex() {

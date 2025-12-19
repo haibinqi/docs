@@ -70,15 +70,7 @@ export default function NoteDetailPage() {
     const { note, htmlContent } = useLoaderData<typeof loader>();
 
     return (
-        <div className="min-w-0">
-            <Link
-                to="/docs"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
-            >
-                <ArrowLeft className="h-4 w-4" />
-                返回列表
-            </Link>
-
+        <div className="min-w-0 max-w-3xl">
             <div className="border-b pb-4 mb-8">
                 <h1 className="text-3xl font-bold mb-2">{note.title}</h1>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -88,7 +80,7 @@ export default function NoteDetailPage() {
             </div>
 
             <article
-                className="markdown-body"
+                className="markdown-body w-full max-w-none"
                 style={{ fontSize: '13px', backgroundColor: 'transparent' }}
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
             />

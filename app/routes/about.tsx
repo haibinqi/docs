@@ -27,9 +27,9 @@ export default function AboutPage() {
     }, []);
 
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-6">
+        <div className="container relative pb-6 lg:gap-10 lg:pb-8 px-[5px] pt-[5px]">
             <article
-                className="markdown-body"
+                className="markdown-body w-full max-w-none"
                 style={{ fontSize: '13px', backgroundColor: 'transparent' }}
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
             />

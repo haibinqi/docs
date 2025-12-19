@@ -65,4 +65,4 @@ Please report this to https://github.com/markedjs/marked.`,r){let s="<p>An error
 - 基于文件系统的 Markdown 笔记
 
 Built by Qihaibin correctly qihaibintc@gmail.com.
-`;function pt(){const[r,e]=re.useState("");return re.useEffect(()=>{async function t(){const s=await d.parse(at);e(s)}t()},[]),ne.jsx("div",{className:"max-w-[1200px] mx-auto px-4 py-6",children:ne.jsx("article",{className:"markdown-body",style:{fontSize:"13px",backgroundColor:"transparent"},dangerouslySetInnerHTML:{__html:r}})})}export{pt as default};
+`;function pt(){const[r,e]=re.useState("");return re.useEffect(()=>{async function t(){const s=await d.parse(at);e(s)}t()},[]),ne.jsx("div",{className:"container relative pb-6 lg:gap-10 lg:pb-8 px-[5px] pt-[5px]",children:ne.jsx("article",{className:"markdown-body w-full max-w-none",style:{fontSize:"13px",backgroundColor:"transparent"},dangerouslySetInnerHTML:{__html:r}})})}export{pt as default};

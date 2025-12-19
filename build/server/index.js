@@ -1,22 +1,21 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { RemixServer, useLocation, Link, Outlet, Meta, Links, ScrollRestoration, Scripts, useRouteError, isRouteErrorResponse, useLoaderData, useMatches } from "@remix-run/react";
+import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
-import { ChevronDown, Calculator, ArrowLeft, ChevronUp, Check, FolderOpen, Plus, Trash2, Download, Save, X, Copy, FileText, Printer, ChevronRight } from "lucide-react";
+import { Sun, Moon, Github, X, ChevronDown, ChevronUp, Check, Plus, Save, Sparkles, Search, Copy, Trash2, FileText, Settings2, Calculator, Printer } from "lucide-react";
 import * as React from "react";
-import { useState, useEffect, useRef, Component } from "react";
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { useState, useEffect } from "react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ChevronRightIcon, CheckIcon, DotFilledIcon } from "@radix-ui/react-icons";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/cloudflare";
+import { json as json$1 } from "@remix-run/node";
 import { marked } from "marked";
-import { Willow, Toolbar, defaultToolbarButtons, Gantt, Editor } from "@svar-ui/react-gantt";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-import * as SelectPrimitive from "@radix-ui/react-select";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { json as json$1, redirect } from "@remix-run/cloudflare";
+import * as SelectPrimitive from "@radix-ui/react-select";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { CheckIcon, DotFilledIcon } from "@radix-ui/react-icons";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 async function handleRequest(request, responseStatusCode, responseHeaders, remixContext, loadContext) {
   const body = await renderToReadableStream(
@@ -29,6 +28,9 @@ async function handleRequest(request, responseStatusCode, responseHeaders, remix
       }
     }
   );
+  if (typeof isbot === "function" && isbot(request.headers.get("user-agent") || "")) {
+    await body.allReady;
+  }
   responseHeaders.set("Content-Type", "text/html");
   return new Response(body, {
     headers: responseHeaders,
@@ -39,239 +41,129 @@ const entryServer = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
   __proto__: null,
   default: handleRequest
 }, Symbol.toStringTag, { value: "Module" }));
+function ThemeToggle() {
+  const [theme, setTheme] = useState("light");
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setTheme("dark");
+      document.documentElement.classList.toggle("dark", true);
+    }
+  }, []);
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
+  return /* @__PURE__ */ jsxs(
+    "button",
+    {
+      onClick: toggleTheme,
+      className: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10",
+      children: [
+        /* @__PURE__ */ jsx(Sun, { className: "h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" }),
+        /* @__PURE__ */ jsx(Moon, { className: "absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" }),
+        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Toggle theme" })
+      ]
+    }
+  );
+}
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
-const DropdownMenu = DropdownMenuPrimitive.Root;
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
-const DropdownMenuSubTrigger = React.forwardRef(({ className, inset, children, ...props }, ref) => /* @__PURE__ */ jsxs(
-  DropdownMenuPrimitive.SubTrigger,
-  {
-    ref,
-    className: cn(
-      "flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-      inset && "pl-8",
-      className
-    ),
-    ...props,
-    children: [
-      children,
-      /* @__PURE__ */ jsx(ChevronRightIcon, { className: "ml-auto" })
-    ]
-  }
-));
-DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
-const DropdownMenuSubContent = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  DropdownMenuPrimitive.SubContent,
-  {
-    ref,
-    className: cn(
-      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-dropdown-menu-content-transform-origin]",
-      className
-    ),
-    ...props
-  }
-));
-DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName;
-const DropdownMenuContent = React.forwardRef(({ className, sideOffset = 4, ...props }, ref) => /* @__PURE__ */ jsx(DropdownMenuPrimitive.Portal, { children: /* @__PURE__ */ jsx(
-  DropdownMenuPrimitive.Content,
-  {
-    ref,
-    sideOffset,
-    className: cn(
-      "z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
-      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-dropdown-menu-content-transform-origin]",
-      className
-    ),
-    ...props
-  }
-) }));
-DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
-const DropdownMenuItem = React.forwardRef(({ className, inset, ...props }, ref) => /* @__PURE__ */ jsx(
-  DropdownMenuPrimitive.Item,
-  {
-    ref,
-    className: cn(
-      "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
-      inset && "pl-8",
-      className
-    ),
-    ...props
-  }
-));
-DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
-const DropdownMenuCheckboxItem = React.forwardRef(({ className, children, checked, ...props }, ref) => /* @__PURE__ */ jsxs(
-  DropdownMenuPrimitive.CheckboxItem,
-  {
-    ref,
-    className: cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    ),
-    checked,
-    ...props,
-    children: [
-      /* @__PURE__ */ jsx("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center", children: /* @__PURE__ */ jsx(DropdownMenuPrimitive.ItemIndicator, { children: /* @__PURE__ */ jsx(CheckIcon, { className: "h-4 w-4" }) }) }),
-      children
-    ]
-  }
-));
-DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName;
-const DropdownMenuRadioItem = React.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxs(
-  DropdownMenuPrimitive.RadioItem,
-  {
-    ref,
-    className: cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    ),
-    ...props,
-    children: [
-      /* @__PURE__ */ jsx("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center", children: /* @__PURE__ */ jsx(DropdownMenuPrimitive.ItemIndicator, { children: /* @__PURE__ */ jsx(DotFilledIcon, { className: "h-2 w-2 fill-current" }) }) }),
-      children
-    ]
-  }
-));
-DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
-const DropdownMenuLabel = React.forwardRef(({ className, inset, ...props }, ref) => /* @__PURE__ */ jsx(
-  DropdownMenuPrimitive.Label,
-  {
-    ref,
-    className: cn(
-      "px-2 py-1.5 text-sm font-semibold",
-      inset && "pl-8",
-      className
-    ),
-    ...props
-  }
-));
-DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
-const DropdownMenuSeparator = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  DropdownMenuPrimitive.Separator,
-  {
-    ref,
-    className: cn("-mx-1 my-1 h-px bg-muted", className),
-    ...props
-  }
-));
-DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
-function Header() {
+function MainNav() {
   const location = useLocation();
-  const [toolsOpen, setToolsOpen] = useState(false);
-  useEffect(() => {
-    setToolsOpen(false);
-  }, [location.pathname]);
-  return /* @__PURE__ */ jsx("header", { className: "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", children: /* @__PURE__ */ jsx("div", { className: "mx-auto flex h-14 max-w-[1200px] items-center px-4", children: /* @__PURE__ */ jsxs("div", { className: "mr-4 hidden md:flex", children: [
+  const pathname = location.pathname;
+  return /* @__PURE__ */ jsxs("div", { className: "mr-4 hidden md:flex", children: [
     /* @__PURE__ */ jsx(Link, { to: "/", className: "mr-6 flex items-center space-x-2", children: /* @__PURE__ */ jsx("span", { className: "hidden font-bold sm:inline-block", children: "Haibin" }) }),
-    /* @__PURE__ */ jsxs("nav", { className: "flex items-center gap-6 text-sm", children: [
-      /* @__PURE__ */ jsxs(DropdownMenu, { modal: false, open: toolsOpen, onOpenChange: setToolsOpen, children: [
-        /* @__PURE__ */ jsxs(DropdownMenuTrigger, { className: "transition-colors hover:text-foreground/80 text-foreground/60 outline-none flex items-center gap-1", children: [
-          "工具 ",
-          /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4" })
-        ] }),
-        /* @__PURE__ */ jsx(DropdownMenuContent, { align: "start", className: "w-[600px] p-4", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-2 gap-4", children: [
-          /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-            /* @__PURE__ */ jsx("h4", { className: "font-medium leading-none text-muted-foreground", children: "数学工具" }),
-            /* @__PURE__ */ jsx("div", { className: "grid gap-1", children: /* @__PURE__ */ jsx(
-              Link,
-              {
-                to: "/tools/math",
-                className: "group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                onClick: () => setToolsOpen(false),
-                children: /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
-                  /* @__PURE__ */ jsx(Calculator, { className: "h-4 w-4 text-primary" }),
-                  /* @__PURE__ */ jsx("div", { className: "text-sm font-medium leading-none", children: "小学生口算" })
-                ] })
-              }
-            ) })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-            /* @__PURE__ */ jsx("h4", { className: "font-medium leading-none text-muted-foreground", children: "开发工具" }),
-            /* @__PURE__ */ jsxs("div", { className: "grid gap-1", children: [
-              /* @__PURE__ */ jsxs(
-                Link,
-                {
-                  to: "/tools/prompts",
-                  className: "group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                  onClick: () => setToolsOpen(false),
-                  children: [
-                    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
-                      /* @__PURE__ */ jsx("div", { className: "h-4 w-4 rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center text-[10px] font-bold", children: "P" }),
-                      /* @__PURE__ */ jsx("div", { className: "text-sm font-medium leading-none", children: "提示词库" })
-                    ] }),
-                    /* @__PURE__ */ jsx("p", { className: "line-clamp-2 text-sm leading-snug text-muted-foreground mt-1 pl-6", children: "管理和检索常用的 AI 提示词" })
-                  ]
-                }
-              ),
-              /* @__PURE__ */ jsxs(
-                Link,
-                {
-                  to: "/tools/project",
-                  className: "group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                  onClick: () => setToolsOpen(false),
-                  children: [
-                    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
-                      /* @__PURE__ */ jsx("div", { className: "h-4 w-4 rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center text-[10px] font-bold", children: "G" }),
-                      /* @__PURE__ */ jsx("div", { className: "text-sm font-medium leading-none", children: "项目管理" })
-                    ] }),
-                    /* @__PURE__ */ jsx("p", { className: "line-clamp-2 text-sm leading-snug text-muted-foreground mt-1 pl-6", children: "基于 SVAR Gantt 的项目进度管理" })
-                  ]
-                }
-              ),
-              /* @__PURE__ */ jsxs("div", { className: "group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none opacity-50 cursor-not-allowed", children: [
-                /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
-                  /* @__PURE__ */ jsx("div", { className: "h-4 w-4 rounded-full border border-primary/20 bg-primary/10" }),
-                  /* @__PURE__ */ jsx("div", { className: "text-sm font-medium leading-none", children: "JSON 格式化" })
-                ] }),
-                /* @__PURE__ */ jsx("p", { className: "line-clamp-2 text-sm leading-snug text-muted-foreground mt-1 pl-6", children: "即将推出..." })
-              ] })
-            ] })
-          ] })
-        ] }) })
-      ] }),
+    /* @__PURE__ */ jsxs("nav", { className: "flex items-center gap-4 text-sm lg:gap-6", children: [
       /* @__PURE__ */ jsx(
         Link,
         {
           to: "/docs",
-          className: "transition-colors hover:text-foreground/80 text-foreground/60",
-          children: "笔记"
+          className: cn(
+            "transition-colors hover:text-foreground/80",
+            pathname.startsWith("/docs") ? "text-foreground" : "text-foreground/60"
+          ),
+          children: "文档"
+        }
+      ),
+      /* @__PURE__ */ jsx(
+        Link,
+        {
+          to: "/tools/prompts",
+          className: cn(
+            "transition-colors hover:text-foreground/80",
+            pathname.startsWith("/tools") ? "text-foreground" : "text-foreground/60"
+          ),
+          children: "工具"
         }
       ),
       /* @__PURE__ */ jsx(
         Link,
         {
           to: "/about",
-          className: "transition-colors hover:text-foreground/80 text-foreground/60",
+          className: cn(
+            "transition-colors hover:text-foreground/80",
+            pathname.startsWith("/about") ? "text-foreground" : "text-foreground/60"
+          ),
           children: "关于"
         }
       )
     ] })
-  ] }) }) });
+  ] });
 }
-function Footer() {
-  return /* @__PURE__ */ jsx("footer", { className: "border-t py-6 md:py-0", children: /* @__PURE__ */ jsx("div", { className: "mx-auto flex flex-col items-center justify-between gap-4 md:h-20 md:flex-row max-w-[1200px] px-4", children: /* @__PURE__ */ jsxs("p", { className: "text-center text-sm leading-loose text-muted-foreground md:text-left", children: [
-    "Built by ",
-    /* @__PURE__ */ jsx("span", { className: "font-medium underline underline-offset-4", children: "Qihaibin" }),
-    "."
-  ] }) }) });
+function SiteHeader() {
+  return /* @__PURE__ */ jsx("header", { className: "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", children: /* @__PURE__ */ jsxs("div", { className: "container flex h-14 max-w-screen-2xl items-center px-4", children: [
+    /* @__PURE__ */ jsx(MainNav, {}),
+    /* @__PURE__ */ jsxs("div", { className: "flex flex-1 items-center justify-between space-x-2 md:justify-end", children: [
+      /* @__PURE__ */ jsx("div", { className: "w-full flex-1 md:w-auto md:flex-none" }),
+      /* @__PURE__ */ jsxs("nav", { className: "flex items-center", children: [
+        /* @__PURE__ */ jsx(
+          Link,
+          {
+            to: "https://github.com/qihaibin/docs",
+            target: "_blank",
+            rel: "noreferrer",
+            children: /* @__PURE__ */ jsxs("div", { className: "inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-transparent shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground", children: [
+              /* @__PURE__ */ jsx(Github, { className: "h-4 w-4" }),
+              /* @__PURE__ */ jsx("span", { className: "sr-only", children: "GitHub" })
+            ] })
+          }
+        ),
+        /* @__PURE__ */ jsx(ThemeToggle, {})
+      ] })
+    ] })
+  ] }) });
 }
 const tailwindHref = "/assets/tailwind.css";
-const links$1 = () => [
+const links = () => [
   { rel: "stylesheet", href: tailwindHref }
 ];
+async function loader$5({ request }) {
+  const cookieHeader = request.headers.get("Cookie");
+  (cookieHeader == null ? void 0 : cookieHeader.includes("sidebar:state=true")) ?? true;
+  if (cookieHeader == null ? void 0 : cookieHeader.includes("sidebar:state=false")) {
+    return json({ defaultOpen: false });
+  }
+  return json({ defaultOpen: true });
+}
 function Layout({ children }) {
-  return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
+  return /* @__PURE__ */ jsxs("html", { lang: "en", className: "h-full", children: [
     /* @__PURE__ */ jsxs("head", { children: [
       /* @__PURE__ */ jsx("meta", { charSet: "utf-8" }),
       /* @__PURE__ */ jsx("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
       /* @__PURE__ */ jsx(Meta, {}),
       /* @__PURE__ */ jsx(Links, {})
     ] }),
-    /* @__PURE__ */ jsxs("body", { className: "min-h-screen bg-background font-sans antialiased", children: [
-      /* @__PURE__ */ jsxs("div", { className: "relative flex min-h-screen flex-col", children: [
-        /* @__PURE__ */ jsx(Header, {}),
-        /* @__PURE__ */ jsx("div", { className: "flex-1", children }),
-        /* @__PURE__ */ jsx(Footer, {})
+    /* @__PURE__ */ jsxs("body", { className: "h-full bg-background font-sans antialiased overflow-y-scroll", children: [
+      /* @__PURE__ */ jsxs("div", { className: "relative flex min-h-screen flex-col bg-background", children: [
+        /* @__PURE__ */ jsx(SiteHeader, {}),
+        /* @__PURE__ */ jsx("div", { className: "flex-1 flex flex-col", children })
       ] }),
       /* @__PURE__ */ jsx(ScrollRestoration, {}),
       /* @__PURE__ */ jsx(Scripts, {})
@@ -281,7 +173,7 @@ function Layout({ children }) {
 function App() {
   return /* @__PURE__ */ jsx(Outlet, {});
 }
-function ErrorBoundary$2() {
+function ErrorBoundary$1() {
   const error = useRouteError();
   return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
     /* @__PURE__ */ jsxs("head", { children: [
@@ -311,14 +203,15 @@ function ErrorBoundary$2() {
 }
 const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  ErrorBoundary: ErrorBoundary$2,
+  ErrorBoundary: ErrorBoundary$1,
   Layout,
   default: App,
-  links: links$1
+  links,
+  loader: loader$5
 }, Symbol.toStringTag, { value: "Module" }));
 const __vite_glob_0_0 = "---\r\ntitle: Antigravity登入\r\n---\r\n\r\n### 下载安装\r\n### 登入\r\n\r\n会遇到跳转到浏览器登入后跳转不回IDE的场景，接下来的步骤是：\r\n\r\n* https://policies.google.com/country-association-form?pli=1，到此链接把归属地改到美国\r\n\r\n* 梯子打开TUN模式\r\n\r\n\r\n";
 const __vite_glob_0_1 = "## 一、目的\r\n\r\n通过制定仓库的管理制度及操作流程规定,指导和规范仓库人员的日常工作行为，对有效提高工作效率起到激励作用。\r\n\r\n## 二、适用范围\r\n\r\n仓库的所用工作人员\r\n\r\n## 三、职责\r\n\r\n- 仓库主管负责仓库一切事务的安排和管理,协调部门间的事务和传达与执行上级下达的任务，培训和提高仓库人员行为规范及工作效率。\r\n- 仓管员负责物料的收料、报检、入库、发料、退料、储存、防护工作。\r\n- 仓务员负责单据追查、保管、入帐。\r\n- 仓库杂工负责货物的装卸、搬运、包装等工作。\r\n- 仓库主管、IQC、采购共同负责对原材料的检验、不良品处置方式的确定和废弃物的处置工作。\r\n\r\n## 四、仓储管理规定\r\n\r\n### 1、原材料收货及入库\r\n\r\n- 需严格按照 “收货入库单”的流程进行作业。\r\n- 采购员将“客户送货单”给到仓库后，仓库需将此物料放在指定的检验区内，作好防护措施。\r\n- 仓库收货时需要求采购人员给到“客户送货单”，没有时需追查，直到拿到单据为止，仓库人员有追查和保管单据的责任。\r\n- 仓库收货时的原材料必须有物料部门提供的采购订单(或者说PO)，否则拒绝收货。\r\n- 仓库人员与采购共同确认送货单的数量和实物,如不符由采购人员联系供货商处理，并由采购人员在送货单签字确认实收数量。\r\n- 仓库人员对已送往仓库的原材料及时通知IQC进行物料品质检验。\r\n- 对IQC检验的合格原材料进行开“物料入库单”并经仓库主管签名确认后进仓对不合格原材料进行退货。\r\n- 仓库原则上当天送来的原材料当天处理完毕，如有特殊最迟不得超过一个星期。\r\n- 仓库对已入库的原材料进行分区分类摆放，不得随意堆放，如有特殊情况需在当天内完成。\r\n- 仓库对不合格的原材料放在指定的退货区，由仓库主管、采购共同确定退货。\r\n\r\n### 2、原材料出库\r\n\r\n- 需严格按照“物料领料单”、“生产通知单”、“开发部调用单”的流程进行操作。\r\n- 仓库的生产原材料出库依据是物料部门提供的BOM(即单件用量通知单)，生产通知单中生产数量,及厂部所规定的原材料损耗进行核料,并由部长签名确认。\r\n- 仓库把所出库之原材料配好，并填好“物料领料单”后，通知相关的领料部门进库领料，并由领料部门负责人签名确认后方可让原材料出库。\r\n- 仓库出库物料的原则是同一原材料做到先进先出。\r\n- 超用物料的出库必须依据由生产部长签名确认“领用超单”，且超用人注明了超用原因，以及得到上级主管部门的批准的“领用超用单”，仓库方可发料。\r\n- 开发部门的物料调用依据是由开发部门填写“调用单”，并由开发部负责人签名确认，并经物料部门同意后，仓库才可以依此办理相关手续，否则予与拒绝。\r\n- 仓库任何人员都无权给没有办理相关手续的原材料出库。\r\n\r\n### 3、退厂原材料的处理\r\n\r\n- 需严格按照“退厂物料通知单”进行操作。\r\n- 对采购来的不良物料需要及时通知采购部,并由采购部给予处理意见且签名确认后，可暂放仓库，待采购部把原材料退与供应商。·\r\n- 对于不良原材料不可以办理出入库用续。\r\n\r\n### 4、原材料报废\r\n\r\n- 严格执行 “报废单”进行操作\r\n- 发现仓库库存物料不良时及时处理或通知上级主管部门处理。\r\n- 需要区别分开库存物料报废、来料不良的报废部分、客户退回的报废物料，并且分开保管。\r\n\r\n### 5、成品的收货及出库\r\n\r\nA.成品的收货及入库\r\n\r\n- 严格按照 “成品入库单”进行操作\r\n- 所有入库之成品必须为合格之产品，并由终查(即 QA)提供QC报告之允许入库的成品，否则拒绝入库。\r\n- 入库成品随货提供产品的数量，码数，颜色，款号，单价等信息的送货单，对产品与单不符的不予办理入库手续。\r\n- 对合格产品且与送货单一致的及时办理入库手续。并按要求存放好。\r\n\r\nB.成品的出货\r\n\r\n- 严格按照 “成品出货单”进行操作。\r\n- 成品出货的依据是由营销部提供“客户货物配送单”，进行检货，并把检好成品进行包装。\r\n- 对于即将出库之成品通知营销部，由营销部签名确认,并办理相关出库手续后方可发货。\r\n\r\nC.成品的退货\r\n\r\n- 严格按照“成品退货单”进行操作\r\n- 由客户退回之不合格产品进行核对款号、颜色、码数、数量无误后，办理相关的退货手续。\r\n- 客户退回之不合格产品及时通知生产部进行维修，尽快返还客户。\r\n\r\n## 五、货物管理\r\n\r\n- 货物的品质维护:物料在收货、点数、入库、搬运、摆放、归位、存放、储存、发货过程中遵守安全原则，做到防损、防水、防蛀、防晒等安全措施。\r\n- 每天检查货物信息，如发现储位不对、帐物不符、品质问题及时反馈和处理。\r\n- 保持货物的正确标示，由仓管负责，对于错误标示及时更正。\r\n- 货物的单据、咭、帐由仓库记帐人把电子档和手工单据一同交到财务。每月的单据由其分类保管好，原则上单据保管2年，在此期间不得销毁。做到帐、物、咭-致。\r\n\r\n## 六、货物的盘点\r\n\r\n- 仓库货物盘点由财务、仓库以及主管部门拟定盘点计划时间表和盘点流程。\r\n- 盘点过程中需要其他相关部门予以配合,需入库和发料统一按内部盘点安排操作。\r\n- 盘点时保证做到盘点数量的准确性、公正性，严禁弄虚作假、虚报数据。盘点过程中严禁更换不同的盘点人员，以免少盘、多盘、漏盘等。\r\n- 盘点分初盘、复盘，但所有的盘点数据都需盘点人员签名确认。\r\n\r\n## 七、仓库的安全、卫生管理\r\n\r\n- 仓库每天都对仓库区域进行清洁整理工作,清理掉不要、不用的东西和坏的东西，并将仓库内的物料整理到提定的区域内，达到整洁、整齐、干净、卫生、合理的摆放要求。\r\n- 对仓库内货物摆放做出合理的摆放和规划。\r\n- 仓库卫生可以在仓库空闲的时间进行。\r\n- 仓库内保持安全通道畅通，不可有堆积物，保证人员安全。\r\n- 仓库内严禁烟火，严禁非仓库人员非工作需要进入仓库。\r\n- 仓库内的规划区域要有明确标识(如:物料摆放区、安全通道、物料报废区、物料发放区、配料区、不合格物料存放区、待检物料存放区、消防设施摆放区、办公区等)，其中物料摆放区内要分类分小区存放，且有清楚的标识。\r\n- 上下班关闭窗户及锁上仓库门。\r\n- 做好及时检查物货，如有异常或者安全隐患及时处理和上报。\r\n- 仓库内需要高空作业时做好安全防范。\r\n\r\n## 八、人员的工作态度及作风\r\n\r\n- 仓库人员的工作态度及作风仓库工作人员应该培养良好的工作态度和作风，形成良好的工作习惯。\r\n- 仓库工作人员要求做事细心，认真，负责，诚实,有良好的团队意识及职业道德。\r\n- 对于上级下达的任务要按时按质完成。\r\n- 其他的工作制度和行为准则依厂部规定为准则。\r\n\r\n放得进-库容规划 良好的规划可以根据存放不同性质和规格的物料能够有计划的预留存储空间\r\n\r\n拿得出-通道顺畅 保持能够顺畅进出物料的通道，是仓库实现高效管理的必经之路\r\n\r\n现场好-注重仓库 5S 5S 能提升仓库的工作效率、减少浪费、确保安全并营造一个整洁有序的仓库环境\r\n\r\n常检查-管理落实 制定一套规则、流程、制度是容易的但能够落实才是管理好的关键\r\n\r\n找得到-分类清晰\r\n\r\n账物符-数量准确 仓库里实物数量和账面不一致的话对生产、销售乃至整个企业运作都会造成困扰\r\n\r\n重安全-安全第一 确保仓库安全不仅关乎员工的人身安全，也关系到企业的财产安全和业务连续性\r\n\r\n做保障-无缝对接 仓库在整个生产链条中的角色是保障和服务部门，仓库的工作要围绕生产展开，确保一切顺畅";
-const __vite_glob_0_2 = "核心区别\r\n\r\n| **维度**     | **正排 (正序排程)**             | **倒排 (倒序排程)**            |\r\n| ------------ | ------------------------------- | ------------------------------ |\r\n| **起点**     | 从订单接收/生产开始时间正向推算 | 从订单交付截止时间反向推算     |\r\n| **优先级**   | 资源利用率优先                  | 交期保障优先                   |\r\n| **时间轴**   | 当前时间 → 未来时间             | 交付截止时间 → 当前时间        |\r\n| **产能约束** | 可能因资源不足延后交期          | 可能因资源不足需要调整生产策略 |\r\n\r\n应用场景对比\r\n\r\n正排适用场景\r\n\r\n- 产能有限时优化资源分配\r\n- 长周期生产项目（如飞机制造）\r\n- 按批次生产的流程型制造\r\n- 原料供应不稳定的情况\r\n\r\n倒排适用场景\r\n\r\n- 交期严格的关键订单\r\n- JIT（准时制）生产模式\r\n- 短周期快消品制造\r\n- 供应链响应敏捷的环境\r\n\r\n算法特性对比\r\n\r\n| **特性** | 正排                       | 倒排                        |\r\n| -------- | -------------------------- | --------------------------- |\r\n| 时间计算 | 前推法(Forward Scheduling) | 后推法(Backward Scheduling) |\r\n| 瓶颈处理 | 暴露产能缺口               | 强制满足交期                |\r\n| 灵活性   | 更适应常规生产节奏         | 更适合紧急订单处理          |\r\n| 缓冲设置 | 通常在工序间设置时间缓冲   | 更多在起始阶段预留安全时间  |\r\n\r\n混合排程策略\r\n\r\n现代APS系统常采用：\r\n\r\n1. **关键路径倒排**：对核心工序倒排\r\n2. **非关键路径正排**：辅助工序正排\r\n3. **动态缓冲调整**：根据实时产能变化自动优化";
+const __vite_glob_0_2 = "### 核心区别\r\n\r\n| **维度**     | **正排 (正序排程)**             | **倒排 (倒序排程)**            |\r\n| ------------ | ------------------------------- | ------------------------------ |\r\n| **起点**     | 从订单接收/生产开始时间正向推算 | 从订单交付截止时间反向推算     |\r\n| **优先级**   | 资源利用率优先                  | 交期保障优先                   |\r\n| **时间轴**   | 当前时间 → 未来时间             | 交付截止时间 → 当前时间        |\r\n| **产能约束** | 可能因资源不足延后交期          | 可能因资源不足需要调整生产策略 |\r\n\r\n### 应用场景对比\r\n\r\n正排适用场景\r\n\r\n- 产能有限时优化资源分配\r\n- 长周期生产项目（如飞机制造）\r\n- 按批次生产的流程型制造\r\n- 原料供应不稳定的情况\r\n\r\n倒排适用场景\r\n\r\n- 交期严格的关键订单\r\n- JIT（准时制）生产模式\r\n- 短周期快消品制造\r\n- 供应链响应敏捷的环境\r\n\r\n### 算法特性对比\r\n\r\n| **特性** | 正排                       | 倒排                        |\r\n| -------- | -------------------------- | --------------------------- |\r\n| 时间计算 | 前推法(Forward Scheduling) | 后推法(Backward Scheduling) |\r\n| 瓶颈处理 | 暴露产能缺口               | 强制满足交期                |\r\n| 灵活性   | 更适应常规生产节奏         | 更适合紧急订单处理          |\r\n| 缓冲设置 | 通常在工序间设置时间缓冲   | 更多在起始阶段预留安全时间  |\r\n\r\n混合排程策略\r\n\r\n### 现代APS系统常采用：\r\n\r\n1. **关键路径倒排**：对核心工序倒排\r\n2. **非关键路径正排**：辅助工序正排\r\n3. **动态缓冲调整**：根据实时产能变化自动优化";
 const __vite_glob_0_3 = `---\r
 title: 物料编码规则\r
 date: 2025-12-16\r
@@ -367,8 +260,9 @@ import myGif from './assets/image.gif';\r
 \r
 企业因自身业务、管理需求的不同，有着各自特有的编码规则。面对多规则、高复杂性、高要求的物料编码管理，ENOVIA 可通过二次开发的方式在平台内进行实现。工程师可以更方便地进行在线物料编码的申请，如：用户可以将难以理解、记忆的数字或字母代号，设计成易于识别的文字描述形式，以增强工程师使用过程中的可阅读性与便捷度；支持用户同时申请不同规则的物料编码和工程图号等。如此，灵活性更高，更人性化，简单易用，可满足企业个性需求。`;
 const __vite_glob_0_4 = "---\r\ntitle: Antigravity登入\r\n---\r\n\r\n\r\n#### 下载安装\r\n#### 登入\r\n    ##### 1. 修改google账号归属地到美国，https://policies.google.com/country-association-form?pli=1\r\n    ##### 2. 梯子TUN\r\n#### 运行Antigravity并使用google登入\r\n";
-const __vite_glob_0_5 = "---\r\ntitle: 项目进度\r\n---\r\n\r\n# 项目进度\r\n\r\n## 本周完成\r\n\r\n- 完成了用户界面设计\r\n- 修复了登录问题\r\n\r\n## 下周计划\r\n\r\n- 开始后端开发\r\n- 编写测试用例\r\n";
-const modules = /* @__PURE__ */ Object.assign({ "../../content/Google/anitvity登入问题.md": __vite_glob_0_0, "../../content/制造知识库/仓库管理制度和流程.md": __vite_glob_0_1, "../../content/制造知识库/制造业高级排程中的正排与倒排对比.md": __vite_glob_0_2, "../../content/制造知识库/物料编码规则.mdx": __vite_glob_0_3, "../../content/学习/React学习笔记.md": __vite_glob_0_4, "../../content/工作/项目进度.md": __vite_glob_0_5 });
+const __vite_glob_0_5 = "### notion\r\n\r\n```mermaid\r\nflowchart TB\r\n    U[你<br/>想法 / 需求 / 突发任务]\r\n\r\n    W[网站<br/>待办 & 项目看板<br/>行动中枢]\r\n    N[Notion<br/>项目主表 / 决策 / 复盘]\r\n    D[Google Drive<br/>文件 / 数据 / 输出物]\r\n\r\n    U -->|记录行动| W\r\n    W -->|关联项目| N\r\n    N -->|文件索引| D\r\n\r\n    W -.->|跳转| N\r\n    W -.->|跳转| D\r\n\r\n```\r\n\r\n\r\n待办\r\n```\r\nflowchart LR\r\n    A[新增事项出现] --> B{是否可执行?}\r\n\r\n    B -- 否 --> C[Notion<br/>想法 / 资料]\r\n    B -- 是 --> D[网站<br/>新增待办]\r\n\r\n    D --> E{是否已有项目?}\r\n\r\n    E -- 是 --> F[关联已有项目]\r\n    E -- 否 --> G[Notion 新建项目]\r\n    G --> H[Drive 新建项目文件夹]\r\n\r\n    F --> I[执行任务]\r\n    H --> I\r\n\r\n    I --> J{是否产生决策?}\r\n    J -- 是 --> K[Notion 记录决策]\r\n    J -- 否 --> L[继续执行]\r\n\r\n    K --> L\r\n    L --> M[任务完成]\r\n```\r\n\r\ndrive\r\n```\r\nflowchart TB\r\n    P1[项目想法] --> P2[Notion 创建项目]\r\n    P2 --> P3[定义目标 & 范围]\r\n\r\n    P3 --> P4[网站拆解待办]\r\n    P4 --> P5[执行中]\r\n\r\n    P5 -->|需求变化| P6[Notion 决策记录]\r\n    P6 --> P4\r\n\r\n    P5 --> P7{待办是否清零?}\r\n    P7 -- 否 --> P5\r\n    P7 -- 是 --> P8[项目完成]\r\n\r\n    P8 --> P9[Notion 复盘]\r\n    P9 --> P10[Drive 文件归档]\r\n\r\n```";
+const __vite_glob_0_6 = "---\r\ntitle: 项目进度\r\n---\r\n\r\n# 项目进度\r\n\r\n## 本周完成\r\n\r\n- 完成了用户界面设计\r\n- 修复了登录问题\r\n\r\n## 下周计划\r\n\r\n- 开始后端开发\r\n- 编写测试用例\r\n";
+const modules = /* @__PURE__ */ Object.assign({ "../../content/Google/anitvity登入问题.md": __vite_glob_0_0, "../../content/制造知识库/仓库管理制度和流程.md": __vite_glob_0_1, "../../content/制造知识库/制造业高级排程中的正排与倒排对比.md": __vite_glob_0_2, "../../content/制造知识库/物料编码规则.mdx": __vite_glob_0_3, "../../content/学习/React学习笔记.md": __vite_glob_0_4, "../../content/学习/work_flow.md": __vite_glob_0_5, "../../content/工作/项目进度.md": __vite_glob_0_6 });
 function parseFrontmatter(text) {
   const frontmatterRegex = /^---\s*([\s\S]*?)\s*---/;
   const match = text.match(frontmatterRegex);
@@ -457,7 +351,7 @@ function extractToc(content) {
   }
   return toc;
 }
-async function loader$5({ params }) {
+async function loader$4({ params }) {
   const { tag, slug } = params;
   if (!tag || !slug) {
     throw new Response("Not Found", { status: 404 });
@@ -474,22 +368,11 @@ async function loader$5({ params }) {
   marked.use({ renderer });
   const htmlContent = await marked.parse(note.content);
   const toc = extractToc(note.content);
-  return json({ note, toc, htmlContent });
+  return json$1({ note, toc, htmlContent });
 }
 function NoteDetailPage() {
   const { note, htmlContent } = useLoaderData();
-  return /* @__PURE__ */ jsxs("div", { className: "min-w-0", children: [
-    /* @__PURE__ */ jsxs(
-      Link,
-      {
-        to: "/docs",
-        className: "inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4",
-        children: [
-          /* @__PURE__ */ jsx(ArrowLeft, { className: "h-4 w-4" }),
-          "返回列表"
-        ]
-      }
-    ),
+  return /* @__PURE__ */ jsxs("div", { className: "min-w-0 max-w-3xl", children: [
     /* @__PURE__ */ jsxs("div", { className: "border-b pb-4 mb-8", children: [
       /* @__PURE__ */ jsx("h1", { className: "text-3xl font-bold mb-2", children: note.title }),
       /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-4 text-sm text-muted-foreground", children: [
@@ -503,14 +386,14 @@ function NoteDetailPage() {
     /* @__PURE__ */ jsx(
       "article",
       {
-        className: "markdown-body",
+        className: "markdown-body w-full max-w-none",
         style: { fontSize: "13px", backgroundColor: "transparent" },
         dangerouslySetInnerHTML: { __html: htmlContent }
       }
     )
   ] });
 }
-function ErrorBoundary$1() {
+function ErrorBoundary() {
   const error = useRouteError();
   if (isRouteErrorResponse(error)) {
     return /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center min-h-[50vh] text-center space-y-4", children: [
@@ -531,11 +414,10 @@ function ErrorBoundary$1() {
 }
 const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  ErrorBoundary: ErrorBoundary$1,
+  ErrorBoundary,
   default: NoteDetailPage,
-  loader: loader$5
+  loader: loader$4
 }, Symbol.toStringTag, { value: "Module" }));
-const ganttCss = "/assets/index.css";
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
@@ -575,449 +457,6 @@ const Button = React.forwardRef(
   }
 );
 Button.displayName = "Button";
-const Select = SelectPrimitive.Root;
-const SelectValue = SelectPrimitive.Value;
-const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxs(
-  SelectPrimitive.Trigger,
-  {
-    ref,
-    className: cn(
-      "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-      className
-    ),
-    ...props,
-    children: [
-      children,
-      /* @__PURE__ */ jsx(SelectPrimitive.Icon, { asChild: true, children: /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4 opacity-50" }) })
-    ]
-  }
-));
-SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
-const SelectScrollUpButton = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  SelectPrimitive.ScrollUpButton,
-  {
-    ref,
-    className: cn(
-      "flex cursor-default items-center justify-center py-1",
-      className
-    ),
-    ...props,
-    children: /* @__PURE__ */ jsx(ChevronUp, { className: "h-4 w-4" })
-  }
-));
-SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
-const SelectScrollDownButton = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  SelectPrimitive.ScrollDownButton,
-  {
-    ref,
-    className: cn(
-      "flex cursor-default items-center justify-center py-1",
-      className
-    ),
-    ...props,
-    children: /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4" })
-  }
-));
-SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
-const SelectContent = React.forwardRef(({ className, children, position = "popper", ...props }, ref) => /* @__PURE__ */ jsx(SelectPrimitive.Portal, { children: /* @__PURE__ */ jsxs(
-  SelectPrimitive.Content,
-  {
-    ref,
-    className: cn(
-      "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-      position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-      className
-    ),
-    position,
-    ...props,
-    children: [
-      /* @__PURE__ */ jsx(SelectScrollUpButton, {}),
-      /* @__PURE__ */ jsx(
-        SelectPrimitive.Viewport,
-        {
-          className: cn(
-            "p-1",
-            position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
-          ),
-          children
-        }
-      ),
-      /* @__PURE__ */ jsx(SelectScrollDownButton, {})
-    ]
-  }
-) }));
-SelectContent.displayName = SelectPrimitive.Content.displayName;
-const SelectLabel = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  SelectPrimitive.Label,
-  {
-    ref,
-    className: cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className),
-    ...props
-  }
-));
-SelectLabel.displayName = SelectPrimitive.Label.displayName;
-const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxs(
-  SelectPrimitive.Item,
-  {
-    ref,
-    className: cn(
-      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    ),
-    ...props,
-    children: [
-      /* @__PURE__ */ jsx("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center", children: /* @__PURE__ */ jsx(SelectPrimitive.ItemIndicator, { children: /* @__PURE__ */ jsx(Check, { className: "h-4 w-4" }) }) }),
-      /* @__PURE__ */ jsx(SelectPrimitive.ItemText, { children })
-    ]
-  }
-));
-SelectItem.displayName = SelectPrimitive.Item.displayName;
-const SelectSeparator = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  SelectPrimitive.Separator,
-  {
-    ref,
-    className: cn("-mx-1 my-1 h-px bg-muted", className),
-    ...props
-  }
-));
-SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
-const links = () => [
-  { rel: "stylesheet", href: ganttCss }
-];
-class ErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-  componentDidCatch(error, errorInfo) {
-    console.error("Gantt Error:", error, errorInfo);
-  }
-  render() {
-    var _a;
-    if (this.state.hasError) {
-      return this.props.fallback || /* @__PURE__ */ jsxs("div", { className: "p-4 text-red-500", children: [
-        "Something went wrong: ",
-        (_a = this.state.error) == null ? void 0 : _a.message
-      ] });
-    }
-    return this.props.children;
-  }
-}
-const initialTasks = [
-  { id: 20, text: "需求分析", start: new Date(2024, 5, 11), end: new Date(2024, 6, 12), duration: 1, progress: 60, type: "task", lazy: false },
-  { id: 47, text: "核心开发", start: new Date(2024, 5, 12), end: new Date(2024, 7, 12), duration: 8, progress: 20, parent: 0, type: "summary" },
-  { id: 22, text: "前端实现", start: new Date(2024, 7, 11), end: new Date(2024, 8, 12), duration: 8, progress: 0, parent: 47, type: "task" },
-  { id: 21, text: "后端接口", start: new Date(2024, 7, 10), end: new Date(2024, 8, 12), duration: 3, progress: 0, type: "task", lazy: false },
-  { id: 23, text: "测试验收", start: new Date(2024, 8, 15), end: new Date(2024, 9, 1), duration: 5, progress: 0, type: "task" }
-];
-const initialLinks = [
-  { id: 1, source: 20, target: 47, type: "e2s" },
-  { id: 2, source: 47, target: 23, type: "e2s" }
-];
-function ClientOnly({ children, fallback = null }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-    console.log("ClientOnly mounted");
-  }, []);
-  return mounted ? /* @__PURE__ */ jsx(ErrorBoundary, { children: children() }) : /* @__PURE__ */ jsx(Fragment, { children: fallback });
-}
-function Project() {
-  const [api, setApi] = useState(null);
-  const [scale, setScale] = useState("day");
-  const [projects, setProjects] = useState([]);
-  const [currentProjectId, setCurrentProjectId] = useState("");
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [lastSaved, setLastSaved] = useState(null);
-  const projectsRef = useRef([]);
-  useEffect(() => {
-    projectsRef.current = projects;
-  }, [projects]);
-  useEffect(() => {
-    fetch("/api/projects").then((res) => res.json()).then((data) => {
-      if (data.projects && data.projects.length > 0) {
-        const restored = data.projects.map((p) => ({
-          ...p,
-          tasks: p.tasks.map((t) => ({
-            ...t,
-            start: t.start ? new Date(t.start) : void 0,
-            end: t.end ? new Date(t.end) : void 0
-          }))
-        }));
-        setProjects(restored);
-        setCurrentProjectId(restored[0].id);
-      } else {
-        initDefaultProject();
-      }
-    }).catch((e) => {
-      console.error("Failed to load projects from API", e);
-      initDefaultProject();
-    });
-  }, []);
-  const initDefaultProject = () => {
-    const defaultProject = {
-      id: crypto.randomUUID(),
-      name: "演示项目",
-      tasks: initialTasks,
-      links: initialLinks
-    };
-    saveProjectToApi(defaultProject, true);
-  };
-  const saveProjectToApi = (project, isNew = false) => {
-    const method = isNew ? "POST" : "PUT";
-    fetch("/api/projects", {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(project)
-    }).then((res) => res.json()).then((data) => {
-      if (data.ok) {
-        setLastSaved(/* @__PURE__ */ new Date());
-        if (isNew) {
-          setProjects((prev) => [...prev, project]);
-          setCurrentProjectId(project.id);
-        }
-      } else {
-        console.error("Failed to save project", data.error);
-      }
-    }).catch((e) => console.error("API save error", e));
-  };
-  const saveCurrentProject = (projectId) => {
-    if (!api) return;
-    const currentList = projectsRef.current;
-    const projectToSave = currentList.find((p) => p.id === projectId);
-    if (!projectToSave) return;
-    const currentTasks = api.serialize();
-    let currentLinks = [];
-    try {
-      currentLinks = api.getStores().data.links.serialize();
-    } catch (e) {
-      console.warn("Could not serialize links", e);
-    }
-    const updatedProject = {
-      ...projectToSave,
-      tasks: currentTasks,
-      links: currentLinks.length > 0 ? currentLinks : projectToSave.links
-    };
-    setProjects((prev) => prev.map((p) => p.id === projectId ? updatedProject : p));
-    saveProjectToApi(updatedProject, false);
-  };
-  useEffect(() => {
-    if (!api || !currentProjectId) return;
-    let timeoutId;
-    const currentId = currentProjectId;
-    const handleDataChange = (ev) => {
-      console.log("Gantt event triggered:", ev);
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        console.log("Auto-saving project:", currentId);
-        saveCurrentProject(currentId);
-      }, 1e3);
-    };
-    const events = [
-      "add-task",
-      "update-task",
-      "delete-task",
-      "move-task",
-      "indent-task",
-      "add-link",
-      "update-link",
-      "delete-link"
-    ];
-    const eventIds = [];
-    events.forEach((event) => {
-      try {
-        const id = api.on(event, handleDataChange);
-        if (id) eventIds.push({ event, id });
-      } catch (e) {
-        console.error(`Failed to attach event ${event}`, e);
-      }
-    });
-    return () => {
-      clearTimeout(timeoutId);
-      if (api && api.detach) {
-        eventIds.forEach(({ event, id }) => {
-          try {
-            api.detach(event, id);
-            if (typeof api.detachEvent === "function") {
-              api.detachEvent(id);
-            } else {
-              api.detach(event, id);
-            }
-          } catch (e) {
-            console.warn("Detach failed", e);
-          }
-        });
-      }
-    };
-  }, [api, currentProjectId]);
-  const handleCreateProject = () => {
-    const newProject = {
-      id: crypto.randomUUID(),
-      name: `新项目 ${projects.length + 1}`,
-      tasks: [],
-      links: []
-    };
-    saveProjectToApi(newProject, true);
-  };
-  const handleDeleteProject = (e, id) => {
-    e.stopPropagation();
-    if (confirm("确定要删除这个项目吗？")) {
-      fetch(`/api/projects?id=${id}`, { method: "DELETE" }).then((res) => res.json()).then((data) => {
-        if (data.ok) {
-          const updated = projects.filter((p) => p.id !== id);
-          setProjects(updated);
-          if (currentProjectId === id) {
-            if (updated.length > 0) {
-              setCurrentProjectId(updated[0].id);
-            } else {
-              initDefaultProject();
-            }
-          }
-        }
-      });
-    }
-  };
-  const switchProject = (id) => {
-    if (currentProjectId === id) return;
-    if (currentProjectId && api) {
-      saveCurrentProject(currentProjectId);
-    }
-    setCurrentProjectId(id);
-  };
-  const currentProject = projects.find((p) => p.id === currentProjectId) || projects[0];
-  const handleExport = () => {
-    if (!api) {
-      console.error("API not ready");
-      return;
-    }
-    try {
-      const tasks = api.serialize();
-      if (!Array.isArray(tasks)) {
-        console.error("Serialize returned unexpected format:", tasks);
-        alert("导出数据格式错误");
-        return;
-      }
-      const header = ["ID", "任务名称", "开始时间", "结束时间", "进度"];
-      const csvContent = [
-        header.join(","),
-        ...tasks.map((t) => [
-          t.id,
-          `"${t.text}"`,
-          t.start_date ? new Date(t.start_date).toLocaleDateString() : "",
-          t.end_date ? new Date(t.end_date).toLocaleDateString() : "",
-          (t.progress || 0) + "%"
-        ].join(","))
-      ].join("\n");
-      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `${(currentProject == null ? void 0 : currentProject.name) || "project"}_tasks.csv`;
-      link.click();
-    } catch (e) {
-      alert("导出失败，请稍后重试");
-      console.error(e);
-    }
-  };
-  const scales = scale === "day" ? [
-    { unit: "month", step: 1, format: "MMMM yyy" },
-    { unit: "day", step: 1, format: "d" }
-  ] : scale === "week" ? [
-    { unit: "month", step: 1, format: "MMMM yyy" },
-    { unit: "week", step: 1, format: "'Week 'w" }
-  ] : [
-    { unit: "year", step: 1, format: "yyyy" },
-    { unit: "month", step: 1, format: "MMM" }
-  ];
-  return /* @__PURE__ */ jsxs("div", { className: "h-[calc(100vh-10rem)] w-full border rounded-lg overflow-hidden bg-background flex", children: [
-    /* @__PURE__ */ jsxs("div", { className: "w-64 border-r bg-muted/10 flex flex-col shrink-0", children: [
-      /* @__PURE__ */ jsxs("div", { className: "p-3 border-b flex items-center justify-between bg-muted/20", children: [
-        /* @__PURE__ */ jsxs("span", { className: "font-medium text-sm flex items-center gap-2", children: [
-          /* @__PURE__ */ jsx(FolderOpen, { className: "w-4 h-4" }),
-          "项目列表"
-        ] }),
-        /* @__PURE__ */ jsx(Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: handleCreateProject, children: /* @__PURE__ */ jsx(Plus, { className: "w-4 h-4" }) })
-      ] }),
-      /* @__PURE__ */ jsx("div", { className: "flex-1 overflow-y-auto p-2 space-y-1", children: projects.map((p) => /* @__PURE__ */ jsxs(
-        "div",
-        {
-          onClick: () => switchProject(p.id),
-          className: cn(
-            "group flex items-center justify-between p-2 rounded-md text-sm cursor-pointer hover:bg-accent/50 transition-colors",
-            p.id === currentProjectId ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground"
-          ),
-          children: [
-            /* @__PURE__ */ jsx("span", { className: "truncate", children: p.name }),
-            /* @__PURE__ */ jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                className: "h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10",
-                onClick: (e) => handleDeleteProject(e, p.id),
-                children: /* @__PURE__ */ jsx(Trash2, { className: "w-3.5 h-3.5" })
-              }
-            )
-          ]
-        },
-        p.id
-      )) })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { className: "flex-1 flex flex-col min-w-0", children: [
-      /* @__PURE__ */ jsxs("div", { className: "p-3 border-b flex items-center justify-between bg-muted/20", children: [
-        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
-          /* @__PURE__ */ jsxs(Select, { value: scale, onValueChange: setScale, children: [
-            /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[120px] h-8", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "选择视图" }) }),
-            /* @__PURE__ */ jsxs(SelectContent, { children: [
-              /* @__PURE__ */ jsx(SelectItem, { value: "day", children: "日视图" }),
-              /* @__PURE__ */ jsx(SelectItem, { value: "week", children: "周视图" }),
-              /* @__PURE__ */ jsx(SelectItem, { value: "month", children: "月视图" })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs(Button, { variant: "outline", size: "sm", onClick: handleExport, disabled: !api, className: "h-8", children: [
-            /* @__PURE__ */ jsx(Download, { className: "w-3.5 h-3.5 mr-2" }),
-            "导出 Excel"
-          ] }),
-          /* @__PURE__ */ jsxs(Button, { variant: "default", size: "sm", onClick: () => saveCurrentProject(currentProjectId), disabled: !api, className: "h-8", children: [
-            /* @__PURE__ */ jsx(Save, { className: "w-3.5 h-3.5 mr-2" }),
-            "保存"
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "text-sm text-muted-foreground flex items-center gap-2", children: [
-          lastSaved && /* @__PURE__ */ jsxs("span", { className: "text-xs text-muted-foreground/60", children: [
-            "已保存 ",
-            lastSaved.toLocaleTimeString()
-          ] }),
-          /* @__PURE__ */ jsxs("span", { children: [
-            "当前项目: ",
-            currentProject == null ? void 0 : currentProject.name
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsx(ClientOnly, { fallback: /* @__PURE__ */ jsx("div", { className: "flex items-center justify-center h-full text-muted-foreground", children: "Loading Gantt Chart..." }), children: () => /* @__PURE__ */ jsxs(Willow, { children: [
-        /* @__PURE__ */ jsx(Toolbar, { api, items: defaultToolbarButtons }),
-        currentProject && /* @__PURE__ */ jsx(
-          Gantt,
-          {
-            init: setApi,
-            tasks: currentProject.tasks,
-            links: currentProject.links,
-            scales
-          },
-          currentProject.id
-        ),
-        api && /* @__PURE__ */ jsx(Editor, { api })
-      ] }) })
-    ] })
-  ] });
-}
-const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  default: Project,
-  links
-}, Symbol.toStringTag, { value: "Module" }));
 const Input = React.forwardRef(
   ({ className, type, ...props }, ref) => {
     return /* @__PURE__ */ jsx(
@@ -1051,59 +490,6 @@ const Textarea = React.forwardRef(
   }
 );
 Textarea.displayName = "Textarea";
-const Card = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  "div",
-  {
-    ref,
-    className: cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
-      className
-    ),
-    ...props
-  }
-));
-Card.displayName = "Card";
-const CardHeader = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  "div",
-  {
-    ref,
-    className: cn("flex flex-col space-y-1.5 p-6", className),
-    ...props
-  }
-));
-CardHeader.displayName = "CardHeader";
-const CardTitle = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  "h3",
-  {
-    ref,
-    className: cn(
-      "text-2xl font-semibold leading-none tracking-tight",
-      className
-    ),
-    ...props
-  }
-));
-CardTitle.displayName = "CardTitle";
-const CardDescription = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  "p",
-  {
-    ref,
-    className: cn("text-sm text-muted-foreground", className),
-    ...props
-  }
-));
-CardDescription.displayName = "CardDescription";
-const CardContent = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx("div", { ref, className: cn("p-6 pt-0", className), ...props }));
-CardContent.displayName = "CardContent";
-const CardFooter = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
-  "div",
-  {
-    ref,
-    className: cn("flex items-center p-6 pt-0", className),
-    ...props
-  }
-));
-CardFooter.displayName = "CardFooter";
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
 const DialogPortal = DialogPrimitive.Portal;
@@ -1247,6 +633,112 @@ function deletePrompt(id) {
   if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
   return changed;
 }
+const Select = SelectPrimitive.Root;
+const SelectValue = SelectPrimitive.Value;
+const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxs(
+  SelectPrimitive.Trigger,
+  {
+    ref,
+    className: cn(
+      "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      className
+    ),
+    ...props,
+    children: [
+      children,
+      /* @__PURE__ */ jsx(SelectPrimitive.Icon, { asChild: true, children: /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4 opacity-50" }) })
+    ]
+  }
+));
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
+const SelectScrollUpButton = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  SelectPrimitive.ScrollUpButton,
+  {
+    ref,
+    className: cn(
+      "flex cursor-default items-center justify-center py-1",
+      className
+    ),
+    ...props,
+    children: /* @__PURE__ */ jsx(ChevronUp, { className: "h-4 w-4" })
+  }
+));
+SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
+const SelectScrollDownButton = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  SelectPrimitive.ScrollDownButton,
+  {
+    ref,
+    className: cn(
+      "flex cursor-default items-center justify-center py-1",
+      className
+    ),
+    ...props,
+    children: /* @__PURE__ */ jsx(ChevronDown, { className: "h-4 w-4" })
+  }
+));
+SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
+const SelectContent = React.forwardRef(({ className, children, position = "popper", ...props }, ref) => /* @__PURE__ */ jsx(SelectPrimitive.Portal, { children: /* @__PURE__ */ jsxs(
+  SelectPrimitive.Content,
+  {
+    ref,
+    className: cn(
+      "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+      position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+      className
+    ),
+    position,
+    ...props,
+    children: [
+      /* @__PURE__ */ jsx(SelectScrollUpButton, {}),
+      /* @__PURE__ */ jsx(
+        SelectPrimitive.Viewport,
+        {
+          className: cn(
+            "p-1",
+            position === "popper" && "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+          ),
+          children
+        }
+      ),
+      /* @__PURE__ */ jsx(SelectScrollDownButton, {})
+    ]
+  }
+) }));
+SelectContent.displayName = SelectPrimitive.Content.displayName;
+const SelectLabel = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  SelectPrimitive.Label,
+  {
+    ref,
+    className: cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className),
+    ...props
+  }
+));
+SelectLabel.displayName = SelectPrimitive.Label.displayName;
+const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxs(
+  SelectPrimitive.Item,
+  {
+    ref,
+    className: cn(
+      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    ),
+    ...props,
+    children: [
+      /* @__PURE__ */ jsx("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center", children: /* @__PURE__ */ jsx(SelectPrimitive.ItemIndicator, { children: /* @__PURE__ */ jsx(Check, { className: "h-4 w-4" }) }) }),
+      /* @__PURE__ */ jsx(SelectPrimitive.ItemText, { children })
+    ]
+  }
+));
+SelectItem.displayName = SelectPrimitive.Item.displayName;
+const SelectSeparator = React.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsx(
+  SelectPrimitive.Separator,
+  {
+    ref,
+    className: cn("-mx-1 my-1 h-px bg-muted", className),
+    ...props
+  }
+));
+SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 function Prompts() {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
@@ -1358,30 +850,33 @@ function Prompts() {
     } catch {
     }
   }
-  return /* @__PURE__ */ jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsx("section", { className: "space-y-6 bg-slate-50 dark:bg-transparent", children: /* @__PURE__ */ jsx("div", { className: "mx-auto px-4 max-w-[1200px] py-4", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-6", children: [
-    /* @__PURE__ */ jsx("div", { className: "md:col-span-4", children: /* @__PURE__ */ jsxs(Card, { className: "p-4 sticky top-4", children: [
-      /* @__PURE__ */ jsx("h3", { className: "font-bold mb-3", children: "新增提示词" }),
-      /* @__PURE__ */ jsxs("div", { className: "grid gap-3", children: [
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "分类" }),
-          /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
+  return /* @__PURE__ */ jsxs("div", { className: "flex-1 w-full bg-background flex min-h-0 h-[calc(100vh-8rem)] border rounded-lg overflow-hidden mt-[5px]", children: [
+    /* @__PURE__ */ jsxs("div", { className: "w-[300px] border-r bg-muted/10 flex flex-col shrink-0", children: [
+      /* @__PURE__ */ jsx("div", { className: "h-12 px-4 border-b flex items-center justify-between bg-muted/30", children: /* @__PURE__ */ jsxs("span", { className: "font-medium text-sm flex items-center gap-2", children: [
+        /* @__PURE__ */ jsx(Plus, { className: "w-4 h-4" }),
+        "新增提示词"
+      ] }) }),
+      /* @__PURE__ */ jsxs("div", { className: "flex-1 overflow-y-auto p-4 space-y-4", children: [
+        /* @__PURE__ */ jsxs("div", { className: "space-y-1.5", children: [
+          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground font-medium", children: "分类" }),
+          /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2", children: [
             /* @__PURE__ */ jsxs(
-              "select",
+              Select,
               {
-                value: category,
-                onChange: (e) => {
-                  const v = e.target.value;
+                value: categories.includes(category) ? category : category ? "__NEW__" : "",
+                onValueChange: (v) => {
                   if (v !== "__NEW__") {
                     setCategory(v);
                   } else {
                     setCategory("");
                   }
                 },
-                className: "h-8 text-[13px] w-1/3 rounded-md border border-input bg-background px-3",
                 children: [
-                  /* @__PURE__ */ jsx("option", { value: "", disabled: true, children: "选择分类" }),
-                  categories.map((c) => /* @__PURE__ */ jsx("option", { value: c, children: c }, c)),
-                  /* @__PURE__ */ jsx("option", { value: "__NEW__", children: "输入新分类..." })
+                  /* @__PURE__ */ jsx(SelectTrigger, { className: "h-8 text-[13px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "选择分类" }) }),
+                  /* @__PURE__ */ jsxs(SelectContent, { children: [
+                    categories.map((c) => /* @__PURE__ */ jsx(SelectItem, { value: c, children: c }, c)),
+                    /* @__PURE__ */ jsx(SelectItem, { value: "__NEW__", children: "+ 新建分类" })
+                  ] })
                 ]
               }
             ),
@@ -1390,181 +885,139 @@ function Prompts() {
               {
                 value: category,
                 onChange: (e) => setCategory(e.target.value),
-                className: "h-8 text-[13px] flex-1",
+                className: "h-8 text-[13px]",
                 placeholder: "输入分类名称"
               }
             )
           ] })
         ] }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "标题" }),
-          /* @__PURE__ */ jsx(Input, { value: title, onChange: (e) => setTitle(e.target.value), className: "h-8 text-[13px]", placeholder: "提示词标题" })
+        /* @__PURE__ */ jsxs("div", { className: "space-y-1.5", children: [
+          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground font-medium", children: "标题" }),
+          /* @__PURE__ */ jsx(
+            Input,
+            {
+              value: title,
+              onChange: (e) => setTitle(e.target.value),
+              className: "h-8 text-[13px]",
+              placeholder: "提示词标题"
+            }
+          )
         ] }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground", children: "内容" }),
-          /* @__PURE__ */ jsx(Textarea, { value: content, onChange: (e) => setContent(e.target.value), rows: 6, placeholder: "完整提示词内容" })
+        /* @__PURE__ */ jsxs("div", { className: "space-y-1.5", children: [
+          /* @__PURE__ */ jsx("label", { className: "text-xs text-muted-foreground font-medium", children: "内容" }),
+          /* @__PURE__ */ jsx(
+            Textarea,
+            {
+              value: content,
+              onChange: (e) => setContent(e.target.value),
+              rows: 10,
+              className: "resize-none text-[13px]",
+              placeholder: "输入完整提示词内容..."
+            }
+          )
         ] }),
-        /* @__PURE__ */ jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsx(Button, { size: "sm", className: "h-8 px-4 text-[13px]", onClick: addPrompt, children: "保存" }) })
+        /* @__PURE__ */ jsxs(Button, { size: "sm", className: "w-full h-8 text-[13px]", onClick: addPrompt, children: [
+          /* @__PURE__ */ jsx(Save, { className: "w-3.5 h-3.5 mr-2" }),
+          "保存提示词"
+        ] }),
+        notice && /* @__PURE__ */ jsx(Alert, { className: "py-2", children: /* @__PURE__ */ jsx(AlertDescription, { className: "text-xs text-center", children: notice }) })
       ] })
-    ] }) }),
-    /* @__PURE__ */ jsx("div", { className: "md:col-span-8", children: /* @__PURE__ */ jsxs(Card, { className: "p-4", children: [
-      /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between mb-3", children: [
-        /* @__PURE__ */ jsx("h3", { className: "font-bold", children: "提示词库" }),
-        /* @__PURE__ */ jsx("div", { className: "w-[200px]", children: /* @__PURE__ */ jsxs(
-          "select",
-          {
-            value: filter,
-            onChange: (e) => setFilter(e.target.value),
-            className: "h-8 text-[13px] w-full rounded-md border border-input bg-background px-3",
-            children: [
-              /* @__PURE__ */ jsx("option", { value: "ALL", children: "全部分类" }),
-              categories.map((c) => /* @__PURE__ */ jsx("option", { value: c, children: c }, c))
-            ]
-          }
-        ) })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "grid gap-4", children: [
-        /* @__PURE__ */ jsx("div", { className: "border rounded-md min-h-[120px]", children: prompts.length === 0 ? /* @__PURE__ */ jsx("div", { className: "p-3 text-sm text-muted-foreground", children: "暂无提示词" }) : /* @__PURE__ */ jsx("div", { className: "divide-y", children: prompts.map((p) => /* @__PURE__ */ jsxs("div", { className: "p-3 flex items-center justify-between gap-3", children: [
-          /* @__PURE__ */ jsxs("div", { className: "min-w-0", children: [
-            /* @__PURE__ */ jsx("div", { className: "text-xs text-muted-foreground", children: p.category }),
-            /* @__PURE__ */ jsx("div", { className: "font-medium truncate max-w-[520px]", children: p.title })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
-            /* @__PURE__ */ jsxs(Button, { variant: "outline", size: "sm", className: "h-8 px-3 text-[13px]", onClick: () => {
-              navigator.clipboard.writeText(p.content);
-              setNotice("内容已复制");
-              setTimeout(() => setNotice(""), 2e3);
-            }, children: [
-              /* @__PURE__ */ jsx(Copy, { className: "w-3.5 h-3.5 mr-1" }),
-              " 复制"
-            ] }),
-            /* @__PURE__ */ jsxs(Dialog, { children: [
-              /* @__PURE__ */ jsx(DialogTrigger, { asChild: true, children: /* @__PURE__ */ jsx(Button, { variant: "outline", size: "sm", className: "h-8 px-3 text-[13px]", children: "查看" }) }),
-              /* @__PURE__ */ jsxs(DialogContent, { className: "sm:max-w-[640px]", children: [
-                /* @__PURE__ */ jsx(DialogHeader, { children: /* @__PURE__ */ jsx(DialogTitle, { children: p.title }) }),
-                /* @__PURE__ */ jsx("div", { className: "text-sm whitespace-pre-wrap", children: p.content })
-              ] })
-            ] }),
-            /* @__PURE__ */ jsx(Button, { variant: "destructive", size: "sm", className: "h-8 px-3 text-[13px]", onClick: () => removePrompt(p.id), children: "删除" })
+    ] }),
+    /* @__PURE__ */ jsxs("div", { className: "flex-1 flex flex-col min-w-0 overflow-hidden", children: [
+      /* @__PURE__ */ jsxs("div", { className: "h-12 px-4 border-b flex items-center justify-between bg-muted/30", children: [
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsx(Sparkles, { className: "w-4 h-4 text-primary" }),
+          /* @__PURE__ */ jsx("span", { className: "font-medium text-sm", children: "提示词库" }),
+          /* @__PURE__ */ jsxs("span", { className: "text-xs text-muted-foreground ml-2", children: [
+            "(",
+            prompts.length,
+            ")"
           ] })
-        ] }, p.id)) }) }),
-        notice && /* @__PURE__ */ jsx(Alert, { className: "mb-2", children: /* @__PURE__ */ jsx(AlertDescription, { children: notice }) })
-      ] })
-    ] }) })
-  ] }) }) }) });
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 w-[400px]", children: [
+          /* @__PURE__ */ jsxs("div", { className: "relative flex-1", children: [
+            /* @__PURE__ */ jsx(Search, { className: "absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" }),
+            /* @__PURE__ */ jsx(
+              Input,
+              {
+                type: "search",
+                placeholder: "搜索提示词...",
+                className: "w-full h-8 pl-8 text-[13px] bg-background",
+                value: query,
+                onChange: (e) => setQuery(e.target.value)
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs(Select, { value: filter, onValueChange: setFilter, children: [
+            /* @__PURE__ */ jsx(SelectTrigger, { className: "w-[140px] h-8 text-[13px]", children: /* @__PURE__ */ jsx(SelectValue, { placeholder: "全部分类" }) }),
+            /* @__PURE__ */ jsxs(SelectContent, { children: [
+              /* @__PURE__ */ jsx(SelectItem, { value: "ALL", children: "全部分类" }),
+              categories.map((c) => /* @__PURE__ */ jsx(SelectItem, { value: c, children: c }, c))
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsx("div", { className: "flex-1 overflow-y-auto p-0", children: prompts.length === 0 ? /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center h-[300px] text-muted-foreground", children: [
+        /* @__PURE__ */ jsx(Sparkles, { className: "w-12 h-12 mb-4 opacity-20" }),
+        /* @__PURE__ */ jsx("p", { className: "text-sm", children: "暂无提示词，请在左侧添加" })
+      ] }) : /* @__PURE__ */ jsx("div", { className: "divide-y", children: prompts.map((p) => /* @__PURE__ */ jsxs("div", { className: "p-4 flex items-start justify-between gap-4 hover:bg-muted/30 transition-colors group", children: [
+        /* @__PURE__ */ jsxs("div", { className: "space-y-1 min-w-0 flex-1", children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsx("span", { className: "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80", children: p.category }),
+            /* @__PURE__ */ jsx("h4", { className: "font-medium text-sm truncate", children: p.title })
+          ] }),
+          /* @__PURE__ */ jsx("p", { className: "text-xs text-muted-foreground line-clamp-2 leading-relaxed", children: p.content })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity", children: [
+          /* @__PURE__ */ jsx(
+            Button,
+            {
+              variant: "outline",
+              size: "icon",
+              className: "h-7 w-7",
+              title: "复制内容",
+              onClick: () => {
+                navigator.clipboard.writeText(p.content);
+                setNotice("内容已复制");
+                setTimeout(() => setNotice(""), 2e3);
+              },
+              children: /* @__PURE__ */ jsx(Copy, { className: "w-3.5 h-3.5" })
+            }
+          ),
+          /* @__PURE__ */ jsxs(Dialog, { children: [
+            /* @__PURE__ */ jsx(DialogTrigger, { asChild: true, children: /* @__PURE__ */ jsx(Button, { variant: "outline", size: "sm", className: "h-7 px-2 text-xs", children: "查看" }) }),
+            /* @__PURE__ */ jsxs(DialogContent, { className: "sm:max-w-[640px]", children: [
+              /* @__PURE__ */ jsx(DialogHeader, { children: /* @__PURE__ */ jsx(DialogTitle, { children: p.title }) }),
+              /* @__PURE__ */ jsx("div", { className: "mt-4 p-4 bg-muted/30 rounded-md text-sm whitespace-pre-wrap max-h-[60vh] overflow-y-auto font-mono", children: p.content })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsx(
+            Button,
+            {
+              variant: "ghost",
+              size: "icon",
+              className: "h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10",
+              title: "删除",
+              onClick: () => removePrompt(p.id),
+              children: /* @__PURE__ */ jsx(Trash2, { className: "w-3.5 h-3.5" })
+            }
+          )
+        ] })
+      ] }, p.id)) }) })
+    ] })
+  ] });
 }
-const route3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: Prompts
 }, Symbol.toStringTag, { value: "Module" }));
-function requireDB$1(context) {
-  const db = context == null ? void 0 : context.DB;
-  if (!db) throw new Response("D1 not bound", { status: 500 });
-  return db;
-}
-async function loader$4({ request, context }) {
-  try {
-    const db = requireDB$1(context);
-    await db.prepare(
-      `CREATE TABLE IF NOT EXISTS projects (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          tasks TEXT NOT NULL,
-          links TEXT NOT NULL,
-          created_at INTEGER NOT NULL,
-          updated_at INTEGER NOT NULL
-        )`
-    ).run();
-    const stmt = db.prepare("SELECT id, name, tasks, links, updated_at FROM projects ORDER BY updated_at DESC");
-    const res = await stmt.all();
-    return json$1({
-      projects: (res.results ?? []).map((r) => ({
-        id: String(r.id),
-        name: String(r.name),
-        tasks: JSON.parse(String(r.tasks)),
-        links: JSON.parse(String(r.links)),
-        updatedAt: Number(r.updated_at)
-      }))
-    });
-  } catch (e) {
-    console.error("/api/projects loader error:", e);
-    return json$1({ error: (e == null ? void 0 : e.message) ?? String(e) }, { status: 500 });
-  }
-}
-async function action$1({ request, context }) {
-  try {
-    const db = requireDB$1(context);
-    const method = request.method.toUpperCase();
-    await db.prepare(
-      `CREATE TABLE IF NOT EXISTS projects (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          tasks TEXT NOT NULL,
-          links TEXT NOT NULL,
-          created_at INTEGER NOT NULL,
-          updated_at INTEGER NOT NULL
-        )`
-    ).run();
-    if (method === "POST") {
-      const body = await request.json();
-      const { name, tasks, links: links2 } = body;
-      if (!name) return json$1({ error: "missing name" }, { status: 400 });
-      const id = crypto.randomUUID();
-      const now = Date.now();
-      await db.prepare("INSERT INTO projects (id, name, tasks, links, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)").bind(id, name, JSON.stringify(tasks || []), JSON.stringify(links2 || []), now, now).run();
-      return json$1({ ok: true, id, name, tasks: tasks || [], links: links2 || [] });
-    }
-    if (method === "PUT") {
-      const body = await request.json();
-      const { id, name, tasks, links: links2 } = body;
-      if (!id) return json$1({ error: "missing id" }, { status: 400 });
-      const now = Date.now();
-      const updates = [];
-      const params = [];
-      if (name !== void 0) {
-        updates.push("name = ?");
-        params.push(name);
-      }
-      if (tasks !== void 0) {
-        updates.push("tasks = ?");
-        params.push(JSON.stringify(tasks));
-      }
-      if (links2 !== void 0) {
-        updates.push("links = ?");
-        params.push(JSON.stringify(links2));
-      }
-      if (updates.length === 0) return json$1({ ok: true });
-      updates.push("updated_at = ?");
-      params.push(now);
-      params.push(id);
-      await db.prepare(`UPDATE projects SET ${updates.join(", ")} WHERE id = ?`).bind(...params).run();
-      return json$1({ ok: true });
-    }
-    if (method === "DELETE") {
-      const url = new URL(request.url);
-      const id = url.searchParams.get("id");
-      if (!id) return json$1({ error: "missing id" }, { status: 400 });
-      await db.prepare("DELETE FROM projects WHERE id = ?").bind(id).run();
-      return json$1({ ok: true });
-    }
-    return json$1({ error: "method not allowed" }, { status: 405 });
-  } catch (e) {
-    console.error("/api/projects action error:", e);
-    return json$1({ error: (e == null ? void 0 : e.message) ?? String(e) }, { status: 500 });
-  }
-}
-const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  action: action$1,
-  loader: loader$4
-}, Symbol.toStringTag, { value: "Module" }));
 const loader$3 = async () => {
-  return redirect("/tools/math");
+  return redirect("/tools/prompts");
 };
 function ToolsIndex() {
   return null;
 }
-const route5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: ToolsIndex,
   loader: loader$3
@@ -1586,12 +1039,12 @@ async function loader$2({ request, context }) {
     ).run();
     if (health === "1") {
       const res = await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='prompts'").all();
-      return json$1({ ok: true, table: ((_b = (_a = res.results) == null ? void 0 : _a[0]) == null ? void 0 : _b.name) ?? null });
+      return json({ ok: true, table: ((_b = (_a = res.results) == null ? void 0 : _a[0]) == null ? void 0 : _b.name) ?? null });
     }
     const promptsStmt = category && category !== "ALL" ? db.prepare("SELECT id, category, title, content, created_at FROM prompts WHERE category = ? ORDER BY created_at DESC").bind(category) : db.prepare("SELECT id, category, title, content, created_at FROM prompts ORDER BY created_at DESC");
     const promptsRes = await promptsStmt.all();
     const catsRes = await db.prepare("SELECT DISTINCT category FROM prompts ORDER BY category ASC").all();
-    return json$1({
+    return json({
       prompts: (promptsRes.results ?? []).map((r) => ({
         id: String(r.id),
         category: String(r.category),
@@ -1603,7 +1056,7 @@ async function loader$2({ request, context }) {
     });
   } catch (e) {
     console.error("/api/prompts loader error:", e);
-    return json$1({ error: (e == null ? void 0 : e.message) ?? String(e) }, { status: 500 });
+    return json({ error: (e == null ? void 0 : e.message) ?? String(e) }, { status: 500 });
   }
 }
 async function action({ request, context }) {
@@ -1616,26 +1069,26 @@ async function action({ request, context }) {
       ).run();
       const body = await request.json();
       const { category, title, content } = body ?? {};
-      if (!category || !title || !content) return json$1({ error: "missing fields" }, { status: 400 });
+      if (!category || !title || !content) return json({ error: "missing fields" }, { status: 400 });
       const id = crypto.randomUUID();
       const createdAt = Date.now();
       await db.prepare("INSERT INTO prompts (id, category, title, content, created_at) VALUES (?, ?, ?, ?, ?)").bind(id, category, title, content, createdAt).run();
-      return json$1({ ok: true, id });
+      return json({ ok: true, id });
     }
     if (method === "DELETE") {
       const url = new URL(request.url);
       const id = url.searchParams.get("id");
-      if (!id) return json$1({ error: "missing id" }, { status: 400 });
+      if (!id) return json({ error: "missing id" }, { status: 400 });
       await db.prepare("DELETE FROM prompts WHERE id = ?").bind(id).run();
-      return json$1({ ok: true });
+      return json({ ok: true });
     }
-    return json$1({ error: "method not allowed" }, { status: 405 });
+    return json({ error: "method not allowed" }, { status: 405 });
   } catch (e) {
     console.error("/api/prompts action error:", e);
-    return json$1({ error: (e == null ? void 0 : e.message) ?? String(e) }, { status: 500 });
+    return json({ error: (e == null ? void 0 : e.message) ?? String(e) }, { status: 500 });
   }
 }
-const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   action,
   loader: loader$2
@@ -1643,7 +1096,7 @@ const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
 async function loader$1() {
   const notesByTag = getNotesByTag();
   const debugKeys = getDebugKeys();
-  return json({ notesByTag, debugKeys });
+  return json$1({ notesByTag, debugKeys });
 }
 function DocsIndexPage() {
   const { notesByTag, debugKeys } = useLoaderData();
@@ -1668,7 +1121,7 @@ function DocsIndexPage() {
   }
   return /* @__PURE__ */ jsx("div", { className: "mt-4 text-[13px] text-muted-foreground", children: /* @__PURE__ */ jsx("p", { children: "从左侧选择一个笔记查看正文，右侧显示该页目录。" }) });
 }
-const route7 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: DocsIndexPage,
   loader: loader$1
@@ -1794,64 +1247,57 @@ function MathGenerator() {
         return op;
     }
   };
-  return /* @__PURE__ */ jsxs("div", { className: "space-y-6 text-[13px]", children: [
-    /* @__PURE__ */ jsxs("div", { className: "print:hidden space-y-6", children: [
-      /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxs("h1", { className: "text-[16px] font-bold tracking-tight flex items-center gap-2", children: [
-          /* @__PURE__ */ jsx(Calculator, { className: "h-5 w-5 text-primary" }),
-          "小学生口算生成器，自定义生成加减乘除口算题，支持竖式和横式。"
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsx(Button, { onClick: generateProblems, size: "sm", className: "h-8 px-4 text-[13px]", disabled: operators.length === 0, children: "生成试卷" }),
-          /* @__PURE__ */ jsxs(Button, { variant: "outline", onClick: handlePrint, size: "sm", className: "h-8 px-4 text-[13px]", children: [
-            /* @__PURE__ */ jsx(Printer, { className: "mr-2 h-3.5 w-3.5" }),
-            " 打印A4"
-          ] })
-        ] })
+  return /* @__PURE__ */ jsxs("div", { className: "flex-1 w-full bg-background flex min-h-0 h-[calc(100vh-8rem)] border rounded-lg overflow-hidden mt-[5px]", children: [
+    /* @__PURE__ */ jsxs("div", { className: "w-[300px] border-r bg-muted/10 flex flex-col shrink-0 print:hidden", children: [
+      /* @__PURE__ */ jsx("div", { className: "h-12 px-4 border-b flex items-center justify-between bg-muted/30", children: /* @__PURE__ */ jsxs("span", { className: "font-medium text-sm flex items-center gap-2", children: [
+        /* @__PURE__ */ jsx(Settings2, { className: "w-4 h-4" }),
+        "出题配置"
       ] }) }),
-      /* @__PURE__ */ jsx("div", { className: "bg-muted/30 p-4 rounded-lg border space-y-4", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-end gap-x-8 gap-y-4", children: [
-        /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
-          /* @__PURE__ */ jsx(Label, { htmlFor: "range1", className: "text-xs text-muted-foreground", children: "数字1范围" }),
-          /* @__PURE__ */ jsx(
-            Input,
-            {
-              id: "range1",
-              className: "w-24 h-8 text-[13px]",
-              value: range1,
-              onChange: (e) => setRange1(e.target.value),
-              placeholder: "1-100"
-            }
-          )
+      /* @__PURE__ */ jsxs("div", { className: "flex-1 overflow-y-auto p-4 space-y-6", children: [
+        /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxs("div", { className: "space-y-1.5", children: [
+            /* @__PURE__ */ jsx(Label, { htmlFor: "range1", className: "text-xs text-muted-foreground font-medium", children: "数字1范围" }),
+            /* @__PURE__ */ jsx(
+              Input,
+              {
+                id: "range1",
+                className: "h-8 text-[13px]",
+                value: range1,
+                onChange: (e) => setRange1(e.target.value),
+                placeholder: "1-100"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "space-y-1.5", children: [
+            /* @__PURE__ */ jsx(Label, { htmlFor: "range2", className: "text-xs text-muted-foreground font-medium", children: "数字2范围" }),
+            /* @__PURE__ */ jsx(
+              Input,
+              {
+                id: "range2",
+                className: "h-8 text-[13px]",
+                value: range2,
+                onChange: (e) => setRange2(e.target.value),
+                placeholder: "1-100"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "space-y-1.5", children: [
+            /* @__PURE__ */ jsx(Label, { htmlFor: "count", className: "text-xs text-muted-foreground font-medium", children: "题目数量" }),
+            /* @__PURE__ */ jsx(
+              Input,
+              {
+                id: "count",
+                type: "number",
+                className: "h-8 text-[13px]",
+                value: count,
+                onChange: (e) => setCount(parseInt(e.target.value) || 0)
+              }
+            )
+          ] })
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
-          /* @__PURE__ */ jsx(Label, { htmlFor: "range2", className: "text-xs text-muted-foreground", children: "数字2范围" }),
-          /* @__PURE__ */ jsx(
-            Input,
-            {
-              id: "range2",
-              className: "w-24 h-8 text-[13px]",
-              value: range2,
-              onChange: (e) => setRange2(e.target.value),
-              placeholder: "1-100"
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
-          /* @__PURE__ */ jsx(Label, { htmlFor: "count", className: "text-xs text-muted-foreground", children: "数量" }),
-          /* @__PURE__ */ jsx(
-            Input,
-            {
-              id: "count",
-              type: "number",
-              className: "w-16 h-8 text-[13px]",
-              value: count,
-              onChange: (e) => setCount(parseInt(e.target.value) || 0)
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-          /* @__PURE__ */ jsx(Label, { className: "text-xs text-muted-foreground", children: "符号" }),
-          /* @__PURE__ */ jsx("div", { className: "flex gap-3 items-center h-8", children: ["+", "-", "*", "/"].map((op) => /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-1.5", children: [
+        /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsx(Label, { className: "text-xs text-muted-foreground font-medium", children: "运算符号" }),
+          /* @__PURE__ */ jsx("div", { className: "grid grid-cols-2 gap-2", children: ["+", "-", "*", "/"].map((op) => /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2 border rounded-md p-2 bg-background", children: [
             /* @__PURE__ */ jsx(
               Checkbox,
               {
@@ -1865,68 +1311,92 @@ function MathGenerator() {
               "label",
               {
                 htmlFor: `op-${op}`,
-                className: "text-[13px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                className: "text-[13px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 cursor-pointer",
                 children: getOperatorSymbol(op)
               }
             )
           ] }, op)) })
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-          /* @__PURE__ */ jsx(Label, { className: "text-xs text-muted-foreground", children: "格式" }),
-          /* @__PURE__ */ jsxs(RadioGroup, { value: format, onValueChange: (v) => setFormat(v), className: "flex gap-4 items-center h-8", children: [
-            /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-1.5", children: [
+        /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsx(Label, { className: "text-xs text-muted-foreground font-medium", children: "试卷格式" }),
+          /* @__PURE__ */ jsxs(RadioGroup, { value: format, onValueChange: (v) => setFormat(v), className: "grid grid-cols-2 gap-2", children: [
+            /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2 border rounded-md p-2 bg-background", children: [
               /* @__PURE__ */ jsx(RadioGroupItem, { value: "horizontal", id: "r-horizontal", className: "h-4 w-4" }),
-              /* @__PURE__ */ jsx(Label, { htmlFor: "r-horizontal", className: "text-[13px] font-normal cursor-pointer", children: "横式" })
+              /* @__PURE__ */ jsx(Label, { htmlFor: "r-horizontal", className: "text-[13px] font-normal cursor-pointer flex-1", children: "横式" })
             ] }),
-            /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-1.5", children: [
+            /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2 border rounded-md p-2 bg-background", children: [
               /* @__PURE__ */ jsx(RadioGroupItem, { value: "vertical", id: "r-vertical", className: "h-4 w-4" }),
-              /* @__PURE__ */ jsx(Label, { htmlFor: "r-vertical", className: "text-[13px] font-normal cursor-pointer", children: "竖式" })
+              /* @__PURE__ */ jsx(Label, { htmlFor: "r-vertical", className: "text-[13px] font-normal cursor-pointer flex-1", children: "竖式" })
             ] })
           ] })
-        ] })
-      ] }) })
+        ] }),
+        /* @__PURE__ */ jsx("div", { className: "pt-2", children: /* @__PURE__ */ jsx(Button, { onClick: generateProblems, className: "w-full h-8 text-[13px]", disabled: operators.length === 0, children: "生成试卷" }) })
+      ] })
     ] }),
-    /* @__PURE__ */ jsxs("div", { className: "print:block min-h-[500px]", id: "print-area", children: [
-      /* @__PURE__ */ jsx(
-        "div",
-        {
-          className: `grid w-full ${format === "vertical" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 print:grid-cols-5 gap-x-12 gap-y-12" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-x-12 gap-y-8"}`,
-          children: problems.map((p, i) => /* @__PURE__ */ jsx("div", { className: "font-mono text-xl flex justify-center", style: { breakInside: "avoid" }, children: format === "vertical" ? p.operator === "/" ? (
-            // Vertical Division Layout
-            /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center text-lg", children: [
-              /* @__PURE__ */ jsx("div", { className: "mr-2", children: p.num2 }),
-              /* @__PURE__ */ jsx("div", { className: "border-l border-t border-black px-2 pt-0.5 pb-0.5 min-w-[3em]", children: p.num1 })
-            ] })
-          ) : (
-            // Vertical Standard Layout
-            /* @__PURE__ */ jsxs("div", { className: "inline-flex flex-col items-end", style: { letterSpacing: "0.1em" }, children: [
-              /* @__PURE__ */ jsx("div", { className: "text-right w-full", children: p.num1 }),
-              /* @__PURE__ */ jsxs("div", { className: "text-right w-full border-b-2 border-black relative", children: [
-                /* @__PURE__ */ jsx("span", { className: "absolute left-0 -translate-x-full pr-2", children: getOperatorSymbol(p.operator) }),
-                p.num2
-              ] }),
-              /* @__PURE__ */ jsx("div", { className: "h-16" })
-            ] })
-          ) : (
-            // Horizontal Layout
-            /* @__PURE__ */ jsx("div", { className: "flex items-baseline justify-between border-b border-dashed border-gray-300 pb-1 w-full", children: /* @__PURE__ */ jsxs("span", { children: [
-              p.num1,
-              " ",
-              getOperatorSymbol(p.operator),
-              " ",
-              p.num2,
-              " = "
-            ] }) })
-          ) }, i))
-        }
-      ),
-      problems.length === 0 && /* @__PURE__ */ jsx("div", { className: "print:hidden text-center py-20 text-muted-foreground border-2 border-dashed rounded-lg bg-muted/10", children: "请选择配置并点击“生成试卷”" })
+    /* @__PURE__ */ jsxs("div", { className: "flex-1 flex flex-col min-w-0 overflow-hidden bg-white", children: [
+      /* @__PURE__ */ jsxs("div", { className: "h-12 px-4 border-b flex items-center justify-between bg-muted/30 print:hidden", children: [
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsx(Calculator, { className: "w-4 h-4 text-primary" }),
+          /* @__PURE__ */ jsx("span", { className: "font-medium text-sm", children: "试卷预览" })
+        ] }),
+        /* @__PURE__ */ jsxs(Button, { variant: "outline", onClick: handlePrint, size: "sm", className: "h-8 px-3 text-[13px]", children: [
+          /* @__PURE__ */ jsx(Printer, { className: "mr-2 h-3.5 w-3.5" }),
+          " 打印A4"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: "flex-1 overflow-y-auto p-8", id: "print-area", children: [
+        /* @__PURE__ */ jsxs("div", { className: "text-center mb-8 hidden print:block", children: [
+          /* @__PURE__ */ jsx("h1", { className: "text-2xl font-bold mb-2", children: "口算练习题" }),
+          /* @__PURE__ */ jsxs("div", { className: "flex justify-center gap-8 text-sm text-gray-500", children: [
+            /* @__PURE__ */ jsx("span", { children: "日期：______________" }),
+            /* @__PURE__ */ jsx("span", { children: "用时：______________" }),
+            /* @__PURE__ */ jsx("span", { children: "得分：______________" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsx(
+          "div",
+          {
+            className: `grid w-full ${format === "vertical" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 print:grid-cols-5 gap-x-12 gap-y-12" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-x-12 gap-y-8"}`,
+            children: problems.map((p, i) => /* @__PURE__ */ jsx("div", { className: "font-mono text-xl flex justify-center", style: { breakInside: "avoid" }, children: format === "vertical" ? p.operator === "/" ? (
+              // Vertical Division Layout
+              /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center text-lg", children: [
+                /* @__PURE__ */ jsx("div", { className: "mr-2", children: p.num2 }),
+                /* @__PURE__ */ jsx("div", { className: "border-l border-t border-black px-2 pt-0.5 pb-0.5 min-w-[3em]", children: p.num1 })
+              ] })
+            ) : (
+              // Vertical Standard Layout
+              /* @__PURE__ */ jsxs("div", { className: "inline-flex flex-col items-end", style: { letterSpacing: "0.1em" }, children: [
+                /* @__PURE__ */ jsx("div", { className: "text-right w-full", children: p.num1 }),
+                /* @__PURE__ */ jsxs("div", { className: "text-right w-full border-b-2 border-black relative", children: [
+                  /* @__PURE__ */ jsx("span", { className: "absolute left-0 -translate-x-full pr-2", children: getOperatorSymbol(p.operator) }),
+                  p.num2
+                ] }),
+                /* @__PURE__ */ jsx("div", { className: "h-16" })
+              ] })
+            ) : (
+              // Horizontal Layout
+              /* @__PURE__ */ jsx("div", { className: "flex items-baseline justify-between border-b border-dashed border-gray-300 pb-1 w-full", children: /* @__PURE__ */ jsxs("span", { children: [
+                p.num1,
+                " ",
+                getOperatorSymbol(p.operator),
+                " ",
+                p.num2,
+                " = "
+              ] }) })
+            ) }, i))
+          }
+        ),
+        problems.length === 0 && /* @__PURE__ */ jsxs("div", { className: "print:hidden flex flex-col items-center justify-center h-full text-muted-foreground border-2 border-dashed rounded-lg bg-muted/5 m-4", children: [
+          /* @__PURE__ */ jsx(Calculator, { className: "w-12 h-12 mb-4 opacity-20" }),
+          /* @__PURE__ */ jsx("p", { className: "text-sm", children: "请在左侧配置并点击“生成试卷”" })
+        ] })
+      ] })
     ] }),
     /* @__PURE__ */ jsx("style", { children: `
         @media print {
             @page {
                 size: A4;
-                margin: 20mm;
+                margin: 15mm;
             }
             body {
                 background: white;
@@ -1951,6 +1421,7 @@ function MathGenerator() {
                 margin: 0 !important;
                 padding: 0 !important;
                 display: block !important;
+                overflow: visible !important;
             }
 
             /* Ensure internal grid works */
@@ -1959,7 +1430,6 @@ function MathGenerator() {
             }
             
             /* Neutralize the root layout (Remix/Tailwind specific) */
-            /* This targets the div.relative.flex.min-h-screen in root.tsx */
             body > div {
                 display: block !important;
                 position: static !important;
@@ -1976,12 +1446,12 @@ function MathGenerator() {
       ` })
   ] });
 }
-const route8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: MathGenerator
 }, Symbol.toStringTag, { value: "Module" }));
 function Index() {
-  return /* @__PURE__ */ jsx("div", { className: "flex flex-col items-center justify-center min-h-[calc(100vh-14rem)]", children: /* @__PURE__ */ jsxs("div", { className: "text-center space-y-6 max-w-2xl px-4", children: [
+  return /* @__PURE__ */ jsx("div", { className: "container flex flex-col items-center justify-center min-h-[calc(100vh-14rem)] w-full px-[5px] pt-[5px]", children: /* @__PURE__ */ jsxs("div", { className: "text-center space-y-6 w-full px-0", children: [
     /* @__PURE__ */ jsx("h1", { className: "text-4xl font-bold tracking-tight sm:text-6xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent", children: "Haibin's Docs" }),
     /* @__PURE__ */ jsx("p", { className: "text-lg text-muted-foreground", children: "个人的知识库、工具箱和实验田。" }),
     /* @__PURE__ */ jsxs("div", { className: "flex gap-4 justify-center", children: [
@@ -1990,7 +1460,7 @@ function Index() {
     ] })
   ] }) });
 }
-const route9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route7 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: Index
 }, Symbol.toStringTag, { value: "Module" }));
@@ -2013,90 +1483,101 @@ function AboutPage() {
     }
     parse();
   }, []);
-  return /* @__PURE__ */ jsx("div", { className: "max-w-[1200px] mx-auto px-4 py-6", children: /* @__PURE__ */ jsx(
+  return /* @__PURE__ */ jsx("div", { className: "container relative pb-6 lg:gap-10 lg:pb-8 px-[5px] pt-[5px]", children: /* @__PURE__ */ jsx(
     "article",
     {
-      className: "markdown-body",
+      className: "markdown-body w-full max-w-none",
       style: { fontSize: "13px", backgroundColor: "transparent" },
       dangerouslySetInnerHTML: { __html: htmlContent }
     }
   ) });
 }
-const route10 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: AboutPage
 }, Symbol.toStringTag, { value: "Module" }));
-function Breadcrumbs() {
+const tools = [
+  {
+    title: "Prompt Library",
+    href: "/tools/prompts",
+    icon: Sparkles
+  },
+  {
+    title: "Math Generator",
+    href: "/tools/math",
+    icon: Calculator
+  }
+];
+function ToolsSidebar() {
   const location = useLocation();
-  const pathnames = location.pathname.split("/").filter((x) => x);
-  const getTitle = (value) => {
-    const titleMap = {
-      docs: "文档",
-      notes: "记录",
-      tags: "标签",
-      tools: "工具"
-    };
-    return titleMap[value] || value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, " ");
-  };
-  return /* @__PURE__ */ jsx("div", { className: "mb-4 flex items-center text-sm text-muted-foreground", children: pathnames.map((value, index) => {
-    const title = getTitle(value);
-    const isLast = index === pathnames.length - 1;
-    return /* @__PURE__ */ jsxs("div", { className: "flex items-center", children: [
-      index > 0 && /* @__PURE__ */ jsx(ChevronRight, { className: "h-4 w-4 mx-1" }),
-      /* @__PURE__ */ jsx("span", { className: isLast ? "font-medium text-foreground" : "", children: title })
-    ] }, value + index);
-  }) });
+  const pathname = location.pathname;
+  return /* @__PURE__ */ jsx("aside", { className: "fixed top-[calc(3.5rem+5px)] z-30 -ml-2 hidden h-[calc(100vh-3.5rem-5px)] w-full shrink-0 md:sticky md:block", children: /* @__PURE__ */ jsx("div", { className: "h-full pr-6", children: /* @__PURE__ */ jsx("div", { className: "w-full", children: /* @__PURE__ */ jsx("div", { className: "pb-4", children: /* @__PURE__ */ jsx("div", { className: "grid grid-flow-row auto-rows-max text-sm", children: tools.map((item, index) => /* @__PURE__ */ jsxs(
+    Link,
+    {
+      to: item.href,
+      className: cn(
+        "group flex w-full items-center rounded-md border border-transparent px-2 py-1.5 hover:underline",
+        pathname === item.href || pathname.startsWith(item.href) ? "text-foreground font-medium" : "text-muted-foreground"
+      ),
+      children: [
+        item.icon && /* @__PURE__ */ jsx(item.icon, { className: "mr-2 h-4 w-4" }),
+        item.title
+      ]
+    },
+    index
+  )) }) }) }) }) });
 }
 function ToolsLayout() {
-  return /* @__PURE__ */ jsxs("div", { className: "max-w-[1200px] mx-auto px-4 py-6", children: [
-    /* @__PURE__ */ jsx(Breadcrumbs, {}),
-    /* @__PURE__ */ jsx(Outlet, {})
+  return /* @__PURE__ */ jsxs("div", { className: "container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-2 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-4 px-[5px] pt-[5px]", children: [
+    /* @__PURE__ */ jsx(ToolsSidebar, {}),
+    /* @__PURE__ */ jsx("main", { className: "relative", children: /* @__PURE__ */ jsx(Outlet, {}) })
   ] });
 }
-const route11 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: ToolsLayout
 }, Symbol.toStringTag, { value: "Module" }));
 async function loader() {
   const notesByTag = getNotesByTag();
-  return json({ notesByTag });
+  return json$1({ notesByTag });
 }
 function DocsLayout() {
   var _a;
   const { notesByTag } = useLoaderData();
   const matches = useMatches();
+  const location = useLocation();
   const lastMatch = matches[matches.length - 1];
   const toc = ((_a = lastMatch == null ? void 0 : lastMatch.data) == null ? void 0 : _a.toc) ?? [];
-  return /* @__PURE__ */ jsx("div", { className: "max-w-[1200px] mx-auto px-4 py-6", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-[240px,1fr,260px] gap-8", children: [
-    /* @__PURE__ */ jsxs("aside", { className: "hidden md:block", children: [
-      /* @__PURE__ */ jsxs("div", { className: "text-xs text-muted-foreground mb-2 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsx(FolderOpen, { className: "h-4 w-4" }),
-        "笔记列表"
+  return /* @__PURE__ */ jsxs("div", { className: "container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10 px-[5px] pt-[5px] pb-6", children: [
+    /* @__PURE__ */ jsx("aside", { className: "fixed top-[calc(3.5rem+5px)] z-30 -ml-2 hidden h-[calc(100vh-3.5rem-5px)] w-full shrink-0 md:sticky md:block", children: /* @__PURE__ */ jsx("div", { className: "h-full pr-6", children: /* @__PURE__ */ jsx("div", { className: "w-full", children: /* @__PURE__ */ jsx("div", { className: "space-y-6 overflow-y-auto max-h-[calc(100vh-8rem)] pr-2", children: notesByTag.map(({ tag, notes }) => /* @__PURE__ */ jsxs("div", { children: [
+      /* @__PURE__ */ jsxs("h4", { className: "mb-1 rounded-md px-2 py-1 text-sm font-semibold", children: [
+        tag,
+        " ",
+        /* @__PURE__ */ jsxs("span", { className: "text-muted-foreground font-normal", children: [
+          "(",
+          notes.length,
+          ")"
+        ] })
       ] }),
-      /* @__PURE__ */ jsx("div", { className: "space-y-6 overflow-y-auto max-h-[calc(100vh-160px)] pr-2", children: notesByTag.map(({ tag, notes }) => /* @__PURE__ */ jsxs("div", { children: [
-        /* @__PURE__ */ jsxs("div", { className: "text-[12px] font-semibold mb-2", children: [
-          tag,
-          " ",
-          /* @__PURE__ */ jsxs("span", { className: "text-muted-foreground", children: [
-            "(",
-            notes.length,
-            ")"
-          ] })
-        ] }),
-        /* @__PURE__ */ jsx("div", { className: "space-y-1", children: notes.map((note) => /* @__PURE__ */ jsx(
+      /* @__PURE__ */ jsx("div", { className: "grid grid-flow-row auto-rows-max text-sm", children: notes.map((note) => {
+        const href = `/docs/${encodeURIComponent(note.tag)}/${encodeURIComponent(note.slug)}`;
+        return /* @__PURE__ */ jsx(
           Link,
           {
-            to: `/docs/${encodeURIComponent(note.tag)}/${encodeURIComponent(note.slug)}`,
-            className: "block text-sm text-foreground/80 hover:text-foreground truncate",
+            to: href,
+            className: cn(
+              "group flex w-full items-center rounded-md border border-transparent px-2 py-1.5 hover:underline",
+              location.pathname === href ? "text-foreground font-medium" : "text-muted-foreground"
+            ),
             title: note.title,
             children: note.title
           },
           note.filePath
-        )) })
-      ] }, tag)) })
-    ] }),
-    /* @__PURE__ */ jsx("main", { className: "min-w-0", children: /* @__PURE__ */ jsx(Outlet, {}) }),
-    /* @__PURE__ */ jsx("aside", { className: "hidden lg:block", children: toc.length > 0 && /* @__PURE__ */ jsxs("div", { className: "sticky top-20 border-l pl-6", children: [
+        );
+      }) })
+    ] }, tag)) }) }) }) }),
+    /* @__PURE__ */ jsx("main", { className: "relative min-w-0 mt-[5px]", children: /* @__PURE__ */ jsx(Outlet, {}) }),
+    /* @__PURE__ */ jsx("aside", { className: "fixed top-[calc(3.5rem+5px)] hidden h-[calc(100vh-3.5rem-5px)] w-60 shrink-0 overflow-y-auto border-l pl-6 pt-6 xl:block right-[max(0px,calc(50%-45rem))]", children: toc.length > 0 && /* @__PURE__ */ jsxs("div", { className: "pb-6", children: [
       /* @__PURE__ */ jsx("div", { className: "text-sm font-semibold mb-3", children: "目录" }),
       /* @__PURE__ */ jsx("nav", { className: "text-sm space-y-1.5", children: toc.map((item) => /* @__PURE__ */ jsx(
         "a",
@@ -2109,14 +1590,14 @@ function DocsLayout() {
         item.id
       )) })
     ] }) })
-  ] }) });
+  ] });
 }
-const route12 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route10 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: DocsLayout,
   loader
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client.js", "imports": ["/assets/jsx-runtime.js", "/assets/index4.js", "/assets/index5.js", "/assets/components.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/root.js", "imports": ["/assets/jsx-runtime.js", "/assets/index4.js", "/assets/index5.js", "/assets/components.js", "/assets/index3.js", "/assets/utils.js", "/assets/index6.js", "/assets/Combination.js", "/assets/index7.js", "/assets/index2.js", "/assets/react-icons.esm.js", "/assets/createLucideIcon.js"], "css": [] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug.js", "imports": ["/assets/jsx-runtime.js", "/assets/components.js", "/assets/createLucideIcon.js", "/assets/index5.js", "/assets/index4.js"], "css": ["/assets/github-markdown.css"] }, "routes/tools.project": { "id": "routes/tools.project", "parentId": "routes/tools", "path": "project", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.project.js", "imports": ["/assets/jsx-runtime.js", "/assets/index4.js", "/assets/button.js", "/assets/index3.js", "/assets/index6.js", "/assets/utils.js", "/assets/Combination.js", "/assets/index7.js", "/assets/index.js", "/assets/createLucideIcon.js", "/assets/folder-open.js"], "css": [] }, "routes/tools.prompts": { "id": "routes/tools.prompts", "parentId": "routes/tools", "path": "prompts", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.prompts.js", "imports": ["/assets/jsx-runtime.js", "/assets/button.js", "/assets/input.js", "/assets/utils.js", "/assets/index3.js", "/assets/Combination.js", "/assets/index2.js", "/assets/createLucideIcon.js", "/assets/index4.js"], "css": [] }, "routes/api.projects": { "id": "routes/api.projects", "parentId": "root", "path": "api/projects", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/api.projects.js", "imports": [], "css": [] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index.js", "imports": [], "css": [] }, "routes/api.prompts": { "id": "routes/api.prompts", "parentId": "root", "path": "api/prompts", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/api.prompts.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index.js", "imports": ["/assets/jsx-runtime.js", "/assets/components.js", "/assets/createLucideIcon.js", "/assets/index4.js", "/assets/index5.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math.js", "imports": ["/assets/jsx-runtime.js", "/assets/button.js", "/assets/input.js", "/assets/utils.js", "/assets/index3.js", "/assets/index.js", "/assets/index6.js", "/assets/index2.js", "/assets/react-icons.esm.js", "/assets/createLucideIcon.js", "/assets/index4.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index.js", "imports": ["/assets/jsx-runtime.js", "/assets/button.js", "/assets/components.js", "/assets/utils.js", "/assets/index4.js", "/assets/index5.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about.js", "imports": ["/assets/jsx-runtime.js"], "css": ["/assets/github-markdown.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.js", "imports": ["/assets/jsx-runtime.js", "/assets/index5.js", "/assets/createLucideIcon.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs.js", "imports": ["/assets/jsx-runtime.js", "/assets/components.js", "/assets/folder-open.js", "/assets/index5.js", "/assets/index4.js", "/assets/createLucideIcon.js"], "css": [] } }, "url": "/assets/manifest-18b6bc6d.js", "version": "18b6bc6d" };
+const serverManifest = { "entry": { "module": "/assets/entry.client.js", "imports": ["/assets/jsx-runtime.js", "/assets/index.js", "/assets/components.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/root.js", "imports": ["/assets/jsx-runtime.js", "/assets/index.js", "/assets/components.js", "/assets/createLucideIcon.js", "/assets/utils.js"], "css": [] }, "routes/docs.$tag.$slug": { "id": "routes/docs.$tag.$slug", "parentId": "routes/docs", "path": ":tag/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/docs._tag._slug.js", "imports": ["/assets/jsx-runtime.js", "/assets/components.js", "/assets/index.js"], "css": ["/assets/github-markdown.css"] }, "routes/tools.prompts": { "id": "routes/tools.prompts", "parentId": "routes/tools", "path": "prompts", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.prompts.js", "imports": ["/assets/jsx-runtime.js", "/assets/button.js", "/assets/index2.js", "/assets/utils.js", "/assets/index.js", "/assets/createLucideIcon.js", "/assets/sparkles.js"], "css": [] }, "routes/tools._index": { "id": "routes/tools._index", "parentId": "routes/tools", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools._index.js", "imports": [], "css": [] }, "routes/api.prompts": { "id": "routes/api.prompts", "parentId": "root", "path": "api/prompts", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/api.prompts.js", "imports": [], "css": [] }, "routes/docs._index": { "id": "routes/docs._index", "parentId": "routes/docs", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs._index.js", "imports": ["/assets/jsx-runtime.js", "/assets/components.js", "/assets/createLucideIcon.js", "/assets/index.js"], "css": [] }, "routes/tools.math": { "id": "routes/tools.math", "parentId": "routes/tools", "path": "math", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.math.js", "imports": ["/assets/jsx-runtime.js", "/assets/button.js", "/assets/index2.js", "/assets/utils.js", "/assets/createLucideIcon.js", "/assets/calculator.js", "/assets/index.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index.js", "imports": ["/assets/jsx-runtime.js", "/assets/button.js", "/assets/components.js", "/assets/utils.js", "/assets/index.js"], "css": [] }, "routes/about": { "id": "routes/about", "parentId": "root", "path": "about", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/about.js", "imports": ["/assets/jsx-runtime.js"], "css": ["/assets/github-markdown.css"] }, "routes/tools": { "id": "routes/tools", "parentId": "root", "path": "tools", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/tools.js", "imports": ["/assets/jsx-runtime.js", "/assets/utils.js", "/assets/components.js", "/assets/sparkles.js", "/assets/calculator.js", "/assets/index.js", "/assets/createLucideIcon.js"], "css": [] }, "routes/docs": { "id": "routes/docs", "parentId": "root", "path": "docs", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/docs.js", "imports": ["/assets/jsx-runtime.js", "/assets/utils.js", "/assets/components.js", "/assets/index.js"], "css": [] } }, "url": "/assets/manifest-e43764d0.js", "version": "e43764d0" };
 const mode = "production";
 const assetsBuildDirectory = "build\\client";
 const basename = "/";
@@ -2141,29 +1622,13 @@ const routes = {
     caseSensitive: void 0,
     module: route1
   },
-  "routes/tools.project": {
-    id: "routes/tools.project",
-    parentId: "routes/tools",
-    path: "project",
-    index: void 0,
-    caseSensitive: void 0,
-    module: route2
-  },
   "routes/tools.prompts": {
     id: "routes/tools.prompts",
     parentId: "routes/tools",
     path: "prompts",
     index: void 0,
     caseSensitive: void 0,
-    module: route3
-  },
-  "routes/api.projects": {
-    id: "routes/api.projects",
-    parentId: "root",
-    path: "api/projects",
-    index: void 0,
-    caseSensitive: void 0,
-    module: route4
+    module: route2
   },
   "routes/tools._index": {
     id: "routes/tools._index",
@@ -2171,7 +1636,7 @@ const routes = {
     path: void 0,
     index: true,
     caseSensitive: void 0,
-    module: route5
+    module: route3
   },
   "routes/api.prompts": {
     id: "routes/api.prompts",
@@ -2179,7 +1644,7 @@ const routes = {
     path: "api/prompts",
     index: void 0,
     caseSensitive: void 0,
-    module: route6
+    module: route4
   },
   "routes/docs._index": {
     id: "routes/docs._index",
@@ -2187,7 +1652,7 @@ const routes = {
     path: void 0,
     index: true,
     caseSensitive: void 0,
-    module: route7
+    module: route5
   },
   "routes/tools.math": {
     id: "routes/tools.math",
@@ -2195,7 +1660,7 @@ const routes = {
     path: "math",
     index: void 0,
     caseSensitive: void 0,
-    module: route8
+    module: route6
   },
   "routes/_index": {
     id: "routes/_index",
@@ -2203,7 +1668,7 @@ const routes = {
     path: void 0,
     index: true,
     caseSensitive: void 0,
-    module: route9
+    module: route7
   },
   "routes/about": {
     id: "routes/about",
@@ -2211,7 +1676,7 @@ const routes = {
     path: "about",
     index: void 0,
     caseSensitive: void 0,
-    module: route10
+    module: route8
   },
   "routes/tools": {
     id: "routes/tools",
@@ -2219,7 +1684,7 @@ const routes = {
     path: "tools",
     index: void 0,
     caseSensitive: void 0,
-    module: route11
+    module: route9
   },
   "routes/docs": {
     id: "routes/docs",
@@ -2227,7 +1692,7 @@ const routes = {
     path: "docs",
     index: void 0,
     caseSensitive: void 0,
-    module: route12
+    module: route10
   }
 };
 export {

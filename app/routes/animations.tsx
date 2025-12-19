@@ -39,7 +39,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
     return json({ error: "Title, content and category are required" }, { status: 400 });
   }
 
-  await context.cloudflare.env.DB.prepare(
+  await db.prepare(
     "INSERT INTO animations (title, content, category) VALUES (?, ?, ?)"
   ).bind(title, content, category).run();
 

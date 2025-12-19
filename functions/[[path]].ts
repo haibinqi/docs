@@ -6,11 +6,11 @@ export const onRequest = createPagesFunctionHandler({
   getLoadContext: (context) => {
     return {
       cloudflare: {
-        env: context.env,
-        ctx: context.ctx,
-        caches: context.caches,
-        cf: context.request.cf,
-      }
+        env: context.env || {},
+        ctx: context.ctx || { waitUntil: () => {} },
+        caches: context.caches || null,
+        cf: context.request.cf || null,
+      },
     };
   },
 });

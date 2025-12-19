@@ -26,12 +26,16 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    const cookieHeader = request.headers.get("Cookie");
-    const isOpen = cookieHeader?.includes("sidebar:state=true") ?? true;
-    if (cookieHeader?.includes("sidebar:state=false")) {
-        return json({ defaultOpen: false });
+    try {
+        const cookieHeader = request.headers.get("Cookie");
+        if (cookieHeader?.includes("sidebar:state=false")) {
+            return json({ defaultOpen: false });
+        }
+        return json({ defaultOpen: true });
+    } catch {
+        // Fallback if anything goes wrong with headers
+        return json({ defaultOpen: true });
     }
-    return json({ defaultOpen: true });
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {

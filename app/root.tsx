@@ -15,7 +15,9 @@ import { json } from "@remix-run/cloudflare";
 import tailwindHref from "./tailwind.css?url";
 
 export const headers: HeadersFunction = () => ({
-    "Cache-Control": "public, max-age=0, must-revalidate",
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
 });
 
 export const links: LinksFunction = () => [

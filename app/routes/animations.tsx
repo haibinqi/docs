@@ -3,14 +3,21 @@ import { Outlet, useLoaderData } from "@remix-run/react";
 import { AnimationsSidebar, type AnimationItem } from "@/components/animations-sidebar";
 
 export const loader = async ({ context }: LoaderFunctionArgs) => {
-  if (!context.cloudflare.env.DB) {
+  try {
+    if (!context.cloudflare.env.DB) {
+      console.error("DB binding missing in loader");
+      return json({ animations: [] });
+    }
+
+    const { results } = await context.cloudflare.env.DB.prepare(
+      "SELECT id, title, category FROM animations ORDER BY created_at DESC"
+    ).all<AnimationItem>();
+    return json({ animations: results });
+  } catch (error) {
+    console.error("Error fetching animations:", error);
+    // Return empty list instead of crashing
     return json({ animations: [] });
   }
-
-  const { results } = await context.cloudflare.env.DB.prepare(
-    "SELECT id, title, category FROM animations ORDER BY created_at DESC"
-  ).all<AnimationItem>();
-  return json({ animations: results });
 };
 
 export const action = async ({ request, context }: ActionFunctionArgs) => {

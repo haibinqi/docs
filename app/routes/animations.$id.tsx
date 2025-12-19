@@ -16,15 +16,20 @@ export const loader = async ({ params, context }: LoaderFunctionArgs) => {
     throw new Error("Database binding not found");
   }
 
-  const animation = await context.cloudflare.env.DB.prepare(
-    "SELECT * FROM animations WHERE id = ?"
-  ).bind(id).first();
+  try {
+    const animation = await context.cloudflare.env.DB.prepare(
+      "SELECT * FROM animations WHERE id = ?"
+    ).bind(id).first();
 
-  if (!animation) {
-    throw new Response("Animation Not Found", { status: 404 });
+    if (!animation) {
+      throw new Response("Animation Not Found", { status: 404 });
+    }
+
+    return json({ animation });
+  } catch (error) {
+    console.error(`Error fetching animation ${id}:`, error);
+    throw error;
   }
-
-  return json({ animation });
 };
 
 export const action = async ({ params, context }: ActionFunctionArgs) => {

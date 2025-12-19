@@ -12,13 +12,14 @@ export const meta: MetaFunction = ({ data }) => {
 export const loader = async ({ params, context }: LoaderFunctionArgs) => {
   const { id } = params;
   
-  if (!context?.cloudflare?.env?.DB) {
+  const db = context.cloudflare?.env?.DB;
+  if (!db) {
      console.warn("DB binding missing in detail loader");
      throw new Response("Database Error", { status: 500, statusText: "Database connection failed" });
   }
 
   try {
-    const animation = await context.cloudflare.env.DB.prepare(
+    const animation = await db.prepare(
       "SELECT * FROM animations WHERE id = ?"
     ).bind(id).first();
 
@@ -35,11 +36,12 @@ export const loader = async ({ params, context }: LoaderFunctionArgs) => {
 
 export const action = async ({ params, context }: ActionFunctionArgs) => {
   const { id } = params;
-  if (!context.cloudflare.env.DB) {
+  const db = context.cloudflare?.env?.DB;
+  if (!db) {
       throw new Error("Database binding not found");
   }
   
-  await context.cloudflare.env.DB.prepare(
+  await db.prepare(
       "DELETE FROM animations WHERE id = ?"
   ).bind(id).run();
   

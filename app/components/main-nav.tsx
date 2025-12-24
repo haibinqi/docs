@@ -40,13 +40,14 @@ export function MainNav() {
         </DropdownMenu>
 
         <Link
-          to="/docs"
+          // to="/docs"
+          to="https://starlight-53z.pages.dev/"
           className={cn(
             "transition-colors hover:text-foreground/80",
             pathname.startsWith("/docs") ? "text-foreground" : "text-foreground/60"
           )}
         >
-          文档
+          我的文档
         </Link>
         <Link
           to="/tools/prompts"
